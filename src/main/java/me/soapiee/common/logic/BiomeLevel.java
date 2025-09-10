@@ -1,6 +1,7 @@
 package me.soapiee.common.logic;
 
 import me.soapiee.common.BiomeMastery;
+import me.soapiee.common.logic.events.LevelUpEvent;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
 

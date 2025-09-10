@@ -1,4 +1,4 @@
-package me.soapiee.common.logic;
+package me.soapiee.common.logic.events;
 
 import org.bukkit.OfflinePlayer;
 import org.bukkit.event.Cancellable;

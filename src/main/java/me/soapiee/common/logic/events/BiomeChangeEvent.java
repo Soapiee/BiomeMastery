@@ -1,4 +1,4 @@
-package me.soapiee.common.logic;
+package me.soapiee.common.logic.events;
 
 import org.bukkit.block.Biome;
 import org.bukkit.entity.Player;
