@@ -6,8 +6,6 @@ import me.soapiee.common.util.Logger;
 import me.soapiee.common.util.Message;
 import me.soapiee.common.util.PlayerCache;
 import me.soapiee.common.util.Utils;
-import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -49,52 +47,7 @@ public class AdminCmd implements CommandExecutor, TabCompleter {
 //            OfflinePlayer target = this.playerCache.getOfflinePlayer(args[1]);
 
         if (args.length == 1) {
-            switch (args[0]) {
-                case "reload":
-                    if (!sender.hasPermission("admin.reload")) {
-                        sender.sendMessage(Utils.colour(messageManager.get(Message.NOPERMISSION)));
-                        return true;
-                    }
-                    sender.sendMessage(Utils.colour(messageManager.get(Message.RELOADINPROGRESS)));
-                    this.main.reloadConfig();
-                    if (!this.messageManager.load()) {
-                        sender.sendMessage(Utils.colour(messageManager.get(Message.RELOADERROR)));
-                        return true;
-                    }
-                    String message = Utils.colour(messageManager.get(Message.RELOADSUCCESS));
-                    sender.sendMessage(message);
-                    Bukkit.getConsoleSender().sendMessage(message.replace("S", "s"));
-                    return true;
 
-                case "contents":
-                    sender.sendMessage(ChatColor.YELLOW + "Configuration contents:");
-                    sender.sendMessage("Number: " + main.getConfig().getDouble("Number"));
-
-                    if (this.main.getConfig().getBoolean("Boolean")) {
-                        sender.sendMessage(this.main.getConfig().getString("PositiveMessage"));
-                    } else {
-                        sender.sendMessage(this.main.getConfig().getString("NegativeMessage"));
-                    }
-                    return true;
-                case "upgrades":
-                    sender.sendMessage(ChatColor.YELLOW + "Upgrades:");
-                    for (String category : this.main.getConfig().getConfigurationSection("Upgrades").getKeys(false)) {
-                        for (String upgradeName : this.main.getConfig().getConfigurationSection("Upgrades." + category).getKeys(false)) {
-                            sender.sendMessage(category + "_" + upgradeName);
-                        }
-                    }
-                    return true;
-                case "change":
-                    if (this.main.getConfig().getBoolean("Boolean")) {
-                        this.main.getConfig().set("Boolean", false);
-                    } else {
-                        this.main.getConfig().set("Boolean", true);
-                    }
-                    this.main.saveConfig();
-                    return true;
-                default:
-                    return false;
-            }
         }
         return false;
     }
