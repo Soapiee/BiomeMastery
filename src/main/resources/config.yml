@@ -17,9 +17,12 @@ default_settings:
   enabled_worlds:
     - 'exampleworld'
 
+  # Set this to false if you want to use the blacklist list as a blacklist
   # Set this to true if you want to use the blacklist list as a whitelist instead
   use_blacklist_as_whitelist: false
-  # Biomes that you don't want rewards for
+
+  # If the above setting is false: List biomes that you DON'T want rewards for
+  # If the above setting is true: List biomes that you DO want rewards for
   biomes_blacklist:
     - DEEP_COLD_OCEAN
 
@@ -30,12 +33,12 @@ default_settings:
     '1':
       type: temporary # Valid types: temporary or permanent
       target_duration: 60 # seconds
-      reward_type: potion # Valid types: potion, effect, item, permission, command, xp, currency
+      reward_type: potion # Valid types: potion, effect, item, permission, command, experience, currency
       reward_item: haste:2 #potion effect:amplifier:duration
     '2':
       type: temporary # Valid types: temporary or permanent
       target_duration: 60 # seconds
-      reward_type: potion # Valid types: potion, effect, item, permission, command, xp, currency
+      reward_type: potion # Valid types: potion, effect, item, permission, command, experience, currency
       reward_item: haste:2 #potion effect:amplifier:duration
 
 

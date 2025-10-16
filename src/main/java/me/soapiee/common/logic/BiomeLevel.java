@@ -14,6 +14,7 @@ public class BiomeLevel {
     private final DataManager dataManager;
     private final OfflinePlayer player;
 
+    private BiomeData biomeData;
     private int level;
     private int progress;
     private LocalDateTime entryTime;
@@ -21,6 +22,7 @@ public class BiomeLevel {
     public BiomeLevel(BiomeMastery main, OfflinePlayer player, BiomeData biomeData, int level, int progress) throws NullPointerException {
         dataManager = main.getDataManager();
         this.player = player;
+        this.biomeData = biomeData;
         this.level = level;
         this.progress = progress;
 
@@ -53,7 +55,7 @@ public class BiomeLevel {
     }
 
     private void checkLevelUp() {
-        int targetTime = dataManager.getBiomeData(Biome).getTargetTime();
+        int targetTime = biomeData.getTargetDuration(level);
         if (progress < targetTime) return;
 
         while (progress >= targetTime) {

@@ -45,6 +45,12 @@ public class VaultHook {
         return economy.depositPlayer(target, amount).errorMessage;
     }
 
+    public String getCurrencyName() {
+        if (!hasEconomyPlugin()) return null;
+
+        return economy.currencyNamePlural();
+    }
+
     public Boolean setPermission(OfflinePlayer target, String permission) {
         if (!hasPermissionPlugin())
             throw new UnsupportedOperationException("Vault Permission Plugin not found. You need to install vault for this to work properly");

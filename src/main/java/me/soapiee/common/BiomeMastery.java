@@ -29,7 +29,7 @@ public final class BiomeMastery extends JavaPlugin {
     //TODO:
     // A list of recorded biomes is created on server load (if blacklist, all biomes are added, then the blacklisted ones are removed)
     //    (if whitelist is used, only those in the whitelist are added)
-    //    error check: make sure all specificed biomes fit in the list created. If not, throw error
+    //    error check: make sure all specified biomes fit in the list created. If not, throw error
     // -
     // On player join,
     //     Biome is establised. Biome is checked against recorded biomes list.

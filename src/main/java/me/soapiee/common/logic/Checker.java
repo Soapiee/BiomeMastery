@@ -37,13 +37,13 @@ public class Checker extends BukkitRunnable {
             BiomeLevel playerLevel = dataManager.getPlayerData(player.getUniqueId()).getBiomeData(playerBiome);
             int currentProgress = playerLevel.getProgress();
             //int totalProgress = difference between: playerLevel.getEntryTime() + LocalDateTime.now();
-            if (//totalProgress is more than biome targetTime){
-            playerLevel.addProgress(totalProgress);
-        }
+//            if (//totalProgress is more than biome targetTime){
+//            playerLevel.addProgress(totalProgress)){};
 
+
+        }
+        // Get a list of all players
+        // Loop the list and check their current progress value
+        // If progress is above threshold, level them up
     }
-    // Get a list of all players
-    // Loop the list and check their current progress value
-    // If progress is above threshold, level them up
-}
 }

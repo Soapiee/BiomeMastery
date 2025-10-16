@@ -84,7 +84,7 @@ public class PlayerData {
         for (Biome biome : Biome.values()) {
             int level = contents.getInt(biome + ".Level");
             int progress = contents.getInt(biome + ".Progress");
-            BiomeLevel biomeLevel = new BiomeLevel(main, player, level, progress);
+            BiomeLevel biomeLevel = new BiomeLevel(main, player, dataManager.getBiomeData(biome));
 
             biomesMap.put(biome, biomeLevel);
         }
@@ -108,7 +108,7 @@ public class PlayerData {
                         for (String biome : biomes) {
                             localCopy.set(biome + ".Level", 0);
                             localCopy.set(biome + ".Progress", 0);
-                            biomesMap.put(Biome.valueOf(biome), new BiomeLevel(main, offlinePlayer));
+//                            biomesMap.put(Biome.valueOf(biome), new BiomeLevel(main, offlinePlayer, dataManager.getBiomeData(Biome.valueOf(biome))));
                         }
 
                         localCopy.save(file);
@@ -183,19 +183,19 @@ public class PlayerData {
                         createStatement.setInt(3, 0);
                         createStatement.executeUpdate();
                     }
-                    biomeLevel = new BiomeLevel(main, player);
-                    Bukkit.getScheduler().runTask(main, () -> callback.onQueryDone(player, biomeLevel, null));
+//                    biomeLevel = new BiomeLevel(main, player);
+//                    Bukkit.getScheduler().runTask(main, () -> callback.onQueryDone(player, biomeLevel, null));
                     return;
                 }
 
                 //Get data
                 int level = results.getInt("LEVEL");
                 int progress = results.getInt("PROGRESS");
-                biomeLevel = new BiomeLevel(main, player, level, progress);
+//                biomeLevel = new BiomeLevel(main, player, );
 
-                Bukkit.getScheduler().runTask(main, () -> callback.onQueryDone(player, biomeLevel, null));
+//                Bukkit.getScheduler().runTask(main, () -> callback.onQueryDone(player, biomeLevel, null));
             } catch (SQLException e) {
-                Bukkit.getScheduler().runTask(main, () -> callback.onQueryDone(player, null, e));
+//                Bukkit.getScheduler().runTask(main, () -> callback.onQueryDone(player, null, e));
             }
         });
     }
