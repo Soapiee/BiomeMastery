@@ -3,7 +3,7 @@ package me.soapiee.common.logic;
 import me.soapiee.common.BiomeMastery;
 import me.soapiee.common.data.DataManager;
 import org.bukkit.Bukkit;
-import org.bukkit.Location;
+import org.bukkit.World;
 import org.bukkit.block.Biome;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -13,7 +13,7 @@ import java.util.List;
 public class Checker extends BukkitRunnable {
 
     private final DataManager dataManager;
-    private final List<String> enabledWorlds;
+    private final List<World> enabledWorlds;
 
     public Checker(BiomeMastery main, long delay) {
         dataManager = main.getDataManager();
@@ -23,16 +23,13 @@ public class Checker extends BukkitRunnable {
 
     @Override
     public void run() {
-
         for (Player player : Bukkit.getOnlinePlayers()) {
-            Location location = player.getLocation();
 
-            //Check player is in an enabled world
-            if (!enabledWorlds.contains(location.getWorld().getName())) return;
+            World playerWorld = player.getWorld();
+            if (!dataManager.playerInEnabledWorld(playerWorld)) return;
 
-            //Check player is in an enabled biome
-            Biome playerBiome = location.getBlock().getBiome();
-            if (!enabledWorlds.contains(playerBiome.toString())) return;
+            Biome playerBiome = player.getLocation().getBlock().getBiome();
+            if (!dataManager.playerInEnabledBiome(playerBiome)) return;
 
             BiomeLevel playerLevel = dataManager.getPlayerData(player.getUniqueId()).getBiomeData(playerBiome);
             int currentProgress = playerLevel.getProgress();

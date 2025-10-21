@@ -15,7 +15,7 @@ default_settings:
 
   # List the worlds you want this plugin to work on
   enabled_worlds:
-    - 'exampleworld'
+    - 'world'
 
   # Set this to false if you want to use the blacklist list as a blacklist
   # Set this to true if you want to use the blacklist list as a whitelist instead

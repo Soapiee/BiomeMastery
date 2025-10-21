@@ -9,8 +9,10 @@ import me.soapiee.common.logic.Checker;
 import me.soapiee.common.manager.MessageManager;
 import me.soapiee.common.util.Logger;
 import me.soapiee.common.util.Utils;
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
+import org.bukkit.World;
 import org.bukkit.block.Biome;
 import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.ConfigurationSection;
@@ -35,13 +37,14 @@ public class DataManager {
     private final Logger logger;
     private final VaultHook vaultHook;
     private final FileConfiguration config;
+    private boolean debugMode;
 
     private String dataSaveType;
     private HikariCPConnection database;
 
     private final HashMap<UUID, PlayerData> playerDataMap = new HashMap<>();
     private final HashMap<Biome, BiomeData> biomeDataMap = new HashMap<>();
-    private final List<String> enabledWorlds = new ArrayList<>();
+    private final List<World> enabledWorlds = new ArrayList<>();
     private final List<Biome> enabledBiomes = new ArrayList<>();
     private final HashMap<Integer, Integer> defaultLevels = new HashMap<>();
     private final HashMap<Integer, Reward> defaultRewards = new HashMap<>();
@@ -51,11 +54,13 @@ public class DataManager {
     public DataManager(FileConfiguration config,
                        MessageManager messageManager,
                        VaultHook vaultHook,
-                       Logger logger) {
+                       Logger logger,
+                       boolean debugMode) {
         this.messageManager = messageManager;
         this.logger = logger;
         this.vaultHook = vaultHook;
         this.config = config;
+        this.debugMode = debugMode;
     }
 
     public void initialise(BiomeMastery main) throws IOException, SQLException, CommunicationException {
@@ -74,9 +79,12 @@ public class DataManager {
     }
 
     public void loadData(BiomeMastery main, CommandSender sender) {
+        this.debugMode = main.getDebugMode();
         setDefaultSettings(sender);
         createBiomeData(sender);
         startChecker(main);
+//        main.getPlayerListener().setEnabledWorlds(enabledWorlds);
+//        main.getPlayerListener().setEnabledBiomes(enabledBiomes);
     }
 
     private void setDefaultSettings(CommandSender sender) {
@@ -84,7 +92,15 @@ public class DataManager {
 
         //Create list of enabled worlds
         enabledWorlds.clear();
-        enabledWorlds.addAll(config.getStringList("default_settings.enabled_worlds"));
+        ArrayList<World> worldList = new ArrayList<>();
+        boolean worldsListExists = config.isSet("default_settings.enabled_worlds");
+        if (worldsListExists) {
+            for (String worldString : config.getStringList("default_settings.enabled_worlds")) {
+                World world = Bukkit.getWorld(worldString);
+                if (world != null) worldList.add(world);
+            }
+        }
+        enabledWorlds.addAll(worldList);
 
         //Create default levels + rewards
         defaultLevels.clear();
@@ -140,7 +156,10 @@ public class DataManager {
     private void createBiomeData(CommandSender sender) {
         //Loops through the list of enabled biomes. Find it in the biomes config section, if it doesnt exist then set default settings
         for (Biome enabledBiome : enabledBiomes) {
+            if (debugMode) Utils.consoleMsg("&eEnabled biome: " + enabledBiome.name());
+
             boolean isDefault = config.getConfigurationSection("biomes." + enabledBiome.name()) == null;
+            if (debugMode) Utils.consoleMsg("&eIs default: " + isDefault);
 
             BiomeData biomeData = new BiomeData(this, config, enabledBiome, isDefault, sender);
             biomeDataMap.put(enabledBiome, biomeData);
@@ -151,8 +170,10 @@ public class DataManager {
         RewardType rewardType;
         try {
             rewardType = RewardType.valueOf(config.getString(path + "reward_type").toUpperCase());
-        } catch (IllegalArgumentException ex) {
+        } catch (NullPointerException | IllegalArgumentException e) {
             rewardType = RewardType.NONE;
+            String[] pathParts = path.split("\\.");
+            logger.logToPlayer(sender, e, "&cBiome " + pathParts[1] + " at level " + pathParts[2] + " has an invalid reward type");
         }
 
         switch (rewardType) {
@@ -178,7 +199,6 @@ public class DataManager {
                 return commandReward(sender, path);
         }
 
-        logger.logToPlayer(sender, null, "&c" + rewardType + " is not a valid reward type");
         return new NullReward();
     }
 
@@ -188,9 +208,14 @@ public class DataManager {
         int amplifier;
 
         try {
-            potionType = PotionType.valueOf(potionParts[0].toUpperCase());
             amplifier = Integer.parseInt(potionParts[1]);
-        } catch (IllegalArgumentException ex) {
+            potionType = PotionType.valueOf(potionParts[0].toUpperCase());
+        } catch (IllegalArgumentException error) {
+            if (error instanceof NumberFormatException)
+                createLog(sender, path, error, "potion amplifier value");
+            else
+                createLog(sender, path, error, "potion type");
+
             return new NullReward();
         }
 
@@ -201,8 +226,9 @@ public class DataManager {
         EffectType effectType;
 
         try {
-            effectType = EffectType.valueOf(config.getString(path + "reward_item"));
-        } catch (IllegalArgumentException ex) {
+            effectType = EffectType.valueOf(config.getString(path + "reward_item").toUpperCase());
+        } catch (IllegalArgumentException error) {
+            createLog(sender, path, error, "effect type");
             return new NullReward();
         }
 
@@ -211,7 +237,7 @@ public class DataManager {
 
     private Reward currencyReward(CommandSender sender, String path) {
         if (vaultHook == null) {
-//            logger.logToPlayer(sender, null, ChatColor.RED + "Cannot give currency rewards as Vault could not be hooked into");
+            createLog(sender, path, null, "vault hook");
             return new NullReward();
         }
 
@@ -220,8 +246,13 @@ public class DataManager {
 
         try {
             money = Double.parseDouble(rawDouble);
-        } catch (IllegalArgumentException ex) {
-//            logger.logToPlayer(sender, ex, "&c" + rawDouble + " is not a valid number");
+        } catch (IllegalArgumentException error) {
+            createLog(sender, path, error, "amount");
+            return new NullReward();
+        }
+
+        if (money <= 0) {
+            createLog(sender, path, null, "amount");
             return new NullReward();
         }
 
@@ -234,10 +265,16 @@ public class DataManager {
 
         try {
             experience = Integer.parseInt(rawInt);
-        } catch (IllegalArgumentException ex) {
-            logger.logToPlayer(sender, ex, "&c" + rawInt + " is not a valid number");
+        } catch (IllegalArgumentException error) {
+            createLog(sender, path, error, "amount");
             return new NullReward();
         }
+
+        if (experience <= 0) {
+            createLog(sender, path, null, "amount");
+            return new NullReward();
+        }
+
         return new ExperienceReward(experience);
     }
 
@@ -245,18 +282,20 @@ public class DataManager {
         ArrayList<ItemStack> itemList = new ArrayList<>();
         String[] itemParts;
         Material material;
-        int amount;
+        int quantity;
 
         if (config.isString(path + "reward_item")) {
             itemParts = config.getString(path + "reward_item").split(":");
             try {
                 material = Material.valueOf(itemParts[0].toUpperCase());
-                amount = Integer.parseInt(itemParts[1].replace(":", ""));
-                itemList.add(new ItemStack(material, amount));
-            } catch (NullPointerException ex) {
-                logger.logToPlayer(sender, ex, "&c" + itemParts[0] + " is not a valid material");
-            } catch (NumberFormatException ex) {
-                logger.logToPlayer(sender, ex, "&c" + itemParts[1] + " is not a valid number");
+                quantity = Integer.parseInt(itemParts[1].replace(":", ""));
+                itemList.add(new ItemStack(material, quantity));
+            } catch (IllegalArgumentException | NullPointerException error) {
+
+                if (error instanceof NumberFormatException)
+                    createLog(sender, path, error, "quantity");
+                else
+                    createLog(sender, path, error, "material");
             }
         }
 
@@ -265,14 +304,15 @@ public class DataManager {
                 itemParts = rawItemString.split(":");
                 try {
                     material = Material.valueOf(itemParts[0].toUpperCase());
-                    amount = Integer.parseInt(itemParts[1].replace(":", ""));
-                    itemList.add(new ItemStack(material, amount));
-                } catch (NullPointerException ex) {
-                    logger.logToPlayer(sender, ex, "&c" + itemParts[0] + " is not a valid material");
-                } catch (NumberFormatException ex) {
-                    logger.logToPlayer(sender, ex, "&c" + itemParts[1] + " is not a valid number");
-                }
+                    quantity = Integer.parseInt(itemParts[1].replace(":", ""));
+                    itemList.add(new ItemStack(material, quantity));
+                } catch (IllegalArgumentException | NullPointerException error) {
 
+                    if (error instanceof NumberFormatException)
+                        createLog(sender, path, error, "quantity");
+                    else
+                        createLog(sender, path, error, "material");
+                }
             }
         }
 
@@ -287,12 +327,13 @@ public class DataManager {
         if (config.isString(path + "reward_item"))
             permissionList.add(config.getString(path + "reward_item"));
 
-
         if (config.isList(path + "reward_item"))
             permissionList.addAll(config.getStringList(path + "reward_item"));
 
-
-        if (permissionList.isEmpty()) return new NullReward();
+        if (permissionList.isEmpty()) {
+            createLog(sender, path, null, "permission");
+            return new NullReward();
+        }
 
         return new PermissionReward(vaultHook, permissionList);
     }
@@ -303,15 +344,22 @@ public class DataManager {
         if (config.isString(path + "reward_item"))
             commandList.add(config.getString(path + "reward_item"));
 
-
         if (config.isList(path + "reward_item"))
             commandList.addAll(config.getStringList(path + "reward_item"));
 
-
-        if (commandList.isEmpty()) return new NullReward();
+        if (commandList.isEmpty()) {
+            createLog(sender, path, null, "command");
+            return new NullReward();
+        }
 
         return new CommandReward(commandList);
+    }
 
+    private void createLog(CommandSender sender, String path, Exception error, String invalidObject) {
+        String[] pathParts = path.split("\\.");
+        logger.logToPlayer(sender, error, "&cBiome "
+                + (pathParts[1].equals("levels") ? "&edefault&c" : pathParts[1])
+                + " at level " + pathParts[2] + " has an invalid " + invalidObject);
     }
 
     public void startChecker(BiomeMastery main) {
@@ -349,8 +397,24 @@ public class DataManager {
         return updateInterval;
     }
 
-    public List<String> getEnabledWorlds() {
+    public List<World> getEnabledWorlds() {
         return enabledWorlds;
+    }
+
+    public boolean playerInEnabledWorld(World world) {
+        for (World enabledWorlds : enabledWorlds) {
+            if (enabledWorlds == world) return true;
+        }
+
+        return false;
+    }
+
+    public boolean playerInEnabledBiome(Biome biome) {
+        for (Biome enabledBiome : enabledBiomes) {
+            if (enabledBiome == biome) return true;
+        }
+
+        return false;
     }
 
     public BiomeData getBiomeData(Biome biome) {

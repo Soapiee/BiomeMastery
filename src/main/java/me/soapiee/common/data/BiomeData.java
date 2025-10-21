@@ -29,10 +29,10 @@ public class BiomeData {
         } else {
             String biomeName = biome.name();
 
-            for (String key : config.getConfigurationSection("Biomes." + biomeName).getKeys(false)) {
+            for (String key : config.getConfigurationSection("biomes." + biomeName).getKeys(false)) {
                 int level = Integer.parseInt(key);
-                levels.put(level, config.getInt("Biomes." + biomeName + "." + level + ".target_duration"));
-                rewards.put(level, dataManager.createReward(sender, "Biomes." + biomeName + "." + level + "."));
+                levels.put(level, config.getInt("biomes." + biomeName + "." + level + ".target_duration"));
+                rewards.put(level, dataManager.createReward(sender, "biomes." + biomeName + "." + level + "."));
             }
         }
     }

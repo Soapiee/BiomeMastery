@@ -12,6 +12,7 @@ import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.inventory.ItemFactory;
 import org.bukkit.inventory.ItemStack;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -31,6 +32,7 @@ public class DataManagerTest {
     private Logger mockLogger;
     private MessageManager mockMessageManager;
     private VaultHook mockVaultHook;
+    private MockedStatic<Bukkit> mockedBukkit;
 
     private DataManager dataManager;
 
@@ -50,16 +52,19 @@ public class DataManagerTest {
         when(mockMain.getVaultHook()).thenReturn(mockVaultHook);
 
         // mock Bukkit static methods
-        MockedStatic<Bukkit> mockedBukkit = Mockito.mockStatic(Bukkit.class);
+        mockedBukkit = Mockito.mockStatic(Bukkit.class);
         mockedBukkit.when(Bukkit::getConsoleSender).thenReturn(mockConsoleSender);
 
-        dataManager = new DataManager(mockConfig, mockMessageManager, mockVaultHook, mockLogger);
+        dataManager = new DataManager(mockConfig, mockMessageManager, mockVaultHook, mockLogger, false);
+    }
+
+    @AfterEach
+    void afterEach() {
+        mockedBukkit.close();
     }
 
     @Test
     void testDataManagerInitialization() {
-        DataManager dataManager = new DataManager(mockConfig, mockMessageManager, mockVaultHook, mockLogger);
-
         assertNotNull(dataManager);
     }
 
@@ -105,7 +110,7 @@ public class DataManagerTest {
 
     @Test
     public void givenTypePotion_whenCreateReward_thenReturnPotionReward() {
-        String path = "test.";
+        String path = "biome.plains.1";
         when(mockConfig.getString(path + "reward_type")).thenReturn("potion");
         when(mockConfig.getString(path + "reward_item")).thenReturn("jump:1");
 
@@ -116,12 +121,18 @@ public class DataManagerTest {
 
     @Test
     public void givenTypeEffect_whenCreateReward_thenReturnEffectReward() {
+        String path = "biome.plains.1";
+        when(mockConfig.getString(path + "reward_type")).thenReturn("effect");
+        when(mockConfig.getString(path + "reward_item")).thenReturn("night_vision");
 
+        Reward actualValue = dataManager.createReward(Bukkit.getConsoleSender(), path);
+
+        Assertions.assertInstanceOf(EffectReward.class, actualValue);
     }
 
     @Test
     public void givenTypeCurrency_whenCreateReward_thenReturnCurrencyReward() {
-        String path = "test.";
+        String path = "biome.plains.1";
         when(mockConfig.getString(path + "reward_type")).thenReturn("Currency");
         when(mockConfig.getString(path + "reward_item")).thenReturn("200");
 
@@ -132,7 +143,7 @@ public class DataManagerTest {
 
     @Test
     public void givenTypeExperience_whenCreateReward_thenReturnExperienceReward() {
-        String path = "test.";
+        String path = "biome.plains.1";
         when(mockConfig.getString(path + "reward_type")).thenReturn("Experience");
         when(mockConfig.getString(path + "reward_item")).thenReturn("10");
 
@@ -165,7 +176,7 @@ public class DataManagerTest {
     @Test
     public void givenTypeItem_whenCreateReward_thenReturnItemReward() {
         when(Bukkit.getItemFactory()).thenReturn(mock(ItemFactory.class));
-        String path = "test.";
+        String path = "biome.plains.1";
         when(mockConfig.isString(path + "reward_item")).thenReturn(true);
         when(mockConfig.isList(path + "reward_item")).thenReturn(false);
         when(mockConfig.getString(path + "reward_type")).thenReturn("item");
@@ -180,7 +191,7 @@ public class DataManagerTest {
 
     @Test
     public void givenTypePermission_whenCreateReward_thenReturnPermissionReward() {
-        String path = "test.";
+        String path = "biome.plains.1";
         when(mockConfig.isString(path + "reward_item")).thenReturn(false);
         when(mockConfig.isList(path + "reward_item")).thenReturn(true);
         when(mockConfig.getString(path + "reward_type")).thenReturn("Permission");
@@ -197,7 +208,7 @@ public class DataManagerTest {
 
     @Test
     public void givenTypeCommand_whenCreateReward_thenReturnCommandReward() {
-        String path = "test.";
+        String path = "biome.plains.1";
         when(mockConfig.isString(path + "reward_item")).thenReturn(true);
         when(mockConfig.isList(path + "reward_item")).thenReturn(false);
         when(mockConfig.getString(path + "reward_type")).thenReturn("command");
@@ -210,7 +221,7 @@ public class DataManagerTest {
 
     @Test
     public void givenInvalidType_whenCreateReward_thenReturnNullReward() {
-        String path = "test.";
+        String path = "biome.plains.1";
         when(mockConfig.getString(path + "reward_type")).thenReturn("currency");
         when(mockConfig.getString(path + "reward_item")).thenReturn("abc");
 

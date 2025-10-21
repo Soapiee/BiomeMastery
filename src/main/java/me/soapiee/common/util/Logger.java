@@ -1,6 +1,7 @@
 package me.soapiee.common.util;
 
 import me.soapiee.common.BiomeMastery;
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -40,24 +41,50 @@ public class Logger {
             Date dt = new Date();
             SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
             String time = df.format(dt);
+            writer.write("--------------------------------------------------------------------------------------------------");
+            writer.write(System.lineSeparator());
             writer.write(time + " [" + logType.name() + "] " + string);
-            Utils.consoleMsg(ChatColor.RED + "An error has been added to the logger.log file");
+            writer.write(System.lineSeparator());
+            writer.write("BiomeMastery Version: " + Bukkit.getPluginManager().getPlugin("BiomeMastery").getDescription().getVersion());
+            writer.write(System.lineSeparator());
+            writer.write("Server Version: " + Bukkit.getBukkitVersion());
+            writer.write(System.lineSeparator());
             if (error != null) {
                 writer.write(System.lineSeparator());
                 error.printStackTrace(writer);
             }
+            writer.write("--------------------------------------------------------------------------------------------------");
+            writer.write(System.lineSeparator());
+            writer.write(System.lineSeparator());
             writer.close();
+            Utils.consoleMsg(ChatColor.RED + "An error has been added to the logger.log file");
         } catch (IOException e) {
             Utils.consoleMsg(ChatColor.RED + "There was an error whilst writing to the logger file");
         }
     }
 
     public void logToPlayer(CommandSender sender, Exception error, String string) {
-        logToFile(error, string);
+        if (!string.contains(" successfully created")) logToFile(error, string);
+
+        if (sender == null) return;
+        if (string.isEmpty()) return;
 
         if (sender instanceof Player)
-            if (((Player) sender).isOnline())
+            if (((Player) sender).isOnline()) {
                 sender.sendMessage(Utils.colour(string));
+            }
+    }
+
+    public void onlyLogToPlayer(CommandSender sender, String string) {
+        if (string.isEmpty()) return;
+
+        if (sender instanceof Player)
+            if (((Player) sender).isOnline()) {
+                sender.sendMessage(Utils.colour(string));
+                return;
+            }
+
+        Utils.consoleMsg(string);
     }
 
     enum LogType {

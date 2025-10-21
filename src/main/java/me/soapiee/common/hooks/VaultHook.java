@@ -19,15 +19,13 @@ public class VaultHook {
     private void setupEconomy() {
         final RegisteredServiceProvider<Economy> rsp = Bukkit.getServicesManager().getRegistration(Economy.class);
 
-        if (rsp != null)
-            economy = rsp.getProvider();
+        if (rsp != null) economy = rsp.getProvider();
     }
 
     private void setupPermissions() {
         RegisteredServiceProvider<Permission> rsp = Bukkit.getServicesManager().getRegistration(Permission.class);
 
-        if (rsp != null)
-            permissions = rsp.getProvider();
+        if (rsp != null) permissions = rsp.getProvider();
     }
 
     public boolean hasEconomyPlugin() {

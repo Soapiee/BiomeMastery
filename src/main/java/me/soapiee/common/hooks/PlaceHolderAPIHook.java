@@ -17,7 +17,7 @@ public class PlaceHolderAPIHook extends PlaceholderExpansion {
 
     @Override
     public @NotNull String getIdentifier() {
-        return "tfquiz";
+        return "biomemastery";
     }
 
     @Override

@@ -14,7 +14,7 @@ public class Utils {
 
     public static void consoleMsg(String message) {
         String prefix = "[" + Bukkit.getServer().getPluginManager().getPlugin("BiomeMastery").getDescription().getPrefix() + "]";
-        Bukkit.getConsoleSender().sendMessage(prefix + " " + message);
+        Bukkit.getConsoleSender().sendMessage(colour(prefix + " " + message));
     }
 
     public static String colour(String message) { // 1.8 and above

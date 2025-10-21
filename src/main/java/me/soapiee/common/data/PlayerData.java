@@ -84,7 +84,7 @@ public class PlayerData {
         for (Biome biome : Biome.values()) {
             int level = contents.getInt(biome + ".Level");
             int progress = contents.getInt(biome + ".Progress");
-            BiomeLevel biomeLevel = new BiomeLevel(main, player, dataManager.getBiomeData(biome));
+            BiomeLevel biomeLevel = new BiomeLevel(player, dataManager.getBiomeData(biome), level, progress);
 
             biomesMap.put(biome, biomeLevel);
         }
