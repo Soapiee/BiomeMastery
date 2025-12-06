@@ -6,7 +6,7 @@ import me.soapiee.common.logic.rewards.types.EffectReward;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
 
-import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -14,36 +14,51 @@ public interface Effect {
 
     EffectType getType();
 
-    List<EffectType> getConflicts();
+    HashSet<EffectType> getConflicts();
 
-    String getIdentifier();
+    default Effect hasConflict(PlayerData playerData) {
+        if (getConflicts().isEmpty()) return null;
 
-    default boolean hasConflict(PlayerData playerData) {
-        if (getConflicts().isEmpty()) return false;
-
-        List<EffectReward> activeEffects = playerData.getActiveRewards().stream()
-                .filter(r -> r.getType() == RewardType.EFFECT)
-                .map(r -> (EffectReward) r)
-                .collect(Collectors.toList());
-        if (activeEffects.isEmpty()) return false;
+        List<EffectReward> activeEffects = getActiveEffects(playerData);
+        if (activeEffects.isEmpty()) return null;
 
         for (EffectType type : getConflicts()) {
             for (EffectReward reward : activeEffects) {
-                if (reward.getEffect().getType() == type) return true;
+                Effect conflict = reward.getEffect();
+                if (conflict.getType() == type) return conflict;
             }
         }
-        return false;
+
+        return null;
     }
 
-    default List<EffectType> loadConflicts(FileConfiguration config, String path) {
-        List<EffectType> result = new ArrayList<>();
+    default List<EffectReward> getActiveEffects(PlayerData playerData){
+        return playerData.getActiveRewards().stream()
+                .filter(r -> r.getType() == RewardType.EFFECT)
+                .map(r -> (EffectReward) r)
+                .collect(Collectors.toList());
+    }
 
-        if (config.isSet(path + ".effect_conflicts")){
-            for (String s : config.getStringList(path + ".effect_conflicts")) {
+    default HashSet<EffectType> loadConflicts(FileConfiguration config) {
+        HashSet<EffectType> result = new HashSet<>();
+
+        String stringType = getType().name();
+        if (config.isSet(stringType + ".effect_conflicts")){
+            for (String conflict : config.getStringList(stringType + ".effect_conflicts")) {
                 try {
-                    result.add(EffectType.valueOf(s.toUpperCase()));
+                    result.add(EffectType.valueOf(conflict.toUpperCase()));
                 } catch (IllegalArgumentException ignored) {
-//                main.getLogger().warning("Invalid conflict type: " + s);
+//                main.getLogger().warning("Invalid conflict type: " + conflict);
+                }
+            }
+        }
+
+        for (EffectType type : EffectType.values()){
+            if (!config.isConfigurationSection(type.name())) continue;
+
+            for (String effectSection : config.getConfigurationSection(type.name()).getKeys(false)){
+                for (String conflict : config.getStringList(effectSection + ".effect_conflicts")) {
+                    if (conflict.equalsIgnoreCase(getType().name())) result.add(type);
                 }
             }
         }

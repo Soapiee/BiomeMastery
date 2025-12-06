@@ -229,8 +229,8 @@ public class UsageCmd implements CommandExecutor, TabCompleter {
         int currentLevel = biomeLevel.getLevel();
         int maxLevel = biomeDataManager.getBiomeData(biome).getMaxLevel();
 
-        if (levelToClaim > maxLevel) {
-            sendMessage(player, messageManager.getWithPlaceholder(Message.LEVELOUTOFBOUNDARY, maxLevel));
+        if (levelToClaim > maxLevel || levelToClaim < 1) {
+            sendMessage(player, messageManager.getWithPlaceholder(Message.LEVELOUTOFBOUNDARY, maxLevel, value));
             return;
         }
 
@@ -240,7 +240,13 @@ public class UsageCmd implements CommandExecutor, TabCompleter {
         }
 
         Reward reward = biomeDataManager.getBiomeData(biome).getReward(levelToClaim);
-        if (!reward.isTemporary()) {
+
+        if (reward == null){
+            sendHelpMessage(player, "biome");
+            return;
+        }
+
+        if (!reward.isSingular()) {
             if (hasThisActiveReward(player, reward)) {
                 deactivateReward(player, reward);
                 return;
@@ -387,7 +393,7 @@ public class UsageCmd implements CommandExecutor, TabCompleter {
         }
 
         Reward reward = biomeData.getReward(rewardLevel);
-        if (reward.isTemporary()) {
+        if (reward.isSingular()) {
             String message = messageManager.get(Message.REWARDCLAIMED);
             return message == null ? "" : message;
         }

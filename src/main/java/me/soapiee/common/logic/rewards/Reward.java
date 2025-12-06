@@ -8,6 +8,6 @@ import me.soapiee.common.manager.MessageManager;
 public abstract class Reward implements RewardInterface {
 
     @Getter protected final RewardType type;
-    @Getter private final boolean isTemporary;
+    @Getter private final boolean isSingular;
     @Getter protected final MessageManager messageManager;
 }

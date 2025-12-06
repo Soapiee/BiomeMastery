@@ -11,8 +11,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
@@ -22,8 +21,8 @@ public class FreeFoodEffect implements Effect {
     private final BiomeMastery main;
 
     @Getter private final EffectType type = EffectType.FREEFOOD;
-    @Getter private final String identifier;
-    @Getter private final List<EffectType> conflicts = new ArrayList<>();
+    private final String identifier;
+    @Getter private final HashSet<EffectType> conflicts = new HashSet<>();
     @Getter private final Map<UUID, BukkitTask> activePlayers = new ConcurrentHashMap<>();
 
     private final long cooldown;
@@ -38,7 +37,7 @@ public class FreeFoodEffect implements Effect {
         this.main = main;
         String key = type.name();
         identifier = config.getString(key + ".friendly_name", key);
-        conflicts.addAll(loadConflicts(config, key));
+        conflicts.addAll(loadConflicts(config));
 
         cooldown = loadCooldown(config, key);
         hungerToIncrease = loadHungerIncrease(config, key);

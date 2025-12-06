@@ -8,15 +8,14 @@ import me.soapiee.common.logic.effects.EffectType;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
 
-import java.util.Collections;
-import java.util.List;
+import java.util.HashSet;
 import java.util.UUID;
 
 public class LavaSwimmerEffect implements Effect {
 
     @Getter private final EffectType type = EffectType.LAVASWIMMER;
-    @Getter private final String identifier;
-    @Getter private final List<EffectType> conflicts;
+    private final String identifier;
+    @Getter private final HashSet<EffectType> conflicts = new HashSet<>();
     private final EffectsListener listener;
 
     private static final int SPEED_MIN = 10;
@@ -28,7 +27,7 @@ public class LavaSwimmerEffect implements Effect {
         listener = main.getEffectsListener();
         String key = type.name();
         identifier = config.getString(key + ".friendly_name", key);
-        conflicts = Collections.unmodifiableList(loadConflicts(config, key));
+        conflicts.addAll(loadConflicts(config));
 
         int speed = loadSpeed(config, key);
         listener.setLavaSwimmingSpeed(speed / 100.0);

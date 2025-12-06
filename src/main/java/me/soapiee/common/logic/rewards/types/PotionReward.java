@@ -16,8 +16,8 @@ public class PotionReward extends Reward {
     private final PotionEffect potion;
     private final PlayerDataManager playerDataManager;
 
-    public PotionReward(BiomeMastery main, PlayerDataManager playerDataManager, PotionType potionType, int amplifier, boolean isTemporary) {
-        super(RewardType.POTION, isTemporary, main.getMessageManager());
+    public PotionReward(BiomeMastery main, PlayerDataManager playerDataManager, PotionType potionType, int amplifier, boolean isSingular) {
+        super(RewardType.POTION, isSingular, main.getMessageManager());
         potion = new PotionEffect(potionType.getEffectType(), Integer.MAX_VALUE, amplifier);
         this.playerDataManager = playerDataManager;
     }

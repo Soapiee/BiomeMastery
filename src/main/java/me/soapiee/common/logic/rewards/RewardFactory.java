@@ -88,9 +88,9 @@ public class RewardFactory {
             return new NullReward();
         }
 
-        String temp = config.getString(path + "type", "temporary");
+        String singular = config.getString(path + "type", "singular");
 
-        return new PotionReward(main, playerDataManager, potionType, amplifier, (temp.equalsIgnoreCase("temporary")));
+        return new PotionReward(main, playerDataManager, potionType, amplifier, (singular.equalsIgnoreCase("singular")));
     }
 
     private Reward effectReward(String path) {
@@ -104,9 +104,9 @@ public class RewardFactory {
             return new NullReward();
         }
 
-        String temp = config.getString(path + "type", "temporary");
+        String singular = config.getString(path + "type", "singular");
 
-        return new EffectReward(main, playerDataManager, effectsManager, effectType, (temp.equalsIgnoreCase("temporary")));
+        return new EffectReward(main, playerDataManager, effectsManager, effectType, (singular.equalsIgnoreCase("singular")));
     }
 
     private Reward currencyReward(String path) {

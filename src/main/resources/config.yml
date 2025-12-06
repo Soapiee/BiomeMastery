@@ -43,12 +43,12 @@ default_biome_settings:
   # these settings will automatically apply.
   levels:
     '1':
-      type: temporary # Valid types: temporary or permanent (Only needed for potion + effect reward types)
+      type: singular # Valid types: singular or multi-use (Only needed for potion + effect reward types)
       target_duration: 60 # seconds
       reward_type: potion # Valid types: potion, effect, item, permission, command, experience, currency
       reward_item: jump:2 #potion effect:amplifier:duration
     '2':
-      type: temporary # Valid types: temporary or permanent (Only needed for potion + effect reward types)
+      type: singular # Valid types: singular or multi-use (Only needed for potion + effect reward types)
       target_duration: 60 # seconds
       reward_type: potion # Valid types: potion, effect, item, permission, command, experience, currency
       reward_item: jump:2 #potion effect:amplifier:duration
@@ -57,23 +57,23 @@ default_biome_settings:
 # Use this if you want specific perks for a certain biome
 # Make sure the biome name is from this list: https://hub.spigotmc.org/javadocs/spigot/org/bukkit/block/Biome.html
 biomes:
-  # Permanent rewards are rewards that a player can activate/deactivate whenever they want whilst in the specific biome.
+  # Multi-use rewards are rewards that a player can activate/deactivate whenever they want whilst in the specific biome.
   # For example, if a player is at level 2 for the plains biome (see below),
   # they will be able to activate night vision every single time they're in that biome in the future
   #
-  # Temporary rewards are rewards that are received only once.
+  # Singular rewards are rewards that are received only once.
   #
-  # Regardless if the reward is temporary or permanent, if it's a potion or effect reward type, it will
+  # Regardless if the reward is singular or multi-use, if it's a potion or effect reward type, it will
   # be removed once the player leaves that biome
 
   FOREST:
     '1':
-      type: permanent # Valid types: temporary or permanent (Only needed for potion + effect reward types)
+      type: multi-use # Valid types: singular or multi-use (Only needed for potion + effect reward types)
       target_duration: 60 # seconds
       reward_type: potion # Valid types: potion, effect, item, permission, command, experience, currency
       reward_item: jump:2 #potion effect:amplifier:duration
     '2':
-      type: temporary # Valid types: temporary or permanent (Only needed for potion + effect reward types)
+      type: singular # Valid types: singular or multi-use (Only needed for potion + effect reward types)
       target_duration: 60 # seconds
       reward_type: effect # Valid types: potion, effect, item, permission, command, experience, currency
       reward_item: free_food # Valid effects: speed_swimmer, lava_swimmer, free_food
@@ -84,12 +84,12 @@ biomes:
 
   PLAINS:
     '1':
-      type: permanent # Valid types: temporary or permanent (Only needed for potion + effect reward types)
+      type: multi-use # Valid types: singular or multi-use (Only needed for potion + effect reward types)
       target_duration: 60 # seconds
       reward_type: potion # Valid types: potion, effect, item, permission, command, experience, currency
       reward_item: jump:2 #potion effect:amplifier:duration
     '2':
-      type: temporary # Valid types: temporary or permanent (Only needed for potion + effect reward types)
+      type: singular # Valid types: singular or multi-use (Only needed for potion + effect reward types)
       target_duration: 60 # seconds
       reward_type: effect # Valid types: potion, effect, item, permission, command, experience, currency
       reward_item: speed_swimmer # Valid effects: speed_swimmer, lava_swimmer, free_food
@@ -102,7 +102,7 @@ biomes:
       reward_type: currency
       reward_item: 2000 #amount
     '5':
-      type: temporary # Valid types: temporary or permanent (Only needed for potion + effect reward types)
+      type: singular # Valid types: singular or multi-use (Only needed for potion + effect reward types)
       target_duration: 60 # seconds
       reward_type: command
       reward_item: give %player% apple 2 # use placeholder %player%
@@ -114,27 +114,27 @@ biomes:
 
   FLOWER_FOREST:
     '1':
-      type: temporary
+      type: singular
       target_duration: 60
       reward_type: potion
       reward_item: jump:2
     '2':
-      type: temporary
+      type: singular
       target_duration: 60
       reward_type: effect
       reward_item: lava_swimmer
     '3':
-      type: temporary
+      type: singular
       target_duration: 60
       reward_type: item
       reward_item: apple:5
     '4':
-      type: temporary
+      type: singular
       target_duration: 60
       reward_type: experience
       reward_item: 10
     '5':
-      type: temporary
+      type: singular
       target_duration: 60
       reward_type: command
       reward_item: give %player% apple 2

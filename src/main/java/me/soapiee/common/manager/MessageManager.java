@@ -137,18 +137,22 @@ public class MessageManager {
 
         return message.replace("%player_name%", string2)
                 .replace("%reward%", string2)
-                .replace("%biome%", string1);
+                .replace("%biome%", string1)
+                .replace("%conflicting_effect%", string1)
+                .replace("%effect%", string2);
     }
 
-    public String getWithPlaceholder(Message messageEnum, int input, String biomeName) {
+    public String getWithPlaceholder(Message messageEnum, int value, String input) {
         String message = get(messageEnum);
         if (message == null) return null;
 
-        String string = String.valueOf(input);
-        return message.replace("%level%", string)
-                .replace("%level_formatted%",string + (input > 1 ? " levels" : " level") )
-                .replace("%progress%",Utils.formatTargetDuration(input))
-                .replace("%biome%", biomeName);
+        String valueString = String.valueOf(value);
+        return message.replace("%level%", valueString)
+                .replace("%level_formatted%",valueString + (value > 1 ? " levels" : " level") )
+                .replace("%progress%",Utils.formatTargetDuration(value))
+                .replace("%max_level%",valueString)
+                .replace("%input%",input)
+                .replace("%biome%", input);
     }
 
     public String getWithPlaceholder(Message messageEnum, int level, Reward reward, String string) {

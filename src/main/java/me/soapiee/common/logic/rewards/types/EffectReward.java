@@ -22,8 +22,8 @@ public class EffectReward extends Reward {
                         PlayerDataManager playerDataManager,
                         EffectsManager effectsManager,
                         EffectType effect,
-                        boolean isTemporary) {
-        super(RewardType.EFFECT, isTemporary, main.getMessageManager());
+                        boolean isSingular) {
+        super(RewardType.EFFECT, isSingular, main.getMessageManager());
         this.effect = effect.getInstance(main, effectsManager.getConfig());
         this.playerDataManager = playerDataManager;
     }
@@ -31,8 +31,10 @@ public class EffectReward extends Reward {
     @Override
     public void give(Player player) {
         PlayerData playerData = playerDataManager.getPlayerData(player.getUniqueId());
-        if (effect.hasConflict(playerData)) {
-            player.sendMessage(Utils.colour(messageManager.getWithPlaceholder(Message.REWARDCONFLICT, toString())));
+
+        Effect conflict = effect.hasConflict(playerData);
+        if (conflict != null) {
+            player.sendMessage(Utils.colour(messageManager.getWithPlaceholder(Message.REWARDCONFLICT, toString(), conflict + " effect")));
             return;
         }
 

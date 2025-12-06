@@ -4,7 +4,6 @@ import lombok.Getter;
 import me.soapiee.common.commands.AdminCmd;
 import me.soapiee.common.commands.UsageCmd;
 import me.soapiee.common.data.PlayerData;
-import me.soapiee.common.hooks.PlaceHolderAPIHook;
 import me.soapiee.common.hooks.VaultHook;
 import me.soapiee.common.listeners.EffectsListener;
 import me.soapiee.common.listeners.LevelUpListener;
@@ -39,7 +38,7 @@ public class BiomeMastery extends JavaPlugin {
         super();
     }
 
-    //Used for MockedBukkit
+    //MockedBukkit
     public BiomeMastery(JavaPluginLoader loader, PluginDescriptionFile description, File dataFolder, File file) {
         super(loader, description, dataFolder, file);
     }
@@ -52,7 +51,6 @@ public class BiomeMastery extends JavaPlugin {
         customLogger = new Logger(this);
         messageManager = new MessageManager(this);
 
-        // Data setup
         dataManager = new DataManager(this);
 
         try {
@@ -63,11 +61,10 @@ public class BiomeMastery extends JavaPlugin {
             return;
         }
 
-        // Hooks
-        if (getServer().getPluginManager().getPlugin("PlaceholderAPI") != null) {
-            new PlaceHolderAPIHook(messageManager, dataManager).register();
-            Utils.consoleMsg(ChatColor.GREEN + "Hooked into PlaceholderAPI");
-        }
+//        if (getServer().getPluginManager().getPlugin("PlaceholderAPI") != null) {
+//            new PlaceHolderAPIHook(messageManager, dataManager).register();
+//            Utils.consoleMsg(ChatColor.GREEN + "Hooked into PlaceholderAPI");
+//        }
         if (getServer().getPluginManager().getPlugin("Vault") != null) {
             vaultHook = new VaultHook();
             Utils.consoleMsg(ChatColor.GREEN + "Hooked into Vault");
@@ -83,7 +80,6 @@ public class BiomeMastery extends JavaPlugin {
         dataManager.initialiseBiomeData(getConfig());
         dataManager.startChecker(this);
 
-        // Listeners setup
         PlayerListener playerListener = new PlayerListener(this, dataManager);
         getServer().getPluginManager().registerEvents(playerListener, this);
         PotionRemovalListener potionRemovalListener = new PotionRemovalListener(dataManager.getPlayerDataManager());
@@ -91,12 +87,10 @@ public class BiomeMastery extends JavaPlugin {
         LevelUpListener levelUpListener = new LevelUpListener(messageManager, customLogger, dataManager);
         getServer().getPluginManager().registerEvents(levelUpListener, this);
 
-        // Commands setup
         getCommand("abiomemastery").setExecutor(new AdminCmd(this));
         getCommand("biomemastery").setExecutor(new UsageCmd(this));
 
-        // Updater notification setup
-        // TODO: Enable later
+        // TODO:
         // Updater notification setup
 //        updateChecker = new UpdateChecker(this, 125077);
 //        updateChecker.updateAlert(Bukkit.getConsoleSender());
@@ -120,7 +114,6 @@ public class BiomeMastery extends JavaPlugin {
     }
 
     public VaultHook getVaultHook() {
-        if (getServer().getPluginManager().getPlugin("Vault") == null) return null;
-        else return vaultHook;
+        return (getServer().getPluginManager().getPlugin("Vault") == null) ? null : vaultHook;
     }
 }

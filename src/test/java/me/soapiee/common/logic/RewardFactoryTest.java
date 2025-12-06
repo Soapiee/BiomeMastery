@@ -78,7 +78,7 @@ class RewardFactoryTest {
         String path = "biome.plains.1";
         when(mockConfig.getString(path + "reward_type")).thenReturn("potion");
         when(mockConfig.getString(path + "reward_item")).thenReturn("jump:1");
-        when(mockConfig.getString(path + "type", "temporary")).thenReturn("temporary");
+        when(mockConfig.getString(path + "type", "singular")).thenReturn("singular");
 
         Reward actualValue = rewardFactory.create(path);
 
@@ -90,7 +90,7 @@ class RewardFactoryTest {
         String path = "biome.plains.1";
         when(mockConfig.getString(path + "reward_type")).thenReturn("effect");
         when(mockConfig.getString(path + "reward_item")).thenReturn("free_food");
-        when(mockConfig.getString(path + "type", "temporary")).thenReturn("temporary");
+        when(mockConfig.getString(path + "type", "singular")).thenReturn("singular");
 
         Reward actualValue = rewardFactory.create(path);
 

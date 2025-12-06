@@ -45,14 +45,14 @@ public class LevelUpListener implements Listener {
         Player player = offlinePlayer.getPlayer();
         player.sendMessage(Utils.colour(messageManager.getWithPlaceholder(Message.LEVELLEDUP, event.getNewLevel(), biomeName)));
 
-        if (!reward.isTemporary())
+        if (!reward.isSingular())
             if (!playerInCorrectBiome(player, biomeLevel.getBiome(), reward)) return;
 
         reward.give(player);
     }
 
     private void addPendingReward(Reward reward, OfflinePlayer offlinePlayer, int newLevel, Biome biome) {
-        if (!reward.isTemporary()) return;
+        if (!reward.isSingular()) return;
 
         if (configManager.isDebugMode()) Utils.debugMsg(offlinePlayer.getName(), "&eAdded Pending Reward");
         pendingRewardsManager.add(offlinePlayer.getUniqueId(), new PendingReward(newLevel, biome.name(), reward));
