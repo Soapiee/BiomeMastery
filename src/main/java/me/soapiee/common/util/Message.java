@@ -25,10 +25,10 @@ public enum Message {
 
     //                    --->    PLAYER CMD MESSAGES    <---
     PLAYERHELP("player_help", "#01d54a--------- BiomeMastery Help ---------"
-            + "\n#01d54aKey: [] = Optional | <> = Required"
-            + "\n#01d54a/%cmd_label% info [player] &7- Shows biome levels"
-            + "\n#01d54a/%cmd_label% info <biome> [player] &7- Shows more in-depth details about a particular biome"
-            + "\n#01d54a/%cmd_label% reward <biome> <level> &7- Toggles a reward (Used for the multi-use rewards)"),
+            + "\n#01d54aKey: < > = Optional | [ ] = Required"
+            + "\n#01d54a/%cmd_label% info <player> &7- Shows biome levels"
+            + "\n#01d54a/%cmd_label% info [biome] <player> &7- Shows more in-depth details about a particular biome"
+            + "\n#01d54a/%cmd_label% reward [biome] [level] &7- Toggles a reward (Used for the multi-use rewards)"),
     INVALIDBIOME("player_invalid_biome", "&c%biome% is not a valid biome"),
     INVALIDNUMBER("player_invalid_number", "&c%input% is not a valid number"),
     LEVELOUTOFBOUNDARY("player_input_outofboundary", "&c%input% must be within 0-%max_level%"),
@@ -64,15 +64,15 @@ public enum Message {
     //                    --->    ADMIN CMD MESSAGES    <---
     UPDATEAVAILABLE("update_available", "&aThere is an update available"),
     ADMINHELP("admin_help", "#01d54a--------- BiomeMastery Admin Help ---------"
-            + "\n#01d54aKey: [] = Optional | <> = Required"
+            + "\n#01d54aKey: < > = Optional | [ ] = Required"
             + "\n#01d54a/%cmd_label% reload &7- Reloads the plugin"
             + "\n#01d54a/%cmd_label% list worlds &7- Lists all the enabled worlds"
-            + "\n#01d54a/%cmd_label% enable|disable <world> &7- Adds/Removes the world from the config. The server must be restarted for it to take effect"
+            + "\n#01d54a/%cmd_label% enable|disable [world] &7- Adds/Removes the world from the config. The server must be restarted for it to take effect"
             + "\n#01d54a/%cmd_label% list biomes &7- Lists all the enabled biomes"
-            + "\n#01d54a/%cmd_label% enable|disable <biome> &7- Adds/Removes the biome from the config. The server must be restarted for it to take effect"
-            + "\n#01d54a/%cmd_label% setlevel|addlevel|removelevel <player> <biome> <amount> &7- Modify a players biome level"
-            + "\n#01d54a/%cmd_label% setprogress|addprogress|removeprogress <player> <biome> <amount> &7- Modify the players progress for their current level"
-            + "\n#01d54a/%cmd_label% reset <player> [biome] &7- Clears all of the players data or just for a specified biome"),
+            + "\n#01d54a/%cmd_label% enable|disable [biome] &7- Adds/Removes the biome from the config. The server must be restarted for it to take effect"
+            + "\n#01d54a/%cmd_label% setlevel|addlevel|removelevel [player] [biome] [amount] &7- Modify a players biome level"
+            + "\n#01d54a/%cmd_label% setprogress|addprogress|removeprogress [player] [biome] [amount] &7- Modify the players progress for their current level"
+            + "\n#01d54a/%cmd_label% reset [player] <biome> &7- Clears all of the players data or just for a specified biome"),
     WORLDLISTHEADER("world_list_header", "#01d54a--------- Worlds List ---------"),
     BIOMELISTHEADER("biome_list_header", "#01d54a--------- Biome List ---------"),
     INVALIDWORLDBIOME("invalid_world_biome", "&cYou need to enter a valid World or Biome"),

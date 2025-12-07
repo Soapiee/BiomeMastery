@@ -27,6 +27,9 @@ permissions:
   biomemastery.reload:
     description: Allows access to /abm reload
     default: op
+  biomemastery.reset:
+    description: Allows access to /abm reset
+    default: op
   biomemastery.player:
     description: Allows access to /biome help
     default: true

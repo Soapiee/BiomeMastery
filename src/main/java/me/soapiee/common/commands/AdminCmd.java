@@ -100,6 +100,7 @@ public class AdminCmd implements CommandExecutor, TabCompleter {
 
         // /abm reset <player>
         if (args.length == 2 && args[0].equalsIgnoreCase("reset")) {
+            if (!checkPermission(sender, "biomemastery.reset")) return true;
             resetPlayer(sender, playerCache.getOfflinePlayer(args[1]));
             return true;
         }
@@ -192,6 +193,7 @@ public class AdminCmd implements CommandExecutor, TabCompleter {
                 return true;
             }
 
+            if (!checkPermission(sender, "biomemastery.reset")) return true;
             resetBiome(sender, target, biomeLevel);
             return true;
         }
