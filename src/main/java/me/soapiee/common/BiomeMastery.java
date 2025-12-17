@@ -100,7 +100,6 @@ public class BiomeMastery extends JavaPlugin {
     public void onDisable() {
         if (dataManager == null) return;
 
-        //Remove all active rewards
         PlayerDataManager playerDataManager = dataManager.getPlayerDataManager();
         for (Player player : Bukkit.getOnlinePlayers()) {
             PlayerData playerData = playerDataManager.getPlayerData(player.getUniqueId());

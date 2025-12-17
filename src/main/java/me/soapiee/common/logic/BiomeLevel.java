@@ -49,8 +49,8 @@ public class BiomeLevel {
             long toAdd = ChronoUnit.SECONDS.between(entryTime, LocalDateTime.now());
             entryTime = LocalDateTime.now();
 
-//            Utils.debugMsg(player.getName(),
-//                    ChatColor.GREEN.toString() + toAdd + " seconds added to biome " + biomeData.getBiome().name());
+//            Utils.debugMsg(player.getName(),ChatColor.GREEN.toString() + toAdd + " seconds added to biome " + biomeData.getBiome().name());
+
             progress += toAdd;
             checkLevelUp();
         }

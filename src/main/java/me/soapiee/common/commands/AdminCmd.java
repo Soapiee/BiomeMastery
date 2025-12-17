@@ -122,14 +122,8 @@ public class AdminCmd implements CommandExecutor, TabCompleter {
         // /abm enable|disable <world> - Enables/Disables a world
         // /abm enable|disable <biome> - Enables/Disables a biome
         if (args.length == 2) {
-            World inputWorld = null;
-            Biome inputBiome = null;
-
-            try {
-                inputWorld = Bukkit.getWorld(args[1]);
-                inputBiome = Biome.valueOf(args[1]);
-            } catch (IllegalArgumentException ignored) {
-            }
+            World inputWorld = validateWorld(args[1]);
+            Biome inputBiome = validateBiome(args[1]);
 
             if (inputWorld == null && inputBiome == null) {
                 sendMessage(sender, messageManager.get(Message.INVALIDWORLDBIOME));
@@ -173,8 +167,11 @@ public class AdminCmd implements CommandExecutor, TabCompleter {
             }
         }
 
-        Biome inputBiome = validateBiome(sender, args[2]);
-        if (inputBiome == null) return true;
+        Biome inputBiome = validateBiome(args[2]);
+        if (inputBiome == null) {
+            sendMessage(sender, messageManager.getWithPlaceholder(Message.INVALIDBIOME, args[2]));
+            return true;
+        }
 
         if (!configManager.isEnabledBiome(inputBiome)) {
             sendMessage(sender, messageManager.getWithPlaceholder(Message.DISABLEDBIOME, args[2]));
@@ -248,16 +245,19 @@ public class AdminCmd implements CommandExecutor, TabCompleter {
         return true;
     }
 
-    private Biome validateBiome(CommandSender sender, String input) {
+    private Biome validateBiome(String input) {
         Biome biome;
         try {
-            biome = Biome.valueOf(input);
+            biome = Biome.valueOf(input.toUpperCase());
         } catch (IllegalArgumentException error) {
-            sendMessage(sender, messageManager.getWithPlaceholder(Message.INVALIDBIOME, input));
             return null;
         }
 
         return biome;
+    }
+
+    private World validateWorld(String input) {
+        return Bukkit.getWorld(input);
     }
 
     private void updateProgress(OfflinePlayer target) {
@@ -706,12 +706,8 @@ public class AdminCmd implements CommandExecutor, TabCompleter {
 
             case 4:
                 if (args[0].equalsIgnoreCase("setlevel")) {
-                    Biome biome;
-                    try {
-                        biome = Biome.valueOf(args[2]);
-                    } catch (IllegalArgumentException ignored) {
-                        break;
-                    }
+                    Biome biome = validateBiome(args[2]);
+                    if (biome == null) break;
                     if (!configManager.isEnabledBiome(biome)) break;
 
                     int maxLevel = biomeDataManager.getBiomeData(biome).getMaxLevel();

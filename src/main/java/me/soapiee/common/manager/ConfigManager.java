@@ -22,7 +22,9 @@ public class ConfigManager {
 
     private FileConfiguration config;
 
-    @Getter @Setter private boolean databaseEnabled;
+    @Getter
+    @Setter
+    private boolean databaseEnabled;
     @Getter private boolean debugMode;
     @Getter private boolean updateNotif;
     @Getter private final HashSet<World> enabledWorlds = new HashSet<>();
@@ -67,7 +69,6 @@ public class ConfigManager {
     }
 
     public List<Biome> setUpEnabledBiomes() {
-        //Make list of enabled biomes + create the biome data
         boolean whiteList = config.getBoolean("default_biome_settings.use_blacklist_as_whitelist", true);
         if (!config.isSet("default_biome_settings.biomes_blacklist")) {
             config.set("default_biome_settings.biomes_blacklist", new ArrayList<>());
@@ -86,11 +87,66 @@ public class ConfigManager {
         dataManager.getCooldownManager().updateThreshold(config.getInt("settings.command_cooldown", 3));
     }
 
+    public Biome[] getAllMCBiomes() {
+        return Biome.values();
+
+//        return Bukkit.getRegistry(Biome.class).stream().collect(Collectors.toList());
+    }
+
+    private String biomeToString(Biome biome) {
+        // <= 1.20.9
+        return biome.name();
+
+        // 1.21 -> 1.21.11
+//        return biome.getKey().toString().replace("minecraft:", "");
+
+        // >= 1.21.12
+//            NamespacedKey biomeKey = biome.getKeyOrNull();
+//            if (biomeKey == null) return null;
+//            return biomeKey.toString().replace("minecraft:", "");
+    }
+
+//    private String biomeToString(Biome biome) {
+//        // ≤1.20.9
+//        try {
+//            Utils.consoleMsg(ChatColor.RED + "Trying < 1.20.9");
+//            Method nameMethod = Biome.class.getMethod("name");
+//            return (String) nameMethod.invoke(biome);
+//        } catch (Exception ignored) {
+//        }
+//
+//        // 1.21 → 1.21.11
+//        try {
+//            Utils.consoleMsg(ChatColor.RED + "Trying 1.21+");
+//            Method getKey = Biome.class.getMethod("getKey");
+//            Object keyObj = getKey.invoke(biome);
+//            if (keyObj != null) return keyObj.toString().replace("minecraft:", "");
+//
+//        } catch (Exception ignored) {
+//        }
+//
+//        // ≥1.21.12
+//        try {
+//            Method getKeyOrNull = Biome.class.getMethod("getKeyOrNull");
+//            Object keyObj = getKeyOrNull.invoke(biome);
+//            if (keyObj != null) return keyObj.toString().replace("minecraft:", "");
+//
+//        } catch (Exception ignored) {
+//        }
+//
+//        return null;
+//    }
+
+
     public List<Biome> createBiomeBlacklist(List<String> listedBiomes) {
         List<Biome> blacklist = new ArrayList<>();
 
-        for (Biome biome : Biome.values()) {
-            if (listedBiomes.contains(biome.name())) continue;
+        for (Biome biome : getAllMCBiomes()) {
+            String biomeString = biomeToString(biome);
+            if (biomeString == null) continue;
+
+            if (listedBiomes.contains(biomeString.toUpperCase())) continue;
+            if (listedBiomes.contains(biomeString.toLowerCase())) continue;
             blacklist.add(biome);
         }
 
@@ -119,6 +175,25 @@ public class ConfigManager {
 
         return biome;
     }
+
+    // 1.21.X
+//    private Biome validateBiome(String string) {
+//        Registry<Biome> biomeRegistry = Bukkit.getRegistry(Biome.class);
+//        String keyString = string.toLowerCase();
+//
+//        // convert "PLAINS" to "minecraft:plains"
+//        if (!keyString.contains(":")) keyString = "minecraft:" + keyString;
+//
+//        // NamespacedKey.fromString() is the standard way to parse the key string.
+//        NamespacedKey key;
+//        key = NamespacedKey.fromString(keyString);
+//
+//        // Return null if the key format is invalid
+//        if (key == null) return null;
+//
+//        // 3. Look up the biome in the registry using the NamespacedKey.
+//        return biomeRegistry.get(key);
+//    }
 
     public boolean isEnabledWorld(World world) {
         return enabledWorlds.contains(world);

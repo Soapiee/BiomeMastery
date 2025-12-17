@@ -69,6 +69,7 @@ public class FreeFoodEffect implements Effect {
 
                 if (main.getDataManager().getConfigManager().isDebugMode())
                     Utils.debugMsg(player.getName(), ChatColor.BLUE.toString() + hungerToIncrease + " hunger added");
+
             }
         }.runTaskTimer(main, cooldown * 20L, cooldown * 20L));
     }

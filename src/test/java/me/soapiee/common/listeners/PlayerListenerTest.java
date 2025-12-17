@@ -20,7 +20,6 @@ public final class PlayerListenerTest {
 
     private static PlayerListener playerListener;
     private static ConfigManager mockConfigManager;
-    private static BiomeDataManager mockBiomeDataManager;
 
     private static ServerMock server;
 
@@ -32,7 +31,7 @@ public final class PlayerListenerTest {
         PlayerCache mockPlayerCache = mock(PlayerCache.class);
         PlayerDataManager mockPlayerDataManager = mock(PlayerDataManager.class);
         mockConfigManager = mock(ConfigManager.class);
-        mockBiomeDataManager = mock(BiomeDataManager.class);
+        BiomeDataManager mockBiomeDataManager = mock(BiomeDataManager.class);
         Logger mockLogger = mock(Logger.class);
         MessageManager mockMessageManager = mock(MessageManager.class);
         PendingRewardsManager mockPendingRewardsManager = mock(PendingRewardsManager.class);

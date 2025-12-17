@@ -90,7 +90,12 @@ public class UsageCmd implements CommandExecutor, TabCompleter {
             return true;
         }
 
-        Biome biome = getBiome(sender, args[1]);
+        Biome biome = validateBiome(args[1]);
+
+        if (!configManager.isEnabledBiome(biome)) {
+            sendMessage(sender, messageManager.getWithPlaceholder(Message.BIOMEINFODISABLED, args[1]));
+            return true;
+        }
 
         // /bm info <player>
         // /bm info <biome>
@@ -107,16 +112,16 @@ public class UsageCmd implements CommandExecutor, TabCompleter {
             return true;
         }
 
-        // /bm reward <biome> <level>
-        if (args.length == 3 && args[0].equalsIgnoreCase("reward")) {
-            toggleReward((Player) sender, biome, args[2]);
-            return true;
-        }
-
         // /bm info <biome> [player]
         if (args.length == 3 && args[0].equalsIgnoreCase("info")) {
             if (!checkPermission(sender, "biomemastery.player.others")) return true;
             displayBiomeInfo(sender, target, biome);
+            return true;
+        }
+
+        // /bm reward <biome> <level>
+        if (args.length == 3 && args[0].equalsIgnoreCase("reward")) {
+            toggleReward((Player) sender, biome, args[2]);
             return true;
         }
 
@@ -187,16 +192,11 @@ public class UsageCmd implements CommandExecutor, TabCompleter {
         return target;
     }
 
-    private Biome getBiome(CommandSender sender, String value) {
+    private Biome validateBiome(String value) {
         Biome biome;
         try {
-            biome = Biome.valueOf(value);
+            biome = Biome.valueOf(value.toUpperCase());
         } catch (IllegalArgumentException error) {
-            return null;
-        }
-
-        if (!configManager.isEnabledBiome(biome)) {
-            sendMessage(sender, messageManager.getWithPlaceholder(Message.BIOMEINFODISABLED, value));
             return null;
         }
 
