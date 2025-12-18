@@ -15,11 +15,28 @@ public class Utils {
 
     public static void consoleMsg(String message) {
         String prefix = "[" + Bukkit.getServer().getPluginManager().getPlugin("BiomeMastery").getDescription().getPrefix() + "]";
-        Bukkit.getConsoleSender().sendMessage(colour(prefix + " " + message));
+        Bukkit.getConsoleSender().sendMessage(addColour(prefix + " " + message));
     }
 
     public static void debugMsg(String playerName, String message) {
         consoleMsg(ChatColor.YELLOW + "[DEBUG] " + (playerName.isEmpty() ? "" : "@" + playerName + " " ) + message);
+    }
+
+    public static String addColour(String message) {
+        Matcher matcher = Pattern.compile("#([A-Fa-f0-9]{6})").matcher(message);
+        StringBuffer buffer = new StringBuffer();
+
+        while (matcher.find()) {
+            String color = matcher.group(1);
+            StringBuilder replacement = new StringBuilder("§x");
+            for (char c : color.toCharArray()) {
+                replacement.append('§').append(c);
+            }
+            matcher.appendReplacement(buffer, replacement.toString());
+        }
+        matcher.appendTail(buffer);
+
+        return ChatColor.translateAlternateColorCodes('&', buffer.toString());
     }
 
     public static String capitalise(String string){
@@ -53,25 +70,6 @@ public class Utils {
 
         DecimalFormat df = new DecimalFormat("#.#");
         return df.format(Math.floor(duration)) + unit + (!unit.equalsIgnoreCase("s") ? (duration < 2 ? "" : "s") : "");
-    }
-
-    public static String colour(String message) { // 1.8 and above
-        Pattern pattern = Pattern.compile("#[a-fA-F0-9]{6}");
-        Matcher matcher = pattern.matcher(message);
-        while (matcher.find()) {
-            String hexCode = message.substring(matcher.start(), matcher.end());
-            String replaceSharp = hexCode.replace('#', 'x');
-
-            char[] ch = replaceSharp.toCharArray();
-            StringBuilder builder = new StringBuilder("");
-            for (char c : ch) {
-                builder.append("&" + c);
-            }
-
-            message = message.replace(hexCode, builder.toString());
-            matcher = pattern.matcher(message);
-        }
-        return ChatColor.translateAlternateColorCodes('&', message);
     }
 
     public static boolean hasFreeSpace(Material type, int amount, Player player) {

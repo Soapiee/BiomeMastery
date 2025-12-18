@@ -26,18 +26,24 @@ public enum Message {
     //                    --->    PLAYER CMD MESSAGES    <---
     PLAYERHELP("player_help", "#01d54a--------- BiomeMastery Help ---------"
             + "\n#01d54aKey: < > = Optional | [ ] = Required"
-            + "\n#01d54a/%cmd_label% info <player> &7- Shows biome levels"
+            + "\n#01d54a/%cmd_label% info <page> &7- Shows your biome levels"
+            + "\n#01d54a/%cmd_label% info [player] <page> &7- Shows biome levels of another player"
             + "\n#01d54a/%cmd_label% info [biome] <player> &7- Shows more in-depth details about a particular biome"
             + "\n#01d54a/%cmd_label% reward [biome] [level] &7- Toggles a reward (Used for the multi-use rewards)"),
     INVALIDBIOME("player_invalid_biome", "&c%biome% is not a valid biome"),
     INVALIDNUMBER("player_invalid_number", "&c%input% is not a valid number"),
-    LEVELOUTOFBOUNDARY("player_input_outofboundary", "&c%input% must be within 0-%max_level%"),
+    INVALIDPAGE("player_invalid_page", "&c%input% is not a valid page number. It must be within 1-%total_pages%"),
+    LEVELOUTOFBOUNDARY("player_input_outofboundary", "&c%input% must be within 1-%max_level%"),
     BIOMEINFODISABLED("player_biome_disabled", "&cThe biome %biome% is disabled"),
     REWARDNOTACHIEVED("player_reward_not_available", "&cYou have not achieved this level yet. You are level %current_level%"),
     BIOMEBASICINFOHEADER("player_biome_info_header", "#01d54a--------- %player_name%s Biome Info ---------"),
-    BIOMEBASICINFOFORMAT("player_biome_info_format", "&a%biome% &7[Lvl &a%player_level%&7/%biome_max_level% : &a%player_progress%&7/%target_duration_formatted%]"),
-    BIOMEBASICINFOSEPERATOR("player_biome_info_seperator", "-"),
+    BIOMEBASICINFOFORMAT("player_biome_info_format", "&2> &a%biome% &7[Lvl &a%player_level%&7/%biome_max_level% : &a%player_progress%&7/%target_duration_formatted%]"),
     BIOMEBASICINFOMAX("player_biome_info_max", "&a%biome% &7[Lvl %player_level%/%biome_max_level%]"),
+    BIOMEBASICINFOFOOTER("player_biome_info_footer", "#01d54a<-- [%current_page%/%total_pages%] -->"),
+    BIOMEBASICINFOPREVBUTTON("player_biome_prev_button", "#087014Previous Page"),
+    BIOMEBASICINFONEXTBUTTON("player_biome_next_button", "#087014Next Page"),
+    PREVBUTTONHOVER("player_biome_prev_hover", "&eClick me"),
+    NEXTBUTTONHOVER("player_biome_next_hover", "&eClick me"),
     BIOMEDETAILEDFORMAT("player_biome_details_format", "#01d54a--------- %player_name%s %biome% Biome ---------"
             + "\n&7Level: #01d54a%player_level%&7/%biome_max_level%"
             + "\n&7Progress: #01d54a%player_progress%&7/%target_duration_formatted%"

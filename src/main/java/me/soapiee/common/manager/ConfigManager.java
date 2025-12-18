@@ -27,6 +27,7 @@ public class ConfigManager {
     private boolean databaseEnabled;
     @Getter private boolean debugMode;
     @Getter private boolean updateNotif;
+    @Getter private int biomesPerPage;
     @Getter private final HashSet<World> enabledWorlds = new HashSet<>();
     @Getter private final HashSet<Biome> enabledBiomes = new HashSet<>();
     @Getter private final HashMap<Integer, Integer> defaultLevelsThresholds = new HashMap<>();
@@ -40,6 +41,7 @@ public class ConfigManager {
         debugMode = config.getBoolean("debug_mode", false);
         updateNotif = config.getBoolean("settings.plugin_update_notification", true);
         updateInterval = Math.max(config.getInt("settings.update_interval", 60), 1);
+        biomesPerPage = Math.max(config.getInt("settings.biomes_per_page", 5), 1);
 
         enabledWorlds.addAll(setUpEnabledWords());
         enabledBiomes.addAll(setUpEnabledBiomes());
@@ -84,6 +86,7 @@ public class ConfigManager {
         config = main.getConfig();
         updateInterval = config.getInt("settings.update_interval", 60);
         debugMode = config.getBoolean("debug_mode", false);
+        biomesPerPage = Math.max(config.getInt("settings.biomes_per_page", 5), 1);
         dataManager.getCooldownManager().updateThreshold(config.getInt("settings.command_cooldown", 3));
     }
 

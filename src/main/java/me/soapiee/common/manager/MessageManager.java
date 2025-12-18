@@ -60,8 +60,10 @@ public class MessageManager {
                 || messageEnum == Message.PLAYERHELP
                 || messageEnum == Message.ADMINHELP
                 || messageEnum == Message.BIOMEBASICINFOHEADER
+                || messageEnum == Message.BIOMEBASICINFOFOOTER
+                || messageEnum == Message.BIOMEBASICINFOPREVBUTTON
+                || messageEnum == Message.BIOMEBASICINFONEXTBUTTON
                 || messageEnum == Message.BIOMEBASICINFOFORMAT
-                || messageEnum == Message.BIOMEBASICINFOSEPERATOR
                 || messageEnum == Message.BIOMEBASICINFOMAX
                 || messageEnum == Message.BIOMEDETAILEDFORMAT
                 || messageEnum == Message.BIOMEDETAILEDMAX
@@ -152,6 +154,15 @@ public class MessageManager {
                 .replace("%max_level%",valueString)
                 .replace("%input%",input)
                 .replace("%biome%", input);
+    }
+
+    public String getWithPlaceholder(Message messageEnum, int currentPage, int totalPages) {
+        String message = get(messageEnum);
+        if (message == null) return null;
+
+        return message.replace("%current_page%", String.valueOf(currentPage))
+                .replace("%total_pages%", String.valueOf(totalPages))
+                .replace("%input%", String.valueOf(currentPage));
     }
 
     public String getWithPlaceholder(Message messageEnum, int level, Reward reward, String string) {

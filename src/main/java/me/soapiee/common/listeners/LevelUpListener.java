@@ -43,7 +43,7 @@ public class LevelUpListener implements Listener {
         }
 
         Player player = offlinePlayer.getPlayer();
-        player.sendMessage(Utils.colour(messageManager.getWithPlaceholder(Message.LEVELLEDUP, event.getNewLevel(), biomeName)));
+        player.sendMessage(Utils.addColour(messageManager.getWithPlaceholder(Message.LEVELLEDUP, event.getNewLevel(), biomeName)));
 
         if (!reward.isSingular())
             if (!playerInCorrectBiome(player, biomeLevel.getBiome(), reward)) return;
@@ -71,7 +71,7 @@ public class LevelUpListener implements Listener {
         Biome playerBiome = player.getLocation().getBlock().getBiome();
 
         if (!playerBiome.name().equalsIgnoreCase(correctBiome.name())) {
-            player.sendMessage(Utils.colour(messageManager.getWithPlaceholder(Message.NOTINBIOME, correctBiome.name(), reward.toString())));
+            player.sendMessage(Utils.addColour(messageManager.getWithPlaceholder(Message.NOTINBIOME, correctBiome.name(), reward.toString())));
             return false;
         }
         return true;

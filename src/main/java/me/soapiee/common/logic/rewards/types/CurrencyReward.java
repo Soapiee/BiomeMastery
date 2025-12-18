@@ -21,7 +21,7 @@ public class CurrencyReward extends Reward {
 
     @Override
     public void give(Player player) {
-        player.sendMessage(Utils.colour(messageManager.getWithPlaceholder(Message.REWARDRECEIVED, toString())));
+        player.sendMessage(Utils.addColour(messageManager.getWithPlaceholder(Message.REWARDRECEIVED, toString())));
         vaultHook.deposit(player, amount);
     }
 

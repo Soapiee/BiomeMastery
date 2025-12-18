@@ -13,6 +13,8 @@ import me.soapiee.common.util.Logger;
 import me.soapiee.common.util.Message;
 import me.soapiee.common.util.PlayerCache;
 import me.soapiee.common.util.Utils;
+import net.md_5.bungee.api.chat.*;
+import net.md_5.bungee.api.chat.hover.content.Text;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.block.Biome;
 import org.bukkit.command.Command;
@@ -26,6 +28,7 @@ import org.jetbrains.annotations.NotNull;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -39,6 +42,7 @@ public class UsageCmd implements CommandExecutor, TabCompleter {
     private final MessageManager messageManager;
     private final Logger customLogger;
     private final CmdCooldownManager cooldownManager;
+    private final HashMap<Integer, Biome> enabledBiomes = new HashMap<>();
 
     public UsageCmd(BiomeMastery main) {
         this.main = main;
@@ -50,31 +54,17 @@ public class UsageCmd implements CommandExecutor, TabCompleter {
         messageManager = main.getMessageManager();
         customLogger = main.getCustomLogger();
         cooldownManager = dataManager.getCooldownManager();
+
+        int i = 1;
+        for (Biome biome : configManager.getEnabledBiomes()) {
+            enabledBiomes.put(i, biome);
+            i++;
+        }
     }
 
     @Override
     public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, String[] args) {
         if (!checkPermission(sender, "biomemastery.player.command")) return true;
-
-        // /bm help
-        if (args.length == 1 && args[0].equalsIgnoreCase("help")) {
-            sendHelpMessage(sender, label);
-            return true;
-        }
-
-        OfflinePlayer target = getTarget(sender, label, args);
-        if (target == null) return true;
-
-        //Check player has data
-        if (!playerDataManager.has(target.getUniqueId())) {
-            try {
-                PlayerData playerData = new PlayerData(main, target);
-                playerDataManager.add(playerData);
-            } catch (IOException | SQLException error) {
-                customLogger.logToPlayer(sender, error, Utils.colour(messageManager.get(Message.DATAERRORPLAYER)));
-                return true;
-            }
-        }
 
         // /bm - Opens the GUI
         if (args.length == 0) {
@@ -84,112 +74,119 @@ public class UsageCmd implements CommandExecutor, TabCompleter {
             return true;
         }
 
-        // /bm info
-        if (args.length == 1 && args[0].equalsIgnoreCase("info")) {
-            displayInfo(sender, target);
-            return true;
-        }
-
-        Biome biome = validateBiome(args[1]);
-
-        if (!configManager.isEnabledBiome(biome)) {
-            sendMessage(sender, messageManager.getWithPlaceholder(Message.BIOMEINFODISABLED, args[1]));
-            return true;
-        }
-
-        // /bm info <player>
-        // /bm info <biome>
-        if (args.length == 2 && args[0].equalsIgnoreCase("info")) {
-            if (biome == null) {
-                if (!checkPermission(sender, "biomemastery.player.others")) return true;
-                displayInfo(sender, target);
-            } else displayBiomeInfo(sender, target, biome);
-            return true;
-        }
-
-        if (biome == null) {
-            sendMessage(sender, messageManager.getWithPlaceholder(Message.INVALIDBIOME, args[1]));
-            return true;
-        }
-
-        // /bm info <biome> [player]
-        if (args.length == 3 && args[0].equalsIgnoreCase("info")) {
-            if (!checkPermission(sender, "biomemastery.player.others")) return true;
-            displayBiomeInfo(sender, target, biome);
+        // /bm help
+        if (args[0].equalsIgnoreCase("help")) {
+            sendHelpMessage(sender, label);
             return true;
         }
 
         // /bm reward <biome> <level>
-        if (args.length == 3 && args[0].equalsIgnoreCase("reward")) {
-            toggleReward((Player) sender, biome, args[2]);
+        if (args[0].equalsIgnoreCase("reward")) {
+            if (!rewardBiome(sender, args)) sendHelpMessage(sender, label);
             return true;
+        }
+
+        // /bm info
+        // /bm info <page>
+        // /bm info [player]
+        // /bm info [player] <page>
+        // /bm info [biome]
+        // /bm info [biome] <player>
+        if (args[0].equalsIgnoreCase("info")) {
+            // /bm info
+            if (args.length == 1) {
+                if (isConsole(sender)) return true;
+
+                displayInfo(sender, (Player) sender, 1);
+                return true;
+            }
+
+            if (args.length == 2 || args.length == 3) {
+                // /bm info <page>
+                int page = validatePage(args[1], sender);
+
+                if (page >= 0) {
+                    if (page == 0) return true;
+                    displayInfo(sender, (Player) sender, page);
+                    return true;
+                }
+
+                // /bm info <biome>
+                // /bm info <biome> <player>
+                Biome biome = validateBiome(args[1]);
+                if (biome != null) {
+                    infoBiome(sender, biome, args);
+                    return true;
+                }
+
+                // /bm info <player>
+                // /bm info <player> <page>
+                OfflinePlayer target = getTarget(sender, args[1]);
+                if (target == null) return true;
+                if (!checkPermission(sender, "biomemastery.player.others")) return true;
+
+                if (infoPlayer(sender, target, args)) return true;
+            }
         }
 
         sendHelpMessage(sender, label);
         return true;
     }
 
-    private OfflinePlayer getTarget(CommandSender sender, String label, String[] args) {
-        OfflinePlayer target;
+    private OfflinePlayer getTarget(CommandSender sender, String playerName) {
+        OfflinePlayer target = playerCache.getOfflinePlayer(playerName);
+        if (target == null) {
+            sendMessage(sender, messageManager.get(Message.PLAYERNOTFOUND));
+            return null;
+        }
 
-        if (args.length == 0) {
-            if (!(sender instanceof Player)) {
-                sendMessage(sender, messageManager.get(Message.MUSTBEPLAYERERROR));
-                return null;
-            }
-
-            target = (Player) sender;
-
-        } else if (args[0].equalsIgnoreCase("info")) {
-            // /bm info
-            if (args.length == 1) {
-                if (!(sender instanceof Player)) {
-                    sendMessage(sender, messageManager.get(Message.CONSOLEUSAGEERROR));
-                    return null;
-                }
-
-                target = (Player) sender;
-            }
-
-            // /bm info <player>
-            // /bm info <biome>
-            else if (args.length == 2) {
-                target = playerCache.getOfflinePlayer(args[1]);
-
-                if (target == null) {
-                    if (!(sender instanceof Player)) {
-                        sendMessage(sender, messageManager.get(Message.CONSOLEUSAGEERROR));
-                        return null;
-                    }
-                    target = (Player) sender;
-                }
-            }
-
-            // /bm info <biome> [player]
-            else if (args.length == 3) {
-                target = playerCache.getOfflinePlayer(args[2]);
-
-                if (target == null) {
-                    sendMessage(sender, messageManager.get(Message.PLAYERNOTFOUND));
-                }
-            } else {
-                sendHelpMessage(sender, label);
-                target = null;
-            }
-
-        } else if (args[0].equalsIgnoreCase("reward")) {
-            if (!(sender instanceof Player)) {
-                sendMessage(sender, messageManager.get(Message.CONSOLEUSAGEERROR));
-                return null;
-            }
-
-            target = (Player) sender;
-        } else {
-            sendHelpMessage(sender, label);
-            target = null;
+        if (!hasPlayerData(sender, target)) {
+            return null;
         }
 
         return target;
+    }
+
+    private boolean hasPlayerData(CommandSender sender, OfflinePlayer target) {
+        if (target == null) return false;
+
+        if (!playerDataManager.has(target.getUniqueId())) {
+            try {
+                PlayerData playerData = new PlayerData(main, target);
+                playerDataManager.add(playerData);
+            } catch (IOException | SQLException error) {
+                customLogger.logToPlayer(sender, error, Utils.addColour(messageManager.get(Message.DATAERRORPLAYER)));
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    private boolean isConsole(CommandSender sender) {
+        if (!(sender instanceof Player)) {
+            sendMessage(sender, messageManager.get(Message.CONSOLEUSAGEERROR));
+            return true;
+        }
+
+        return false;
+    }
+
+    private int validatePage(String value, CommandSender sender) {
+        int page;
+        try {
+            page = Integer.parseInt(value);
+        } catch (NumberFormatException ignored) {
+            return -1;
+        }
+
+        int totalPages = enabledBiomes.size() / configManager.getBiomesPerPage();
+        if (page < 1 || page > totalPages) {
+            sendMessage(sender, messageManager.getWithPlaceholder(Message.INVALIDPAGE, page, totalPages));
+            return 0;
+        }
+
+        return page;
     }
 
     private Biome validateBiome(String value) {
@@ -241,7 +238,7 @@ public class UsageCmd implements CommandExecutor, TabCompleter {
 
         Reward reward = biomeDataManager.getBiomeData(biome).getReward(levelToClaim);
 
-        if (reward == null){
+        if (reward == null) {
             sendHelpMessage(player, "biome");
             return;
         }
@@ -302,7 +299,7 @@ public class UsageCmd implements CommandExecutor, TabCompleter {
     private void sendMessage(CommandSender sender, String message) {
         if (message == null) return;
 
-        if (sender instanceof Player) sender.sendMessage(Utils.colour(message));
+        if (sender instanceof Player) sender.sendMessage(Utils.addColour(message));
         else Utils.consoleMsg(message);
     }
 
@@ -316,7 +313,68 @@ public class UsageCmd implements CommandExecutor, TabCompleter {
         return player.hasPermission(permission);
     }
 
-    private void displayInfo(CommandSender sender, OfflinePlayer target) {
+    private void infoBiome(CommandSender sender, Biome biome, String[] args) {
+        if (!configManager.isEnabledBiome(biome)) {
+            sendMessage(sender, messageManager.getWithPlaceholder(Message.BIOMEINFODISABLED, args[1]));
+            return;
+        }
+
+        OfflinePlayer target;
+        if (args.length == 2) {
+            target = (Player) sender;
+        } else {
+            if (!checkPermission(sender, "biomemastery.player.others")) return;
+            target = getTarget(sender, args[2]);
+
+            if (target == null) return;
+        }
+
+        displayBiomeInfo(sender, target, biome);
+    }
+
+    private boolean infoPlayer(CommandSender sender, OfflinePlayer target, String[] args) {
+//      /bm info <player> <page>
+        if (args.length == 3) {
+            int page = validatePage(args[2], sender);
+            if (page == 0) return true;
+            if (page < 0) {
+                sendMessage(sender, messageManager.getWithPlaceholder(Message.INVALIDNUMBER, args[2]));
+                return true;
+            }
+
+            displayInfo(sender, target, page);
+            return true;
+        }
+
+//      /bm info <player>
+        if (args.length == 2) {
+            displayInfo(sender, target, 1);
+            return true;
+        }
+
+        return false;
+    }
+
+    private boolean rewardBiome(CommandSender sender, String[] args) {
+        if (args.length != 3) return false;
+
+        Biome biome = validateBiome(args[1]);
+
+        if (biome == null) {
+            sendMessage(sender, messageManager.getWithPlaceholder(Message.INVALIDBIOME, args[1]));
+            return true;
+        }
+
+        if (!configManager.isEnabledBiome(biome)) {
+            sendMessage(sender, messageManager.getWithPlaceholder(Message.BIOMEINFODISABLED, args[1]));
+            return true;
+        }
+
+        toggleReward((Player) sender, biome, args[2]);
+        return true;
+    }
+
+    private void displayInfo(CommandSender sender, OfflinePlayer target, int page) {
         int cooldown = (int) cooldownManager.getCooldown(sender);
         if (cooldown > 0) {
             sendMessage(sender, messageManager.getWithPlaceholder(Message.CMDONCOOLDOWN, cooldown));
@@ -329,29 +387,90 @@ public class UsageCmd implements CommandExecutor, TabCompleter {
 
         builder.append(messageManager.getWithPlaceholder(Message.BIOMEBASICINFOHEADER, target.getName())).append("\n");
 
-        int i = 0;
+        int maxBiomes = configManager.getBiomesPerPage();
+        int startPoint = page * maxBiomes;
+        int totalPages = enabledBiomes.size() / maxBiomes;
 
-        for (Biome biome : configManager.getEnabledBiomes()) {
+        for (int i = startPoint; i < (page + 1) * maxBiomes; i++) {
+            if (i >= enabledBiomes.size()) break;
+
+            Biome biome = enabledBiomes.get(i);
             BiomeLevel biomeLevel = playerData.getBiomeLevel(biome);
             BiomeData biomeData = biomeDataManager.getBiomeData(biome);
-
-            if (i > 0 && i % 3 != 0) {
-                builder.append(" ")
-                        .append(messageManager.get(Message.BIOMEBASICINFOSEPERATOR))
-                        .append(" ");
-            }
-            i++;
 
             Message message = Message.BIOMEBASICINFOFORMAT;
             if (biomeLevel.getLevel() == biomeData.getMaxLevel()) message = Message.BIOMEBASICINFOMAX;
 
             builder.append(messageManager.getWithPlaceholder(message, target.getName(), biomeData, biomeLevel));
 
-            if (i % 3 == 0) builder.append("\n");
+            builder.append("\n");
         }
 
         cooldownManager.addCooldown(sender);
         sendMessage(sender, builder.toString());
+
+        sendDynamicPageFooter(sender, page, totalPages, target);
+    }
+
+    private void sendDynamicPageFooter(CommandSender sender, int page, int totalPages, OfflinePlayer target) {
+        String message = Utils.addColour(messageManager.getWithPlaceholder(Message.BIOMEBASICINFOFOOTER, page, totalPages));
+
+        if (!(sender instanceof Player)) {
+            sendMessage(sender, message);
+            return;
+        }
+
+        ComponentBuilder builder = new ComponentBuilder();
+
+        //Previous button
+        if (page - 1 > 0) {
+            TextComponent prevButton = createTextComponent(
+                    messageManager.get(Message.BIOMEBASICINFOPREVBUTTON),
+                    "/biome info " + target.getName() + " " + (page - 1),
+                    messageManager.get(Message.PREVBUTTONHOVER)
+            );
+
+            if (prevButton != null) builder.append(prevButton);
+        }
+
+        builder.append(" ", ComponentBuilder.FormatRetention.NONE);
+        String translatedColours = Utils.addColour(message);
+        builder.append(TextComponent.fromLegacyText(translatedColours));
+        builder.append(" ");
+
+        //Next button
+        if (page + 1 <= totalPages) {
+            TextComponent nextButton = createTextComponent(
+                    messageManager.get(Message.BIOMEBASICINFONEXTBUTTON),
+                    "/biome info " + target.getName() + " " + (page + 1),
+                    messageManager.get(Message.NEXTBUTTONHOVER)
+            );
+
+            if (nextButton != null) builder.append(nextButton);
+        }
+
+        sender.spigot().sendMessage(builder.create());
+    }
+
+    private TextComponent createTextComponent(String message, String cmd, String hoverText) {
+        if (message == null || message.isEmpty()) return null;
+
+        TextComponent component = new TextComponent("");
+        String translatedMessage = Utils.addColour(message);
+        for (BaseComponent child : TextComponent.fromLegacyText(translatedMessage)) {
+            component.addExtra(child);
+        }
+
+        component.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, cmd));
+
+        if (hoverText != null && !hoverText.isEmpty()) {
+            String translatedHover = Utils.addColour(hoverText);
+
+            BaseComponent[] hoverComponents = TextComponent.fromLegacyText(translatedHover);
+            component.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new Text(hoverComponents)));
+        }
+
+        return component;
     }
 
     private void displayBiomeInfo(CommandSender sender, OfflinePlayer target, Biome biome) {
@@ -421,6 +540,7 @@ public class UsageCmd implements CommandExecutor, TabCompleter {
 
     private void openGUI(Player player) {
         //TODO: Open gui for player
+        // if (!hasPlayerData(player)) return;
         // updateProgress((Player) sender);
         // sendMessage(player, messageManager.get(Message.GUIOPENED));
     }

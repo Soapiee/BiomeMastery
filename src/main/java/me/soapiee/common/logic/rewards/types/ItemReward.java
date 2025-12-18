@@ -35,8 +35,8 @@ public class ItemReward extends Reward {
             }
         }
 
-        if (invFull) player.sendMessage(Utils.colour(messageManager.get(Message.INVFULL)));
-        else player.sendMessage(Utils.colour(messageManager.getWithPlaceholder(Message.REWARDRECEIVED, toString())));
+        if (invFull) player.sendMessage(Utils.addColour(messageManager.get(Message.INVFULL)));
+        else player.sendMessage(Utils.addColour(messageManager.getWithPlaceholder(Message.REWARDRECEIVED, toString())));
     }
 
     @Override

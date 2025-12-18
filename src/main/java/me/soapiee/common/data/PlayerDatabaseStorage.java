@@ -59,7 +59,7 @@ public class PlayerDatabaseStorage implements PlayerStorageHandler{
         for (Biome key : configManager.getEnabledBiomes()) {
             getPlayerData(key.name(), (player2, results, error) -> {
                 if (error != null) {
-                    logger.logToPlayer((CommandSender) player2, error, Utils.colour(messageManager.get(Message.DATAERRORPLAYER)));
+                    logger.logToPlayer((CommandSender) player2, error, Utils.addColour(messageManager.get(Message.DATAERRORPLAYER)));
                     return;
                 }
 

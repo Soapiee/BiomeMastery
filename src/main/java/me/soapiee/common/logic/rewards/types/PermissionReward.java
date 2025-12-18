@@ -23,7 +23,7 @@ public class PermissionReward extends Reward {
 
     @Override
     public void give(Player player) {
-        player.sendMessage(Utils.colour(messageManager.getWithPlaceholder(Message.REWARDRECEIVED, toString())));
+        player.sendMessage(Utils.addColour(messageManager.getWithPlaceholder(Message.REWARDRECEIVED, toString())));
 
         for (String permission : permissions) {
             vaultHook.setPermission(player, permission);

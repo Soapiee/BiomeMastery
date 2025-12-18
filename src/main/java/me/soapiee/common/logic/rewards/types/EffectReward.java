@@ -34,11 +34,11 @@ public class EffectReward extends Reward {
 
         Effect conflict = effect.hasConflict(playerData);
         if (conflict != null) {
-            player.sendMessage(Utils.colour(messageManager.getWithPlaceholder(Message.REWARDCONFLICT, toString(), conflict + " effect")));
+            player.sendMessage(Utils.addColour(messageManager.getWithPlaceholder(Message.REWARDCONFLICT, toString(), conflict + " effect")));
             return;
         }
 
-        player.sendMessage(Utils.colour(messageManager.getWithPlaceholder(Message.REWARDACTIVATED, toString())));
+        player.sendMessage(Utils.addColour(messageManager.getWithPlaceholder(Message.REWARDACTIVATED, toString())));
         effect.activate(player);
         playerData.addActiveReward(this);
     }

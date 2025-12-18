@@ -68,7 +68,7 @@ public class Logger {
 
         if (sender instanceof Player)
             if (((Player) sender).isOnline()) {
-                sender.sendMessage(Utils.colour(string));
+                sender.sendMessage(Utils.addColour(string));
             }
     }
 
@@ -77,7 +77,7 @@ public class Logger {
 
         if (sender instanceof Player)
             if (((Player) sender).isOnline()) {
-                sender.sendMessage(Utils.colour(string));
+                sender.sendMessage(Utils.addColour(string));
                 return;
             }
 

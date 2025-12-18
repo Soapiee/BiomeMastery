@@ -162,7 +162,7 @@ public class AdminCmd implements CommandExecutor, TabCompleter {
                 PlayerData playerData = new PlayerData(main, target);
                 playerDataManager.add(playerData);
             } catch (IOException | SQLException error) {
-                customLogger.logToPlayer(sender, error, Utils.colour(messageManager.get(Message.DATAERRORPLAYER)));
+                customLogger.logToPlayer(sender, error, Utils.addColour(messageManager.get(Message.DATAERRORPLAYER)));
                 return true;
             }
         }
@@ -282,7 +282,7 @@ public class AdminCmd implements CommandExecutor, TabCompleter {
             try {
                 playerDataManager.add(new PlayerData(main, target));
             } catch (IOException | SQLException error) {
-                customLogger.logToPlayer(sender, error, Utils.colour(messageManager.get(Message.DATAERRORPLAYER)));
+                customLogger.logToPlayer(sender, error, Utils.addColour(messageManager.get(Message.DATAERRORPLAYER)));
                 return;
             }
         }
@@ -654,7 +654,7 @@ public class AdminCmd implements CommandExecutor, TabCompleter {
     private void sendMessage(CommandSender sender, String message) {
         if (message == null) return;
 
-        if (sender instanceof Player) sender.sendMessage(Utils.colour(message));
+        if (sender instanceof Player) sender.sendMessage(Utils.addColour(message));
         else Utils.consoleMsg(message);
     }
 

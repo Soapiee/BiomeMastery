@@ -69,7 +69,7 @@ public class PlayerListener implements Listener {
                 playerData = new PlayerData(main, player);
                 playerDataManager.add(playerData);
             } catch (IOException | SQLException error) {
-                logger.logToPlayer(player, error, Utils.colour(messageManager.get(Message.DATAERRORPLAYER)));
+                logger.logToPlayer(player, error, Utils.addColour(messageManager.get(Message.DATAERRORPLAYER)));
                 return;
             }
         } else playerData = playerDataManager.getPlayerData(player.getUniqueId());
@@ -133,7 +133,7 @@ public class PlayerListener implements Listener {
         playerData.clearActiveRewards();
 
         String biomeString = biomeDataManager.getBiomeData(previousBiome).getBiomeName();
-        player.sendMessage(Utils.colour(messageManager.getWithPlaceholder(Message.REWARDSDEACTIVATED, biomeString)));
+        player.sendMessage(Utils.addColour(messageManager.getWithPlaceholder(Message.REWARDSDEACTIVATED, biomeString)));
     }
 
     public boolean isLocEnabled(World world, Biome biome) {

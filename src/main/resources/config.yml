@@ -19,9 +19,14 @@ settings:
   # Default: 3
   command_cooldown: 3
 
-  # Do you want there to be a notification given in console when there is an update available
+  # Do you want there to be a notification given in console and to admins when there is an update available
   # Default: true
   plugin_update_notification: true
+
+  # When using the /biome info command
+  # how many biomes should be displayed per page.
+  # You can edit the format of the output in the messages.yml file (player_biome_info_XXX)
+  biomes_per_page: 5
 
 default_biome_settings:
   # List the worlds you want this plugin to work on
