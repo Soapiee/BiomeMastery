@@ -1,7 +1,7 @@
 # **BiomeMastery**
 <p align="center">
-  <img width="256" height="256" alt="BM logo" src="https://github.com/user-attachments/assets/bc924b4e-5dda-4f4a-9500-e383a8091ce0" />
-</p>  
+  <img width="256" height="256" alt="BM logo" src="https://github.com/user-attachments/assets/d81ca1bd-b0e7-4dc9-8847-8b791031fddb" />
+</p>
 
 ## Introduction
 This plugin gives your players something to grind towards. Players can gain experience in each Biome, and they can level up to get rewards. Some rewards are one time use, and some they can toggle (once earnt) any time theyre in that specific Biome.
