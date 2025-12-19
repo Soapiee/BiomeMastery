@@ -261,7 +261,6 @@ public class AdminCmd implements CommandExecutor, TabCompleter {
     }
 
     private void updateProgress(OfflinePlayer target) {
-        // if player is online, get their location, and update that biomelevel
         if (!target.isOnline()) return;
 
         Player onlinePlayer = target.getPlayer();
@@ -450,7 +449,6 @@ public class AdminCmd implements CommandExecutor, TabCompleter {
             ((EffectReward) reward).remove(player);
             playerData.clearActiveReward(reward);
         }
-
     }
 
     private void setProgress(CommandSender sender, OfflinePlayer player, BiomeLevel biomeLevel, int inputValue) {
@@ -720,5 +718,4 @@ public class AdminCmd implements CommandExecutor, TabCompleter {
                 .filter(completion -> completion.toLowerCase().startsWith(args[args.length - 1].toLowerCase()))
                 .collect(Collectors.toList());
     }
-
 }

@@ -135,11 +135,7 @@ public class UsageCmd implements CommandExecutor, TabCompleter {
             return null;
         }
 
-        if (!hasPlayerData(sender, target)) {
-            return null;
-        }
-
-        return target;
+        return ((!hasPlayerData(sender, target)) ? null : target);
     }
 
     private boolean hasPlayerData(CommandSender sender, OfflinePlayer target) {
@@ -199,7 +195,6 @@ public class UsageCmd implements CommandExecutor, TabCompleter {
     }
 
     private void updateProgress(OfflinePlayer target) {
-        // if player is online, get their location, and update that biomelevel
         if (!target.isOnline()) return;
 
         Player onlinePlayer = target.getPlayer();
@@ -433,6 +428,7 @@ public class UsageCmd implements CommandExecutor, TabCompleter {
             if (prevButton != null) builder.append(prevButton);
         }
 
+        //Footer
         builder.append(" ", ComponentBuilder.FormatRetention.NONE);
         String translatedColours = Utils.addColour(message);
         builder.append(TextComponent.fromLegacyText(translatedColours));

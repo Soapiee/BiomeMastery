@@ -72,18 +72,6 @@ public class Logger {
             }
     }
 
-    public void onlyLogToPlayer(CommandSender sender, String string) {
-        if (string.isEmpty()) return;
-
-        if (sender instanceof Player)
-            if (((Player) sender).isOnline()) {
-                sender.sendMessage(Utils.addColour(string));
-                return;
-            }
-
-        Utils.consoleMsg(string);
-    }
-
     enum LogType {
         SEVERE(""),
         WARNING("");

@@ -48,7 +48,6 @@ public class ConfigManager {
     }
 
     public ArrayList<World> setUpEnabledWords() {
-        //Create list of enabled worlds
         ArrayList<World> worldList = new ArrayList<>();
         boolean worldsListExists = config.isSet("default_biome_settings.enabled_worlds");
         if (worldsListExists) {

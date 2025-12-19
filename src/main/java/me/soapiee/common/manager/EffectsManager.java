@@ -2,11 +2,8 @@ package me.soapiee.common.manager;
 
 import lombok.Getter;
 import me.soapiee.common.BiomeMastery;
-import me.soapiee.common.logic.effects.Effect;
-import me.soapiee.common.logic.effects.EffectType;
 import me.soapiee.common.util.Logger;
 import me.soapiee.common.util.Message;
-import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.file.YamlConfiguration;
 
@@ -45,18 +42,5 @@ public class EffectsManager {
             return false;
         }
         return true;
-    }
-
-    public void save() {
-        try {
-            config.save(file);
-            config.load(file);
-        } catch (Exception ex) {
-            customLogger.logToFile(ex, ChatColor.RED + "Could not save the effects.yml");
-        }
-    }
-
-    public Effect getEffect (EffectType effectType){
-        return effectType.getInstance(main, config);
     }
 }

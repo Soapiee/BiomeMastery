@@ -21,7 +21,6 @@ public class SpeedSwimmerEffect implements Effect {
     private static final double SPEED_MIN = 0.1;
     private static final double SPEED_MAX = 1;
     private static final double SPEED_DEFAULT = 0.4;
-    private static final float DEFAULT_WALK_SPEED = 0.2F;
 
     public SpeedSwimmerEffect(BiomeMastery main, FileConfiguration config) {
         listener = main.getEffectsListener();

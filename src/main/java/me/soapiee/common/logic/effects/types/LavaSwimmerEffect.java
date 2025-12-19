@@ -21,7 +21,6 @@ public class LavaSwimmerEffect implements Effect {
     private static final int SPEED_MIN = 10;
     private static final int SPEED_MAX = 50;
     private static final int SPEED_DEFAULT = 10;
-    private static final float DEFAULT_WALK_SPEED = 0.2F;
 
     public LavaSwimmerEffect(BiomeMastery main, FileConfiguration config) {
         listener = main.getEffectsListener();
@@ -53,7 +52,6 @@ public class LavaSwimmerEffect implements Effect {
         UUID uuid = player.getUniqueId();
         if (!listener.hasActiveEffect(type, uuid)) return;
 
-//        player.setWalkSpeed(DEFAULT_WALK_SPEED);
         listener.removeActiveEffect(type, uuid);
     }
 

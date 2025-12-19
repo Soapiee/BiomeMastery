@@ -10,14 +10,14 @@ import java.util.function.BiFunction;
 
 public enum EffectType {
 
+    LAVASWIMMER(LavaSwimmerEffect::new), //Fire res and speed in lava
+    FREEFOOD(FreeFoodEffect::new), //Restores hunger overtime
+    SPEEDSWIMMER(SpeedSwimmerEffect::new), //Swim faster in water
 //    BOOSTEDFISHING(c -> null), //Gives fishing buffs = checks if a fishing rod is being held and apply it to that
 //    WATERBREATHING(c -> null), //Doesnt lose oxygen
 //    WATERFIGHTER(c -> null), //Deal double damage when in water
 //    FIGHTER(c -> null), //Deal double damage to hostile mobs
-    LAVASWIMMER(LavaSwimmerEffect::new), //Fire res and speed in lava
 //    FOODRESTORATION((m, c) -> null), //Restores hunger when killing mobs
-    FREEFOOD(FreeFoodEffect::new), //Restores hunger overtime
-    SPEEDSWIMMER(SpeedSwimmerEffect::new), //Swim faster in water
 //    LOOT(c -> null), //Extra loot drops
 //    FALLDAMAGE(c -> null), //No fall damage
 //    WOLFWHISPER(c -> null), //Spawns 5 tamed wolves

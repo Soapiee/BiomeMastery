@@ -22,7 +22,7 @@ public class DataManager {
     @Getter private final PlayerDataManager playerDataManager;
     @Getter private final PendingRewardsManager pendingRewardsManager;
     @Getter private final CmdCooldownManager cooldownManager;
-    @Getter private ConfigManager configManager;
+    @Getter private final ConfigManager configManager;
     @Getter private BiomeDataManager biomeDataManager;
     @Getter private EffectsManager effectsManager;
     @Getter private RewardFactory rewardFactory;
@@ -63,9 +63,7 @@ public class DataManager {
                 initialiseFiles(main);
             }
 
-        } else {
-            initialiseFiles(main);
-        }
+        } else initialiseFiles(main);
     }
 
     private void initialiseDatabase(FileConfiguration config) throws SQLException, IOException {

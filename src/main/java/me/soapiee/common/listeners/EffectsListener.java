@@ -53,7 +53,6 @@ public class EffectsListener implements Listener {
         Player player = event.getPlayer();
         UUID uuid = player.getUniqueId();
 
-        //TODO: Test compatibility with AE
         if (hasActiveEffect(EffectType.SPEEDSWIMMER, uuid)) waterSwimmer(player);
         if (hasActiveEffect(EffectType.LAVASWIMMER, uuid)) lavaSwimmer(player, event.getTo(), event.getFrom());
     }
@@ -69,30 +68,19 @@ public class EffectsListener implements Listener {
     private void lavaSwimmer(Player player, Location getTo, Location getFrom) {
         if (player.getLocation().getBlock().getType() != Material.LAVA) return;
 
-        // Movement delta (player input indicator)
         Vector delta = getTo.toVector().subtract(getFrom.toVector());
         delta.setY(0);
 
-        // If player is only drifting (VERY small movement), count as NOT pressing W
-        // TUNE: 0.0025 is ~"no input"
         if (delta.lengthSquared() < 0.0025) return;
 
         // Look direction (horizontal only)
-        Vector look = player.getLocation().getDirection().setY(0).normalize();
-
-        // Direction player is REALLY moving
+        Vector lookDir = player.getLocation().getDirection().setY(0).normalize();
         Vector moveDir = delta.clone().normalize();
 
-        // Dot product: how much the movement matches the looking direction
-        double dot = moveDir.dot(look);
-
-        // Require strongly forward movement to apply boost
-        // TUNE: 0.80 = must be mostly forward
-        // If sideways or drifting, do not boost
+        double dot = moveDir.dot(lookDir);
         if (dot < 0.80) return;
 
-        // Apply the controlled boost
-        Vector added = look.clone().multiply(lavaSwimmingSpeed);
+        Vector added = lookDir.clone().multiply(lavaSwimmingSpeed);
         player.setVelocity(player.getVelocity().add(added));
     }
 }
