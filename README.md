@@ -21,4 +21,4 @@ There are only two **OPTIONAL** dependencies
 
 ## Documentation
 - [Wiki](https://github.com/Soapiee/BiomeMasteryDev/wiki)  
-- [Spigot Page](https://www.spigotmc.org/)
+- [Spigot Page](https://www.spigotmc.org/resources/biomemastery.130906/)
