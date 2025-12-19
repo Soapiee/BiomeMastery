@@ -5,7 +5,7 @@ import lombok.Getter;
 public enum Message {
 
     //                    --->    GENERAL MESSAGES    <---
-    PREFIX("messages_prefix", "&5&l[BM]"), // Replace to "" if you want no prefix
+    PREFIX("messages_prefix", "&5&l[BM]&r"), // Replace to "" if you want no prefix
     MUSTBEPLAYERERROR("must_be_player", "&cYou must be a player to use this command"),
     CONSOLEUSAGEERROR("console_usage_error", "&cYou must enter a players name"),
     NOPERMISSION("no_permission", "&cYou do not have permission to use this command"),
@@ -38,7 +38,7 @@ public enum Message {
     REWARDNOTACHIEVED("player_reward_not_available", "&cYou have not achieved this level yet. You are level %current_level%"),
     BIOMEBASICINFOHEADER("player_biome_info_header", "#01d54a--------- %player_name%s Biome Info ---------"),
     BIOMEBASICINFOFORMAT("player_biome_info_format", "&2> &a%biome% &7[Lvl &a%player_level%&7/%biome_max_level% : &a%player_progress%&7/%target_duration_formatted%]"),
-    BIOMEBASICINFOMAX("player_biome_info_max", "&a%biome% &7[Lvl %player_level%/%biome_max_level%]"),
+    BIOMEBASICINFOMAX("player_biome_info_max", "&2> &a%biome% &7[Lvl %player_level%/%biome_max_level%]"),
     BIOMEBASICINFOFOOTER("player_biome_info_footer", "#01d54a<-- [%current_page%/%total_pages%] -->"),
     BIOMEBASICINFOPREVBUTTON("player_biome_prev_button", "#087014Previous Page"),
     BIOMEBASICINFONEXTBUTTON("player_biome_next_button", "#087014Next Page"),
@@ -69,7 +69,7 @@ public enum Message {
     NOTINBIOME("not_inside_biome", "&cYou must be inside the &e%biome% &cbiome to activate the &e%reward% &creward"),
 
     //                    --->    ADMIN CMD MESSAGES    <---
-    UPDATEAVAILABLE("update_available", "&aThere is an update available"),
+    UPDATEAVAILABLE("update_available", "&aThere is an update available for BiomeMastery"),
     ADMINHELP("admin_help", "#01d54a--------- BiomeMastery Admin Help ---------"
             + "\n#01d54aKey: < > = Optional | [ ] = Required"
             + "\n#01d54a/%cmd_label% reload &7- Reloads the plugin"

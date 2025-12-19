@@ -53,7 +53,7 @@ public class UpdateManager {
             if (message == null) return;
 
             if (sender instanceof ConsoleCommandSender) Utils.consoleMsg(message);
-            else sender.sendMessage(message);
+            else sender.sendMessage(Utils.addColour(message));
         }
     }
 

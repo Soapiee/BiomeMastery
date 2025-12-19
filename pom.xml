@@ -6,7 +6,7 @@
 
     <groupId>me.soapiee</groupId>
     <artifactId>biomemastery</artifactId>
-    <version>1.0.0</version>
+    <version>1.0.1</version>
     <packaging>jar</packaging>
 
     <name>BiomeMastery</name>
@@ -21,7 +21,7 @@
     </properties>
 
     <build>
-        <finalName>${project.name}</finalName>
+        <finalName>${project.name}-${project.version}</finalName>
         <defaultGoal>clean package</defaultGoal>
         <plugins>
             <plugin>
@@ -66,40 +66,6 @@
         </plugins>
     </build>
 
-    <profiles>
-        <!-- only trigger this on a windows build, for non-windows this creates folders that shouldn't exist -->
-        <profile>
-            <id>windows-shade</id>
-            <activation>
-                <os>
-                    <family>Windows</family>
-                </os>
-            </activation>
-            <build>
-                <plugins>
-                    <plugin>
-                        <groupId>org.apache.maven.plugins</groupId>
-                        <artifactId>maven-shade-plugin</artifactId>
-                        <executions>
-                            <execution>
-                                <phase>package</phase>
-                                <goals>
-                                    <goal>shade</goal>
-                                </goals>
-                                <configuration>
-                                    <outputFile>D:\Coding\Test Servers\1.21.11 R7\Plugins\BiomeMastery.jar</outputFile>
-                                </configuration>
-                            </execution>
-                        </executions>
-                        <configuration>
-                            <createDependencyReducedPom>false</createDependencyReducedPom>
-                        </configuration>
-                    </plugin>
-                </plugins>
-            </build>
-        </profile>
-    </profiles>
-
     <repositories>
         <repository>
             <id>jitpack.io</id>
@@ -120,7 +86,7 @@
     </repositories>
 
     <dependencyManagement>
-        <!-- Mincecraft, plugin and frameworks -->
+        <!-- Minecraft, plugin and frameworks -->
         <dependencies>
             <dependency>
                 <groupId>org.spigotmc</groupId>

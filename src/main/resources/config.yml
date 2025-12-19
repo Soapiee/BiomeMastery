@@ -26,6 +26,7 @@ settings:
   # When using the /biome info command
   # how many biomes should be displayed per page.
   # You can edit the format of the output in the messages.yml file (player_biome_info_XXX)
+  # Default: 5
   biomes_per_page: 5
 
 default_biome_settings:

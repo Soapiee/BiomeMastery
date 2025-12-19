@@ -64,7 +64,7 @@ public class PlayerDatabaseStorage implements PlayerStorageHandler{
                 }
 
                 playerData.getBiomesMap().get(key).setLevel(results.getLevel());
-                playerData.getBiomesMap().get(key).setProgress(results.getProgress());
+                playerData.getBiomesMap().get(key).initialiseProgress(results.getProgress());
             });
         }
     }

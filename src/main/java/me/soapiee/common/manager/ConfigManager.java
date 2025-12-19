@@ -84,8 +84,9 @@ public class ConfigManager {
     public void reload(BiomeMastery main, DataManager dataManager) {
         main.reloadConfig();
         config = main.getConfig();
-        updateInterval = config.getInt("settings.update_interval", 60);
         debugMode = config.getBoolean("debug_mode", false);
+        updateNotif = config.getBoolean("settings.plugin_update_notification", true);
+        updateInterval = config.getInt("settings.update_interval", 60);
         biomesPerPage = Math.max(config.getInt("settings.biomes_per_page", 5), 1);
         dataManager.getCooldownManager().updateThreshold(config.getInt("settings.command_cooldown", 3));
     }

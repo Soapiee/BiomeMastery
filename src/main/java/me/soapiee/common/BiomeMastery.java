@@ -12,6 +12,7 @@ import me.soapiee.common.listeners.PotionRemovalListener;
 import me.soapiee.common.manager.DataManager;
 import me.soapiee.common.manager.MessageManager;
 import me.soapiee.common.manager.PlayerDataManager;
+import me.soapiee.common.manager.UpdateManager;
 import me.soapiee.common.util.Logger;
 import me.soapiee.common.util.PlayerCache;
 import me.soapiee.common.util.Utils;
@@ -33,6 +34,7 @@ public class BiomeMastery extends JavaPlugin {
     private VaultHook vaultHook;
     @Getter private Logger customLogger;
     @Getter private EffectsListener effectsListener;
+    @Getter private UpdateManager updateChecker;
 
     public BiomeMastery() {
         super();
@@ -90,10 +92,9 @@ public class BiomeMastery extends JavaPlugin {
         getCommand("abiomemastery").setExecutor(new AdminCmd(this));
         getCommand("biomemastery").setExecutor(new UsageCmd(this));
 
-        // TODO:
-        // Updater notification setup
-//        updateChecker = new UpdateChecker(this, 125077);
-//        updateChecker.updateAlert(Bukkit.getConsoleSender());
+//        Updater notification setup
+        updateChecker = new UpdateManager(this, 130906);
+        updateChecker.updateAlert(Bukkit.getConsoleSender());
     }
 
     @Override

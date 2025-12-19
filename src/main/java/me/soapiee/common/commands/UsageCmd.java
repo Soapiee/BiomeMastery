@@ -42,7 +42,7 @@ public class UsageCmd implements CommandExecutor, TabCompleter {
     private final MessageManager messageManager;
     private final Logger customLogger;
     private final CmdCooldownManager cooldownManager;
-    private final HashMap<Integer, Biome> enabledBiomes = new HashMap<>();
+    private final HashMap<Integer, Biome> enabledBiomes;
 
     public UsageCmd(BiomeMastery main) {
         this.main = main;
@@ -54,12 +54,7 @@ public class UsageCmd implements CommandExecutor, TabCompleter {
         messageManager = main.getMessageManager();
         customLogger = main.getCustomLogger();
         cooldownManager = dataManager.getCooldownManager();
-
-        int i = 1;
-        for (Biome biome : configManager.getEnabledBiomes()) {
-            enabledBiomes.put(i, biome);
-            i++;
-        }
+        enabledBiomes = createEnabledBiomes();
     }
 
     @Override
@@ -180,7 +175,10 @@ public class UsageCmd implements CommandExecutor, TabCompleter {
             return -1;
         }
 
-        int totalPages = enabledBiomes.size() / configManager.getBiomesPerPage();
+        int enabledBiomesCount = enabledBiomes.size();
+        int maxBiomes = configManager.getBiomesPerPage();
+        int totalPages = ((enabledBiomesCount % maxBiomes) == 0 ? (enabledBiomesCount / maxBiomes) : (enabledBiomesCount / maxBiomes) + 1);
+
         if (page < 1 || page > totalPages) {
             sendMessage(sender, messageManager.getWithPlaceholder(Message.INVALIDPAGE, page, totalPages));
             return 0;
@@ -388,11 +386,13 @@ public class UsageCmd implements CommandExecutor, TabCompleter {
         builder.append(messageManager.getWithPlaceholder(Message.BIOMEBASICINFOHEADER, target.getName())).append("\n");
 
         int maxBiomes = configManager.getBiomesPerPage();
-        int startPoint = page * maxBiomes;
-        int totalPages = enabledBiomes.size() / maxBiomes;
+        int startPoint = (page * maxBiomes) - (maxBiomes - 1);
+        int endPoint = startPoint + maxBiomes;
+        int enabledBiomesCount = enabledBiomes.size();
+        int totalPages = ((enabledBiomesCount % maxBiomes) == 0 ? (enabledBiomesCount / maxBiomes) : (enabledBiomesCount / maxBiomes) + 1);
 
-        for (int i = startPoint; i < (page + 1) * maxBiomes; i++) {
-            if (i >= enabledBiomes.size()) break;
+        for (int i = startPoint; i < endPoint; i++) {
+            if (i > enabledBiomes.size()) break;
 
             Biome biome = enabledBiomes.get(i);
             BiomeLevel biomeLevel = playerData.getBiomeLevel(biome);
@@ -545,6 +545,17 @@ public class UsageCmd implements CommandExecutor, TabCompleter {
         // sendMessage(player, messageManager.get(Message.GUIOPENED));
     }
 
+    private HashMap<Integer, Biome> createEnabledBiomes(){
+        HashMap<Integer, Biome> map = new HashMap<>();
+
+        int i = 1;
+        for (Biome biome : configManager.getEnabledBiomes()) {
+            map.put(i, biome);
+            i++;
+        }
+
+        return map;
+    }
 
     @Override
     public List<String> onTabComplete(CommandSender sender, Command cmd, String label, String[] args) {

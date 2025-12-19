@@ -60,8 +60,7 @@ public class PlayerListener implements Listener {
 
         if (!player.hasPlayedBefore()) playerCache.addOfflinePlayer(player);
 
-        //TODO:
-        // if (player.hasPermission("biomemastery.admin")) updateNotif(player);
+        if (player.hasPermission("biomemastery.admin")) updateNotif(player);
 
         PlayerData playerData;
         if (!playerDataManager.has(player.getUniqueId())) {
@@ -85,7 +84,7 @@ public class PlayerListener implements Listener {
     }
 
     private void updateNotif(Player player) {
-//        if (configManager.isUpdateNotif()) main.getUpdateChecker().updateAlert(player);
+        if (configManager.isUpdateNotif()) main.getUpdateChecker().updateAlert(player);
     }
 
     private boolean checkPendingRewards(Player player) {
