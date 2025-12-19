@@ -20,5 +20,5 @@ There are only two **OPTIONAL** dependencies
 2. [Spigot DMs](https://www.spigotmc.org/members/soapie.174947/)
 
 ## Documentation
-- [Wiki](https://github.com/Soapiee/BiomeMasteryDev/wiki)  
+- [Wiki](https://github.com/Soapiee/BiomeMastery/wiki)  
 - [Spigot Page](https://www.spigotmc.org/resources/biomemastery.130906/)
