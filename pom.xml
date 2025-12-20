@@ -47,6 +47,22 @@
                         <goals>
                             <goal>shade</goal>
                         </goals>
+                        <configuration>
+                            <!--                            <filters>-->
+                            <!--                                <filter>-->
+                            <!--                                    <artifact>*:*</artifact>-->
+                            <!--                                    <excludes>-->
+                            <!--                                        <exclude>org/apache/logging/**</exclude>-->
+                            <!--                                    </excludes>-->
+                            <!--                                </filter>-->
+                            <!--                            </filters>-->
+                            <relocations>
+                                <relocation>
+                                    <pattern>com.zaxxer.hikari</pattern>
+                                    <shadedPattern>me.soapiee.biomemastery.libs.hikari</shadedPattern>
+                                </relocation>
+                            </relocations>
+                        </configuration>
                     </execution>
                 </executions>
                 <configuration>
@@ -86,44 +102,7 @@
     </repositories>
 
     <dependencyManagement>
-        <!-- Minecraft, plugin and frameworks -->
         <dependencies>
-            <dependency>
-                <groupId>org.spigotmc</groupId>
-                <artifactId>spigot-api</artifactId>
-                <version>${mc.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>com.github.MilkBowl</groupId>
-                <artifactId>VaultAPI</artifactId>
-                <version>1.7.1</version>
-            </dependency>
-            <dependency>
-                <groupId>me.clip</groupId>
-                <artifactId>placeholderapi</artifactId>
-                <version>2.11.6</version>
-            </dependency>
-            <dependency>
-                <groupId>com.zaxxer</groupId>
-                <artifactId>HikariCP</artifactId>
-                <version>6.0.0</version>
-            </dependency>
-
-            <!-- Core dependencies; logging etc. -->
-            <dependency>
-                <groupId>org.apache.logging.log4j</groupId>
-                <artifactId>log4j-bom</artifactId>
-                <version>2.25.1</version>
-                <scope>import</scope>
-                <type>pom</type>
-            </dependency>
-            <dependency>
-                <groupId>org.projectlombok</groupId>
-                <artifactId>lombok</artifactId>
-                <version>${lombok.version}</version>
-            </dependency>
-
-            <!-- Test -->
             <dependency>
                 <groupId>org.junit</groupId>
                 <artifactId>junit-bom</artifactId>
@@ -149,22 +128,12 @@
     </dependencyManagement>
 
     <dependencies>
-        <!-- Core dependencies -->
         <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
+            <version>${lombok.version}</version>
             <scope>provided</scope>
         </dependency>
-        <dependency>
-            <groupId>org.apache.logging.log4j</groupId>
-            <artifactId>log4j-slf4j-impl</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.logging.log4j</groupId>
-            <artifactId>log4j-core</artifactId>
-        </dependency>
-
-        <!-- Mincecraft, plugins, framework etc. -->
         <dependency>
             <groupId>com.github.seeseemelk</groupId>
             <artifactId>mockbukkit-v1.16</artifactId>
@@ -174,28 +143,31 @@
         <dependency>
             <groupId>org.spigotmc</groupId>
             <artifactId>spigot-api</artifactId>
+            <version>${mc.version}</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>com.github.MilkBowl</groupId>
             <artifactId>VaultAPI</artifactId>
+            <version>1.7.1</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>me.clip</groupId>
             <artifactId>placeholderapi</artifactId>
+            <version>2.11.6</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>com.zaxxer</groupId>
             <artifactId>HikariCP</artifactId>
+            <version>6.0.0</version>
             <scope>compile</scope>
         </dependency>
-
-        <!-- Test -->
         <dependency>
             <groupId>org.assertj</groupId>
             <artifactId>assertj-core</artifactId>
+            <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.junit.jupiter</groupId>
