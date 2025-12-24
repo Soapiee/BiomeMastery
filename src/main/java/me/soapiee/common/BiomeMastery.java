@@ -103,9 +103,9 @@ public class BiomeMastery extends JavaPlugin {
         PlayerDataManager playerDataManager = dataManager.getPlayerDataManager();
         for (Player player : Bukkit.getOnlinePlayers()) {
             PlayerData playerData = playerDataManager.getPlayerData(player.getUniqueId());
-            if (playerData.hasActiveRewards()) {
-                playerData.clearActiveRewards();
-            }
+
+            if (playerData == null) continue;
+            if (playerData.hasActiveRewards()) playerData.clearActiveRewards();
         }
 
         dataManager.saveAll();

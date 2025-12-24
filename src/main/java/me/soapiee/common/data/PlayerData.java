@@ -12,27 +12,27 @@ import org.bukkit.block.Biome;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
-import java.io.IOException;
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.CompletableFuture;
 
 public class PlayerData {
 
     @Getter private final OfflinePlayer player;
-    @Getter private final Map<Biome, BiomeLevel> biomesMap = new HashMap<>();
+    private final Map<Biome, BiomeLevel> biomesMap = new HashMap<>();
     @Getter private final ArrayList<Reward> activeRewards = new ArrayList<>();
     private final PlayerStorageHandler storageHandler;
 
-    public PlayerData(BiomeMastery main, @NotNull OfflinePlayer player) throws IOException, SQLException {
+    public PlayerData(BiomeMastery main, @NotNull OfflinePlayer player) {
         this.player = player;
 
         ConfigManager configManager = main.getDataManager().getConfigManager();
-        if (configManager.isDatabaseEnabled()) storageHandler = new PlayerDatabaseStorage(main, this);
-        else storageHandler = new PlayerFileStorage(main, this);
+        storageHandler = (configManager.isDatabaseEnabled() ? new PlayerDatabaseStorage(main, this) : new PlayerFileStorage(main, this));
+    }
 
-        storageHandler.readData();
+    public CompletableFuture<PlayerData> load() {
+        return storageHandler.readData();
     }
 
     public void saveData(boolean async) {
@@ -75,5 +75,9 @@ public class PlayerData {
 
     public void clearActiveReward(Reward reward) {
         activeRewards.remove(reward);
+    }
+
+    public void addBiomeLevel(Biome key, BiomeLevel biomeLevel){
+        biomesMap.put(key, biomeLevel);
     }
 }

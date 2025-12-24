@@ -1,7 +1,7 @@
 package me.soapiee.common.data;
 
 import me.soapiee.common.BiomeMastery;
-import me.soapiee.common.logic.*;
+import me.soapiee.common.logic.BiomeLevel;
 import me.soapiee.common.manager.BiomeDataManager;
 import me.soapiee.common.manager.ConfigManager;
 import me.soapiee.common.manager.DataManager;
@@ -13,15 +13,16 @@ import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.block.Biome;
-import org.bukkit.command.CommandSender;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.UUID;
+import java.util.*;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.CompletionException;
 
-public class PlayerDatabaseStorage implements PlayerStorageHandler{
+public class PlayerDatabaseStorage implements PlayerStorageHandler {
 
     private final BiomeMastery main;
     private final DataManager dataManager;
@@ -30,6 +31,7 @@ public class PlayerDatabaseStorage implements PlayerStorageHandler{
     private final MessageManager messageManager;
     private final PlayerData playerData;
     private final Logger logger;
+    private final Set<Biome> enabledBiomes;
 
     private final UUID uuid;
     private final OfflinePlayer player;
@@ -44,102 +46,118 @@ public class PlayerDatabaseStorage implements PlayerStorageHandler{
         logger = main.getCustomLogger();
         uuid = playerData.getPlayer().getUniqueId();
         player = playerData.getPlayer();
-
-        createPlayerLevels();
-    }
-
-    private void createPlayerLevels(){
-        for (Biome key : configManager.getEnabledBiomes()) {
-            playerData.getBiomesMap().put(key, new BiomeLevel(player, biomeDataManager.getBiomeData(key)));
-        }
+        enabledBiomes = Collections.unmodifiableSet(new HashSet<>(configManager.getEnabledBiomes()));
     }
 
     @Override
-    public void readData() {
-        for (Biome key : configManager.getEnabledBiomes()) {
-            getPlayerData(key.name(), (player2, results, error) -> {
-                if (error != null) {
-                    logger.logToPlayer((CommandSender) player2, error, Utils.addColour(messageManager.get(Message.DATAERRORPLAYER)));
-                    return;
-                }
+    public CompletableFuture<PlayerData> readData() {
+        CompletableFuture<Map<Biome, AsyncData>> completableFuture = CompletableFuture.supplyAsync(this::getAsync);
 
-                playerData.getBiomesMap().get(key).setLevel(results.getLevel());
-                playerData.getBiomesMap().get(key).initialiseProgress(results.getProgress());
-            });
+        return completableFuture
+                .thenAcceptAsync(this::setBiomeLevelData, BukkitExecutor.sync(main))
+                .thenApplyAsync(ignored -> playerData);
+    }
+
+    private Map<Biome, AsyncData> getAsync() {
+        Map<Biome, AsyncData> loadedData = new HashMap<>();
+
+        try (Connection connection = dataManager.getDatabase().getDatabase().getConnection()) {
+            for (Biome biome : enabledBiomes) {
+                String table = biome.name();
+
+                //Check it exists, and if not, create entry
+                try (PreparedStatement existsStatement = connection.prepareStatement("SELECT LEVEL, PROGRESS FROM " + table + " WHERE UUID=?")) {
+                    existsStatement.setString(1, uuid.toString());
+                    ResultSet results = existsStatement.executeQuery();
+
+                    if (!results.next()) {
+                        // Create new
+                        try (PreparedStatement insertStatement = connection.prepareStatement("INSERT INTO " + table + " VALUES (?,?,?);")) {
+                            insertStatement.setString(1, uuid.toString());
+                            insertStatement.setInt(2, 0);
+                            insertStatement.setInt(3, 0);
+                            insertStatement.executeUpdate();
+                        }
+                        loadedData.put(biome, new AsyncData(0, 0));
+                    } else {
+                        int level = results.getInt("LEVEL");
+                        int progress = results.getInt("PROGRESS");
+                        loadedData.put(biome, new AsyncData(level,progress));
+                    }
+                }
+            }
+        } catch (SQLException e) {
+            throw new CompletionException(e);
+        }
+
+        return loadedData;
+    }
+
+    private void setBiomeLevelData(Map<Biome, AsyncData> loadedData) {
+        for (Map.Entry<Biome, AsyncData> entry : loadedData.entrySet()) {
+            Biome biome = entry.getKey();
+            AsyncData data = entry.getValue();
+
+            BiomeLevel biomeLevel = new BiomeLevel(
+                    player,
+                    biomeDataManager.getBiomeData(biome),
+                    data.getLevel(),
+                    data.getProgress()
+            );
+
+            playerData.addBiomeLevel(biome, biomeLevel);
+            if (configManager.isDebugMode()) Utils.debugMsg(player.getName(),
+                    ChatColor.GREEN + biome.name() + " data set (" + data.getLevel() + ":" + data.getProgress() + ")");
         }
     }
 
     @Override
     public void saveData(boolean async) {
-        if (async) {
-            Bukkit.getScheduler().runTaskAsynchronously(main, () -> {
-                for (final Biome biome : playerData.getBiomesMap().keySet()) {
-                    String biomeName = biome.name();
-                    try (Connection connection = dataManager.getDatabase().getDatabase().getConnection();
-                         PreparedStatement statement = connection.prepareStatement("UPDATE " + biomeName + " SET LEVEL=?, PROGRESS=? WHERE UUID=?;")) {
-                        statement.setInt(1, playerData.getBiomeLevel(biome).getLevel());
-                        statement.setLong(2, playerData.getBiomeLevel(biome).getProgress());
-                        statement.setString(3, uuid.toString());
-                        statement.executeUpdate();
+        if (async) saveAsync(player.getName());
+        else saveSync();
+    }
 
-                    } catch (SQLException e) {
-                        logger.logToFile(e, ChatColor.RED + player.getName() + "'s " + biomeName + " data could not be saved");
-                    }
-                }
-            });
+    private void saveSync(){
+        try (Connection connection = dataManager.getDatabase().getDatabase().getConnection()) {
+            for (Biome biome : configManager.getEnabledBiomes()) {
+                String table = biome.name();
 
-        } else {
-            for (final Biome biome : configManager.getEnabledBiomes()) {
-                String biomeName = biome.name();
-                try (Connection connection = dataManager.getDatabase().getDatabase().getConnection();
-                     PreparedStatement statement = connection.prepareStatement("UPDATE " + biomeName + " SET LEVEL=?, PROGRESS=? WHERE UUID=?;")) {
-                    statement.setInt(1, playerData.getBiomeLevel(biome).getLevel());
-                    statement.setLong(2, playerData.getBiomeLevel(biome).getProgress());
-                    statement.setString(3, uuid.toString());
-                    statement.executeUpdate();
-
-                } catch (SQLException e) {
-                    logger.logToFile(e, ChatColor.RED + player.getName() + "'s " + biomeName + " data could not be saved");
+                try (PreparedStatement saveStatement = connection.prepareStatement("UPDATE " + table + " SET LEVEL=?, PROGRESS=? WHERE UUID=?;")) {
+                    saveStatement.setInt(1, playerData.getBiomeLevel(biome).getLevel());
+                    saveStatement.setLong(2, playerData.getBiomeLevel(biome).getProgress());
+                    saveStatement.setString(3, uuid.toString());
+                    saveStatement.executeUpdate();
                 }
             }
+
+        } catch (SQLException error) {
+            logger.logToFile(error, ChatColor.RED + player.getName() + "'s data could not be saved");
         }
     }
 
-    private void getPlayerData(final String table, final Callback<BiomeLevel> callback) {
-        //The tables are named after biome enums
-        final BiomeData biomeData = biomeDataManager.getBiomeData(table);
+    private void saveAsync(final String playerName) {
+        Map<Biome, AsyncData> loadedData = new HashMap<>();
+        for (Biome biome : configManager.getEnabledBiomes()) {
+            BiomeLevel level = playerData.getBiomeLevel(biome);
+            loadedData.put(biome, new AsyncData(level.getLevel(), (int) level.getProgress()));
+        }
 
         Bukkit.getScheduler().runTaskAsynchronously(main, () -> {
+            try (Connection connection = dataManager.getDatabase().getDatabase().getConnection()) {
+                for (Map.Entry<Biome, AsyncData> entry : loadedData.entrySet()) {
+                    String table = entry.getKey().name();
+                    AsyncData data = entry.getValue();
 
-            //Check it exists, and if not, create entry
-            try (Connection connection = dataManager.getDatabase().getDatabase().getConnection();
-                 PreparedStatement existsStatement = connection.prepareStatement("SELECT * FROM " + table + " WHERE UUID=?")) {
-                existsStatement.setString(1, uuid.toString());
-                ResultSet results = existsStatement.executeQuery();
-
-                BiomeLevel biomeLevel;
-
-                //creates entry
-                if (!results.next()) {
-                    try (PreparedStatement createStatement = connection.prepareStatement("INSERT INTO " + table + " VALUES (?,?,?);")) {
-                        createStatement.setString(1, uuid.toString());
-                        createStatement.setInt(2, 0);
-                        createStatement.setInt(3, 0);
-                        createStatement.executeUpdate();
+                    try (PreparedStatement saveStatement = connection.prepareStatement("UPDATE " + table + " SET LEVEL=?, PROGRESS=? WHERE UUID=?;")) {
+                        saveStatement.setInt(1, data.getLevel());
+                        saveStatement.setLong(2, data.getProgress());
+                        saveStatement.setString(3, uuid.toString());
+                        saveStatement.executeUpdate();
                     }
-                    biomeLevel = new BiomeLevel(player, biomeData);
-                    Bukkit.getScheduler().runTask(main, () -> callback.onQueryDone(player, biomeLevel, null));
-                    return;
                 }
 
-                //Get data
-                int level = results.getInt("LEVEL");
-                int progress = results.getInt("PROGRESS");
-                biomeLevel = new BiomeLevel(player, biomeData, level, progress);
-
-                Bukkit.getScheduler().runTask(main, () -> callback.onQueryDone(player, biomeLevel, null));
-            } catch (SQLException e) {
-                Bukkit.getScheduler().runTask(main, () -> callback.onQueryDone(player, null, e));
+            } catch (SQLException error) {
+                logger.logToFile(error, main.getMessageManager().getWithPlaceholder(Message.DATAERROR, playerName));
             }
         });
     }

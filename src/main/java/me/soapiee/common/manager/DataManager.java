@@ -34,7 +34,7 @@ public class DataManager {
         FileConfiguration mainConfig = main.getConfig();
         Logger logger = main.getCustomLogger();
 
-        playerDataManager = new PlayerDataManager();
+        playerDataManager = new PlayerDataManager(main);
         configManager = new ConfigManager(mainConfig, logger);
         checkDirectory(main);
         cooldownManager = new CmdCooldownManager(main, mainConfig.getInt("settings.command_cooldown", 3));

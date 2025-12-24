@@ -11,7 +11,7 @@ import java.text.DecimalFormat;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class Utils {
+public final class Utils {
 
     public static void consoleMsg(String message) {
         String prefix = "[" + Bukkit.getServer().getPluginManager().getPlugin("BiomeMastery").getDescription().getPrefix() + "]";

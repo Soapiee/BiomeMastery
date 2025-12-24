@@ -12,6 +12,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.concurrent.CompletionException;
 
 
 public class Logger {
@@ -29,9 +30,11 @@ public class Logger {
         }
     }
 
-    public void logToFile(Exception error, String string) {
+    public void logToFile(Throwable error, String string) {
         LogType logType = (error == null) ? LogType.WARNING : LogType.SEVERE;
         if (!string.isEmpty()) Utils.consoleMsg(string);
+
+        Throwable cause = (error instanceof CompletionException && error.getCause() != null) ? error.getCause() : error;
 
         try {
             PrintWriter writer = new PrintWriter(new FileWriter(logFile, true), true);
@@ -46,9 +49,9 @@ public class Logger {
             writer.write(System.lineSeparator());
             writer.write("Server Version: " + Bukkit.getBukkitVersion());
             writer.write(System.lineSeparator());
-            if (error != null) {
+            if (cause != null) {
                 writer.write(System.lineSeparator());
-                error.printStackTrace(writer);
+                cause.printStackTrace(writer);
             }
             writer.write("--------------------------------------------------------------------------------------------------");
             writer.write(System.lineSeparator());
@@ -60,8 +63,40 @@ public class Logger {
         }
     }
 
-    public void logToPlayer(CommandSender sender, Exception error, String string) {
-        if (!string.contains(" successfully created")) logToFile(error, string);
+//    public void logToFile(Throwable error, String string) {
+//        LogType logType = (error == null) ? LogType.WARNING : LogType.SEVERE;
+//        if (!string.isEmpty()) Utils.consoleMsg(string);
+//
+//        try {
+//            PrintWriter writer = new PrintWriter(new FileWriter(logFile, true), true);
+//            Date dt = new Date();
+//            SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+//            String time = df.format(dt);
+//            writer.write("--------------------------------------------------------------------------------------------------");
+//            writer.write(System.lineSeparator());
+//            writer.write(time + " [" + logType.name() + "] " + string);
+//            writer.write(System.lineSeparator());
+//            writer.write("BiomeMastery Version: " + Bukkit.getPluginManager().getPlugin("BiomeMastery").getDescription().getVersion());
+//            writer.write(System.lineSeparator());
+//            writer.write("Server Version: " + Bukkit.getBukkitVersion());
+//            writer.write(System.lineSeparator());
+//            if (error != null) {
+//                writer.write(System.lineSeparator());
+//                error.printStackTrace(writer);
+//            }
+//            writer.write("--------------------------------------------------------------------------------------------------");
+//            writer.write(System.lineSeparator());
+//            writer.write(System.lineSeparator());
+//            writer.close();
+//            Utils.consoleMsg(ChatColor.RED + "An error has been added to the logger.log file");
+//        } catch (IOException e) {
+//            Utils.consoleMsg(ChatColor.RED + "There was an error whilst writing to the logger file");
+//        }
+//    }
+
+    public void logToPlayer(CommandSender sender, Throwable error, String string) {
+        Throwable cause = (error instanceof CompletionException && error.getCause() != null) ? error.getCause() : error;
+        if (!string.contains(" successfully created")) logToFile(cause, string);
 
         if (sender == null) return;
         if (string.isEmpty()) return;
@@ -70,6 +105,18 @@ public class Logger {
             if (((Player) sender).isOnline()) {
                 sender.sendMessage(Utils.addColour(string));
             }
+    }
+
+    public void onlyLogToPlayer(CommandSender sender, String string) {
+        if (string.isEmpty()) return;
+
+        if (sender instanceof Player)
+            if (((Player) sender).isOnline()) {
+                sender.sendMessage(Utils.addColour(string));
+                return;
+            }
+
+        Utils.consoleMsg(string);
     }
 
     enum LogType {

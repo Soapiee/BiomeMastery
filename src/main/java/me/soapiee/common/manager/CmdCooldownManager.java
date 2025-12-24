@@ -66,9 +66,10 @@ public class CmdCooldownManager {
     public void save() {
         contents = new YamlConfiguration();
         try {
-            for (UUID uuid : cooldowns.keySet()) {
-                if (getCooldownLong(uuid) <= 0) continue;
-                contents.set(uuid.toString(), getStartTime(uuid));
+            for (HashMap.Entry<UUID, LocalDateTime> entry : cooldowns.entrySet()) {
+                UUID uuid = entry.getKey();
+                if (getCooldownLong(uuid, false) <= 0) continue;
+                contents.set(uuid.toString(), getStartTime(entry.getValue()));
             }
 
             contents.save(file);
@@ -90,7 +91,7 @@ public class CmdCooldownManager {
         cooldowns.put(uuid, time);
     }
 
-    private UUID getUUID(CommandSender sender){
+    private UUID getUUID(CommandSender sender) {
         UUID uuid;
         if (sender instanceof Player) uuid = ((Player) sender).getUniqueId();
         else uuid = UUID.fromString("2fcaf22d-9f2d-41f3-bb31-ff220e85c685");
@@ -100,22 +101,22 @@ public class CmdCooldownManager {
 
     public long getCooldown(CommandSender sender) {
         UUID uuid = getUUID(sender);
-        return getCooldownLong(uuid);
+        return getCooldownLong(uuid, true);
     }
 
-    private long getCooldownLong(UUID uuid) {
+    private long getCooldownLong(UUID uuid, boolean clean) {
         if (!cooldowns.containsKey(uuid)) return 0;
 
         long difference = ChronoUnit.SECONDS.between(cooldowns.get(uuid), LocalDateTime.now());
         long timeRemaining = threshold - difference;
 
-        if (timeRemaining <= 0) cooldowns.remove(uuid);
+        if (clean && timeRemaining <= 0) cooldowns.remove(uuid);
 
         return (timeRemaining < 0 ? 0 : timeRemaining);
     }
 
-    public String getStartTime(UUID uuid) {
+    private String getStartTime(LocalDateTime time) {
         DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yy-MM-dd HH:mm:ss");
-        return cooldowns.get(uuid).format(dtf);
+        return time.format(dtf);
     }
 }

@@ -1,6 +1,7 @@
 package me.soapiee.common.logic.rewards.types;
 
 import me.soapiee.common.BiomeMastery;
+import me.soapiee.common.data.PlayerData;
 import me.soapiee.common.logic.rewards.Reward;
 import me.soapiee.common.logic.rewards.RewardType;
 import me.soapiee.common.manager.PlayerDataManager;
@@ -24,13 +25,19 @@ public class PotionReward extends Reward {
 
     @Override
     public void give(Player player) {
+        PlayerData playerData = playerDataManager.getPlayerData(player.getUniqueId());
+        if (playerData == null) return;
+
         player.sendMessage(Utils.addColour(messageManager.getWithPlaceholder(Message.REWARDACTIVATED, toString())));
-        playerDataManager.getPlayerData(player.getUniqueId()).addActiveReward(this);
+        playerData.addActiveReward(this);
         player.addPotionEffect(potion);
     }
 
     public void remove(Player player){
-        playerDataManager.getPlayerData(player.getUniqueId()).clearActiveReward(this);
+        PlayerData playerData = playerDataManager.getPlayerData(player.getUniqueId());
+        if (playerData == null) return;
+
+        playerData.clearActiveReward(this);
         player.removePotionEffect(potion.getType());
     }
 

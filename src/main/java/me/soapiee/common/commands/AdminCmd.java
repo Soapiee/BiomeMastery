@@ -1,6 +1,7 @@
 package me.soapiee.common.commands;
 
 import me.soapiee.common.BiomeMastery;
+import me.soapiee.common.data.BukkitExecutor;
 import me.soapiee.common.data.PlayerData;
 import me.soapiee.common.logic.BiomeData;
 import me.soapiee.common.logic.BiomeLevel;
@@ -25,8 +26,6 @@ import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
-import java.io.IOException;
-import java.sql.SQLException;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -95,13 +94,6 @@ public class AdminCmd implements CommandExecutor, TabCompleter {
             return true;
         }
 
-        // /abm reset <player>
-        if (args.length == 2 && args[0].equalsIgnoreCase("reset")) {
-            if (!checkPermission(sender, "biomemastery.reset")) return true;
-            resetPlayer(sender, playerCache.getOfflinePlayer(args[1]));
-            return true;
-        }
-
         // /abm list worlds
         // /abm list biomes
         if (args.length == 2 && args[0].equalsIgnoreCase("list")) {
@@ -121,7 +113,7 @@ public class AdminCmd implements CommandExecutor, TabCompleter {
 
         // /abm enable|disable <world> - Enables/Disables a world
         // /abm enable|disable <biome> - Enables/Disables a biome
-        if (args.length == 2) {
+        if (args.length == 2 && ((args[0].equalsIgnoreCase("enable")) || (args[0].equalsIgnoreCase("disable")))) {
             World inputWorld = validateWorld(args[1]);
             Biome inputBiome = validateBiome(args[1]);
 
@@ -149,22 +141,31 @@ public class AdminCmd implements CommandExecutor, TabCompleter {
             return true;
         }
 
+        // /abm reset <player>
         // /abm reset <player> <biome>
-        // /abm set|add|remove <player> <biome> X - Sets the players level
+        // /abm set|add|remove <player> <biome> <value>
         OfflinePlayer target = playerCache.getOfflinePlayer(args[1]);
         if (target == null) {
             sendMessage(sender, messageManager.get(Message.PLAYERNOTFOUND));
             return true;
         }
 
-        if (!playerDataManager.has(target.getUniqueId())) {
-            try {
-                PlayerData playerData = new PlayerData(main, target);
-                playerDataManager.add(playerData);
-            } catch (IOException | SQLException error) {
-                customLogger.logToPlayer(sender, error, Utils.addColour(messageManager.get(Message.DATAERRORPLAYER)));
+        // /abm reset <player>
+        if (args.length == 2) {
+            if (!args[0].equalsIgnoreCase("reset")) {
+                sendHelpMessage(sender, label);
                 return true;
             }
+
+            if (!checkPermission(sender, "biomemastery.reset")) return true;
+
+            playerDataManager.getOrLoad(target)
+                    .thenAcceptAsync(data -> resetPlayer(sender, target, data), BukkitExecutor.sync(main))
+                    .exceptionally(error -> {
+                        customLogger.logToPlayer(sender, error, Utils.addColour(messageManager.getWithPlaceholder(Message.DATAERROR, target.getName())));
+                        return null;
+                    });
+            return true;
         }
 
         Biome inputBiome = validateBiome(args[2]);
@@ -178,8 +179,6 @@ public class AdminCmd implements CommandExecutor, TabCompleter {
             return true;
         }
 
-        BiomeLevel biomeLevel = playerDataManager.getPlayerData(target.getUniqueId()).getBiomeLevel(inputBiome);
-
         // /abm reset <player> <biome>
         if (args.length == 3) {
             if (!args[0].equalsIgnoreCase("reset")) {
@@ -188,10 +187,17 @@ public class AdminCmd implements CommandExecutor, TabCompleter {
             }
 
             if (!checkPermission(sender, "biomemastery.reset")) return true;
-            resetBiome(sender, target, biomeLevel);
+
+            playerDataManager.getOrLoad(target)
+                    .thenAcceptAsync(data -> resetBiome(sender, target, data, inputBiome), BukkitExecutor.sync(main))
+                    .exceptionally(error -> {
+                        customLogger.logToPlayer(sender, error, Utils.addColour(messageManager.getWithPlaceholder(Message.DATAERROR, target.getName())));
+                        return null;
+                    });
             return true;
         }
 
+        // /abm set|add|remove <player> <biome> <value>
         int inputValue;
         try {
             inputValue = Integer.parseInt(args[3]);
@@ -205,39 +211,66 @@ public class AdminCmd implements CommandExecutor, TabCompleter {
             return true;
         }
 
-        updateProgress(target);
         String argument = args[0].toLowerCase();
         switch (argument) {
             // /abm setlevel <biome> <player> X - Sets the players level
             case "setlevel":
-                setLevel(sender, target, biomeLevel, inputValue);
+                playerDataManager.getOrLoad(target)
+                        .thenAcceptAsync(data -> setLevel(sender, target, data, inputBiome, inputValue), BukkitExecutor.sync(main))
+                        .exceptionally(error -> {
+                            customLogger.logToPlayer(sender, error, Utils.addColour(messageManager.getWithPlaceholder(Message.DATAERROR, target.getName())));
+                            return null;
+                        });
                 break;
 
             // /abm addlevel <biome> <player> X - Adds to the players level
             case "addlevel":
-                if (biomeLevel.isMaxLevel()) playerIsMaxLevel(sender, target.getName());
-                else addLevel(sender, target, biomeLevel, inputValue);
+                playerDataManager.getOrLoad(target)
+                        .thenAcceptAsync(data -> addLevel(sender, target, data.getBiomeLevel(inputBiome), inputValue), BukkitExecutor.sync(main))
+                        .exceptionally(error -> {
+                            customLogger.logToPlayer(sender, error, Utils.addColour(messageManager.getWithPlaceholder(Message.DATAERROR, target.getName())));
+                            return null;
+                        });
                 break;
 
             // /abm removelevel <biome> <player> X - Removes levels from the player
             case "removelevel":
-                removeLevel(sender, target, biomeLevel, inputValue);
+                playerDataManager.getOrLoad(target)
+                        .thenAcceptAsync(data -> removeLevel(sender, target, data, inputBiome, inputValue), BukkitExecutor.sync(main))
+                        .exceptionally(error -> {
+                            customLogger.logToPlayer(sender, error, Utils.addColour(messageManager.getWithPlaceholder(Message.DATAERROR, target.getName())));
+                            return null;
+                        });
                 break;
 
             // /abm setprogress <biome> <player> X - Sets the players progress
             case "setprogress":
-                setProgress(sender, target, biomeLevel, inputValue);
+                playerDataManager.getOrLoad(target)
+                        .thenAcceptAsync(data -> setProgress(sender, target, data.getBiomeLevel(inputBiome), inputValue), BukkitExecutor.sync(main))
+                        .exceptionally(error -> {
+                            customLogger.logToPlayer(sender, error, Utils.addColour(messageManager.getWithPlaceholder(Message.DATAERROR, target.getName())));
+                            return null;
+                        });
                 break;
 
             // /abm addprogress <biome> <player> X - Adds to the players progress
             case "addprogress":
-                if (biomeLevel.isMaxLevel()) playerIsMaxLevel(sender, target.getName());
-                else addProgress(sender, target, biomeLevel, inputValue);
+                playerDataManager.getOrLoad(target)
+                        .thenAcceptAsync(data -> addProgress(sender, target, data.getBiomeLevel(inputBiome), inputValue), BukkitExecutor.sync(main))
+                        .exceptionally(error -> {
+                            customLogger.logToPlayer(sender, error, Utils.addColour(messageManager.getWithPlaceholder(Message.DATAERROR, target.getName())));
+                            return null;
+                        });
                 break;
 
             // /abm removeprogress <biome> <player> X - Removes progress from the player
             case "removeprogress":
-                removeProgress(sender, target, biomeLevel, inputValue);
+                playerDataManager.getOrLoad(target)
+                        .thenAcceptAsync(data -> removeProgress(sender, target, data.getBiomeLevel(inputBiome), inputValue), BukkitExecutor.sync(main))
+                        .exceptionally(error -> {
+                            customLogger.logToPlayer(sender, error, Utils.addColour(messageManager.getWithPlaceholder(Message.DATAERROR, target.getName())));
+                            return null;
+                        });
                 break;
             default:
                 sendHelpMessage(sender, label);
@@ -260,34 +293,17 @@ public class AdminCmd implements CommandExecutor, TabCompleter {
         return Bukkit.getWorld(input);
     }
 
-    private void updateProgress(OfflinePlayer target) {
+    private void updateProgress(OfflinePlayer target, BiomeLevel biomeLevel) {
         if (!target.isOnline()) return;
 
         Player onlinePlayer = target.getPlayer();
         Biome locBiome = onlinePlayer.getLocation().getBlock().getBiome();
         if (!configManager.isEnabledBiome(locBiome)) return;
 
-        BiomeLevel biomeLevel = playerDataManager.getPlayerData(onlinePlayer.getUniqueId()).getBiomeLevel(locBiome);
         biomeLevel.updateProgress(locBiome);
     }
 
-    private void resetPlayer(CommandSender sender, OfflinePlayer target) {
-        if (target == null) {
-            sendMessage(sender, messageManager.get(Message.PLAYERNOTFOUND));
-            return;
-        }
-
-        if (!playerDataManager.has(target.getUniqueId())) {
-            try {
-                playerDataManager.add(new PlayerData(main, target));
-            } catch (IOException | SQLException error) {
-                customLogger.logToPlayer(sender, error, Utils.addColour(messageManager.get(Message.DATAERRORPLAYER)));
-                return;
-            }
-        }
-
-        PlayerData playerData = playerDataManager.getPlayerData(target.getUniqueId());
-
+    private void resetPlayer(CommandSender sender, OfflinePlayer target, PlayerData playerData) {
         for (BiomeLevel biomeLevel : playerData.getBiomeLevels()) {
             biomeLevel.reset();
         }
@@ -303,20 +319,21 @@ public class AdminCmd implements CommandExecutor, TabCompleter {
         pendingRewardsManager.removeAll(target.getUniqueId());
     }
 
-    private void resetBiome(CommandSender sender, OfflinePlayer player, BiomeLevel biomeLevel) {
-        String biomeName = biomeLevel.getBiomeName();
+    private void resetBiome(CommandSender sender, OfflinePlayer target, PlayerData playerData, Biome inputBiome) {
+        String biomeName = inputBiome.name();
+        BiomeLevel biomeLevel = playerData.getBiomeLevel(inputBiome);
 
-        if (player.isOnline()) {
-            removeActiveRewards(biomeLevel.getLevel(), 0, player, biomeLevel.getBiome());
+        if (target.isOnline()) {
+            removeActiveRewards(target, playerData, inputBiome, biomeLevel.getLevel(), 0);
 
-            if (sender instanceof ConsoleCommandSender || sender instanceof Player && sender != player.getPlayer())
-                sendMessage(player.getPlayer(), messageManager.getWithPlaceholder(Message.ADMINRESETBIOME, biomeName));
+            if (sender instanceof ConsoleCommandSender || sender instanceof Player && sender != target.getPlayer())
+                sendMessage(target.getPlayer(), messageManager.getWithPlaceholder(Message.ADMINRESETBIOME, biomeName));
         }
 
         biomeLevel.reset();
-        sendMessage(sender, messageManager.getWithPlaceholder(Message.RESETPLAYERBIOME, biomeName, player.getName()));
+        sendMessage(sender, messageManager.getWithPlaceholder(Message.RESETPLAYERBIOME, biomeName, target.getName()));
 
-        UUID uuid = player.getUniqueId();
+        UUID uuid = target.getUniqueId();
         if (pendingRewardsManager.has(uuid))
             removeBiomePendingRewards(uuid, pendingRewardsManager.get(uuid), biomeLevel.getBiome());
     }
@@ -337,7 +354,10 @@ public class AdminCmd implements CommandExecutor, TabCompleter {
                 Message.ADDERROR, targetName));
     }
 
-    private void setLevel(CommandSender sender, OfflinePlayer player, BiomeLevel biomeLevel, int inputValue) {
+    private void setLevel(CommandSender sender, OfflinePlayer player, PlayerData playerData, Biome inputBiome, int inputValue) {
+        BiomeLevel biomeLevel = playerData.getBiomeLevel(inputBiome);
+        updateProgress(player, biomeLevel);
+
         int oldLevel = biomeLevel.getLevel();
         Biome biome = biomeLevel.getBiome();
         String biomeName = biomeLevel.getBiomeName();
@@ -353,7 +373,7 @@ public class AdminCmd implements CommandExecutor, TabCompleter {
 
             if (oldLevel < inputValue) giveRewards(oldLevel, inputValue, player, biomeLevel);
             if (oldLevel > inputValue) {
-                removeActiveRewards(oldLevel, inputValue, player, biome);
+                removeActiveRewards(player, playerData, inputBiome, oldLevel, inputValue);
                 UUID uuid = player.getUniqueId();
                 if (pendingRewardsManager.has(uuid)) {
                     removePendingRewards(uuid, pendingRewardsManager.get(uuid), biome, inputValue);
@@ -366,6 +386,13 @@ public class AdminCmd implements CommandExecutor, TabCompleter {
     }
 
     private void addLevel(CommandSender sender, OfflinePlayer player, BiomeLevel biomeLevel, int inputValue) {
+        updateProgress(player, biomeLevel);
+
+        if (biomeLevel.isMaxLevel()) {
+            playerIsMaxLevel(sender, player.getName());
+            return;
+        }
+
         int oldLevel = biomeLevel.getLevel();
         int newLevel = oldLevel + inputValue;
 
@@ -384,7 +411,10 @@ public class AdminCmd implements CommandExecutor, TabCompleter {
                 message, player.getName(), inputValue, biomeLevel.getBiomeName()));
     }
 
-    private void removeLevel(CommandSender sender, OfflinePlayer player, BiomeLevel biomeLevel, int inputValue) {
+    private void removeLevel(CommandSender sender, OfflinePlayer player, PlayerData playerData, Biome inputBiome, int inputValue) {
+        BiomeLevel biomeLevel = playerData.getBiomeLevel(inputBiome);
+        updateProgress(player, biomeLevel);
+
         boolean wasMaxLevel = biomeLevel.isMaxLevel();
         int oldLevel = biomeLevel.getLevel();
         int newLevel = biomeLevel.getLevel() - inputValue;
@@ -397,7 +427,7 @@ public class AdminCmd implements CommandExecutor, TabCompleter {
                 if (sender instanceof ConsoleCommandSender || sender instanceof Player && sender != player.getPlayer())
                     sendMessage(player.getPlayer(), messageManager.getWithPlaceholder(Message.ADMINREMOVEDLEVEL, inputValue, biomeLevel.getBiomeName()));
 
-            removeActiveRewards(oldLevel, newLevel, player, biomeLevel.getBiome());
+            removeActiveRewards(player, playerData, inputBiome, oldLevel, newLevel);
         }
 
         sendMessage(sender, messageManager.getWithPlaceholder(
@@ -429,9 +459,8 @@ public class AdminCmd implements CommandExecutor, TabCompleter {
         pendingRewardsManager.addAll(uuid, list);
     }
 
-    private void removeActiveRewards(int oldLevel, int newLevel, OfflinePlayer player, Biome biome) {
+    private void removeActiveRewards(OfflinePlayer player, PlayerData playerData, Biome biome, int oldLevel, int newLevel) {
         BiomeData biomeData = biomeDataManager.getBiomeData(biome);
-        PlayerData playerData = playerDataManager.getPlayerData(player.getUniqueId());
 
         for (int i = oldLevel; i > newLevel; i--) {
             Reward reward = biomeData.getReward(i);
@@ -453,6 +482,7 @@ public class AdminCmd implements CommandExecutor, TabCompleter {
 
     private void setProgress(CommandSender sender, OfflinePlayer player, BiomeLevel biomeLevel, int inputValue) {
         Message message = Message.PROGRESSSET;
+        updateProgress(player, biomeLevel);
 
         long outcome = biomeLevel.setProgress(inputValue);
         if (outcome == -1) message = Message.PROGRESSSETERROR;
@@ -468,6 +498,13 @@ public class AdminCmd implements CommandExecutor, TabCompleter {
     }
 
     private void addProgress(CommandSender sender, OfflinePlayer player, BiomeLevel biomeLevel, int inputValue) {
+        updateProgress(player, biomeLevel);
+
+        if (biomeLevel.isMaxLevel()) {
+            playerIsMaxLevel(sender, player.getName());
+            return;
+        }
+
         long newProgress = biomeLevel.getProgress() + inputValue;
         long outcome = biomeLevel.setProgress(newProgress);
 
@@ -486,6 +523,8 @@ public class AdminCmd implements CommandExecutor, TabCompleter {
     }
 
     private void removeProgress(CommandSender sender, OfflinePlayer player, BiomeLevel biomeLevel, int inputValue) {
+        updateProgress(player, biomeLevel);
+
         long newProgress = biomeLevel.getProgress() - inputValue;
         long outcome = biomeLevel.setProgress(newProgress);
 
