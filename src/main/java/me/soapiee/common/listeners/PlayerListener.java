@@ -1,6 +1,7 @@
 package me.soapiee.common.listeners;
 
 import me.soapiee.common.BiomeMastery;
+import me.soapiee.common.data.BukkitExecutor;
 import me.soapiee.common.data.PlayerData;
 import me.soapiee.common.logic.BiomeLevel;
 import me.soapiee.common.manager.*;
@@ -21,8 +22,6 @@ import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.event.player.PlayerRespawnEvent;
 import org.bukkit.scheduler.BukkitRunnable;
 
-import java.io.IOException;
-import java.sql.SQLException;
 import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
@@ -55,23 +54,21 @@ public class PlayerListener implements Listener {
     @EventHandler
     public void onPlayerJoin(PlayerJoinEvent event) {
         Player player = event.getPlayer();
-        UUID uuid = player.getUniqueId();
-        Biome playerBiome = player.getLocation().getBlock().getBiome();
 
         if (!player.hasPlayedBefore()) playerCache.addOfflinePlayer(player);
-
         if (player.hasPermission("biomemastery.admin")) updateNotif(player);
 
-        PlayerData playerData;
-        if (!playerDataManager.has(player.getUniqueId())) {
-            try {
-                playerData = new PlayerData(main, player);
-                playerDataManager.add(playerData);
-            } catch (IOException | SQLException error) {
-                logger.logToPlayer(player, error, Utils.addColour(messageManager.get(Message.DATAERRORPLAYER)));
-                return;
-            }
-        } else playerData = playerDataManager.getPlayerData(player.getUniqueId());
+        playerDataManager.getOrLoad(player)
+                .thenAcceptAsync(data -> setupPlayer(player, data), BukkitExecutor.sync(main))
+                .exceptionally(error -> {
+                    logger.logToFile(error, "Could not create new data for " + player.getName());
+                    return null;
+                });
+    }
+
+    private void setupPlayer(Player player, PlayerData playerData) {
+        UUID uuid = player.getUniqueId();
+        Biome playerBiome = player.getLocation().getBlock().getBiome();
 
         if (checkPendingRewards(player)) givePendingRewards(player);
         prevLocMap.put(uuid, player.getLocation());
@@ -81,6 +78,30 @@ public class PlayerListener implements Listener {
         if (!configManager.isEnabledBiome(playerBiome)) return;
 
         setBiomeStart(playerData, playerBiome);
+    }
+
+    @EventHandler
+    public void onPlayerQuit(PlayerQuitEvent event) {
+        Player player = event.getPlayer();
+        UUID uuid = player.getUniqueId();
+        PlayerData playerData = playerDataManager.getPlayerData(uuid);
+
+        if (playerData == null) {
+            logger.logToFile(new NullPointerException(), "Could not find " + player.getName() + " players data");
+            return;
+        }
+
+        if (playerData.hasActiveRewards()) playerData.clearActiveRewards();
+
+        World currentWorld = player.getWorld();
+        Biome currentBiome = player.getLocation().getBlock().getBiome();
+        if (configManager.isEnabledWorld(currentWorld))
+            if (configManager.isEnabledBiome(currentBiome)) setBiomeProgress(playerData, currentBiome);
+
+        playerData.saveData(true);
+
+        playerDataManager.remove(uuid);
+        prevLocMap.remove(uuid);
     }
 
     private void updateNotif(Player player) {
@@ -127,8 +148,7 @@ public class PlayerListener implements Listener {
         return (biomeHasChanged(prevBiome, newBiome));
     }
 
-    private void clearActiveRewards(Player player, Biome previousBiome) {
-        PlayerData playerData = playerDataManager.getPlayerData(player.getUniqueId());
+    private void clearActiveRewards(Player player, PlayerData playerData, Biome previousBiome) {
         playerData.clearActiveRewards();
 
         String biomeString = biomeDataManager.getBiomeData(previousBiome).getBiomeName();
@@ -151,8 +171,9 @@ public class PlayerListener implements Listener {
         prevLocMap.put(uuid, newLoc);
 
         PlayerData playerData = playerDataManager.getPlayerData(uuid);
+        if (playerData == null) return;
 
-        if (playerData.hasActiveRewards()) clearActiveRewards(player, previousBiome);
+        if (playerData.hasActiveRewards()) clearActiveRewards(player, playerData, previousBiome);
         if (isLocEnabled(previousWorld, previousBiome)) setBiomeProgress(playerData, previousBiome);
         if (isLocEnabled(newWorld, newBiome)) setBiomeStart(playerData, newBiome);
     }
@@ -186,29 +207,5 @@ public class PlayerListener implements Listener {
 
         BiomeLevel playerLevel = playerData.getBiomeLevel(newBiome);
         playerLevel.setEntryTime(LocalDateTime.now());
-    }
-
-    @EventHandler
-    public void onPlayerQuit(PlayerQuitEvent event) {
-        Player player = event.getPlayer();
-        UUID uuid = player.getUniqueId();
-        PlayerData playerData = playerDataManager.getPlayerData(uuid);
-
-        if (playerData == null) {
-            logger.logToFile(new NullPointerException(), "Could not find " + player.getName() + " players data");
-            return;
-        }
-
-        if (playerData.hasActiveRewards()) playerData.clearActiveRewards();
-
-        World currentWorld = player.getWorld();
-        Biome currentBiome = player.getLocation().getBlock().getBiome();
-        if (configManager.isEnabledWorld(currentWorld))
-            if (configManager.isEnabledBiome(currentBiome)) setBiomeProgress(playerData, currentBiome);
-
-        playerData.saveData(true);
-
-        playerDataManager.remove(uuid);
-        prevLocMap.remove(uuid);
     }
 }

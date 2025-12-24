@@ -1,7 +1,9 @@
 package me.soapiee.common.data;
 
+import java.util.concurrent.CompletableFuture;
+
 public interface PlayerStorageHandler {
 
-    void readData();
+    CompletableFuture<PlayerData> readData();
     void saveData(boolean async);
 }

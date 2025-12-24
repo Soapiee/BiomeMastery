@@ -1,6 +1,7 @@
 package me.soapiee.common.commands;
 
 import me.soapiee.common.BiomeMastery;
+import me.soapiee.common.data.BukkitExecutor;
 import me.soapiee.common.data.PlayerData;
 import me.soapiee.common.logic.BiomeData;
 import me.soapiee.common.logic.BiomeLevel;
@@ -17,16 +18,11 @@ import net.md_5.bungee.api.chat.*;
 import net.md_5.bungee.api.chat.hover.content.Text;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.block.Biome;
-import org.bukkit.command.Command;
-import org.bukkit.command.CommandExecutor;
-import org.bukkit.command.CommandSender;
-import org.bukkit.command.TabCompleter;
+import org.bukkit.command.*;
 import org.bukkit.entity.Player;
 import org.bukkit.potion.PotionEffectType;
 import org.jetbrains.annotations.NotNull;
 
-import java.io.IOException;
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -59,7 +55,7 @@ public class UsageCmd implements CommandExecutor, TabCompleter {
 
     @Override
     public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, String[] args) {
-        if (!checkPermission(sender, "biomemastery.player.command")) return true;
+        if (!hasPermission(sender, "biomemastery.player.command")) return true;
 
         // /bm - Opens the GUI
         if (args.length == 0) {
@@ -77,12 +73,26 @@ public class UsageCmd implements CommandExecutor, TabCompleter {
 
         // /bm reward <biome> <level>
         if (args[0].equalsIgnoreCase("reward")) {
-            if (!rewardBiome(sender, args)) sendHelpMessage(sender, label);
+            if (sender instanceof ConsoleCommandSender){
+                sendMessage(sender, Utils.addColour(messageManager.get(Message.MUSTBEPLAYERERROR)));
+                return true;
+            }
+
+            Biome biome = validateBiome(sender, label, args);
+            if (biome == null) return true;
+
+            playerDataManager.getOrLoad((Player) sender)
+                    .thenAcceptAsync(data -> toggleReward(data, biome, args[2]), BukkitExecutor.sync(main))
+                    .exceptionally(error -> {
+                        customLogger.onlyLogToPlayer(sender, Utils.addColour(messageManager.get(Message.DATAERRORPLAYER)));
+                        customLogger.logToPlayer(sender, error, Utils.addColour(messageManager.getWithPlaceholder(Message.DATAERROR, sender.getName())));
+                        return null;
+                    });
             return true;
         }
 
         // /bm info
-        // /bm info <page>
+        // /bm info [page]
         // /bm info [player]
         // /bm info [player] <page>
         // /bm info [biome]
@@ -92,7 +102,13 @@ public class UsageCmd implements CommandExecutor, TabCompleter {
             if (args.length == 1) {
                 if (isConsole(sender)) return true;
 
-                displayInfo(sender, (Player) sender, 1);
+                playerDataManager.getOrLoad((Player) sender)
+                        .thenAcceptAsync(data -> displayInfo(sender, (Player) sender, data, 1), BukkitExecutor.sync(main))
+                        .exceptionally(error -> {
+                            customLogger.onlyLogToPlayer(sender, Utils.addColour(messageManager.get(Message.DATAERRORPLAYER)));
+                            customLogger.logToPlayer(sender, error, Utils.addColour(messageManager.getWithPlaceholder(Message.DATAERROR, sender.getName())));
+                            return null;
+                        });
                 return true;
             }
 
@@ -102,7 +118,14 @@ public class UsageCmd implements CommandExecutor, TabCompleter {
 
                 if (page >= 0) {
                     if (page == 0) return true;
-                    displayInfo(sender, (Player) sender, page);
+
+                    playerDataManager.getOrLoad((Player) sender)
+                            .thenAcceptAsync(data -> displayInfo(sender, (Player) sender, data, page), BukkitExecutor.sync(main))
+                            .exceptionally(error -> {
+                                customLogger.onlyLogToPlayer(sender, Utils.addColour(messageManager.get(Message.DATAERRORPLAYER)));
+                                customLogger.logToPlayer(sender, error, Utils.addColour(messageManager.getWithPlaceholder(Message.DATAERROR, sender.getName())));
+                                return null;
+                            });
                     return true;
                 }
 
@@ -118,9 +141,16 @@ public class UsageCmd implements CommandExecutor, TabCompleter {
                 // /bm info <player> <page>
                 OfflinePlayer target = getTarget(sender, args[1]);
                 if (target == null) return true;
-                if (!checkPermission(sender, "biomemastery.player.others")) return true;
+                if (!hasPermission(sender, "biomemastery.player.others")) return true;
 
-                if (infoPlayer(sender, target, args)) return true;
+                playerDataManager.getOrLoad(target)
+                        .thenAcceptAsync(data -> infoPlayer(sender, target, data, label, args), BukkitExecutor.sync(main))
+                        .exceptionally(error -> {
+                            customLogger.onlyLogToPlayer(sender, Utils.addColour(messageManager.get(Message.DATAERRORPLAYER)));
+                            customLogger.logToPlayer(sender, error, Utils.addColour(messageManager.getWithPlaceholder(Message.DATAERROR, sender.getName())));
+                            return null;
+                        });
+                return true;
             }
         }
 
@@ -135,23 +165,7 @@ public class UsageCmd implements CommandExecutor, TabCompleter {
             return null;
         }
 
-        return ((!hasPlayerData(sender, target)) ? null : target);
-    }
-
-    private boolean hasPlayerData(CommandSender sender, OfflinePlayer target) {
-        if (target == null) return false;
-
-        if (!playerDataManager.has(target.getUniqueId())) {
-            try {
-                PlayerData playerData = new PlayerData(main, target);
-                playerDataManager.add(playerData);
-            } catch (IOException | SQLException error) {
-                customLogger.logToPlayer(sender, error, Utils.addColour(messageManager.get(Message.DATAERRORPLAYER)));
-                return false;
-            }
-        }
-
-        return true;
+        return target;
     }
 
     private boolean isConsole(CommandSender sender) {
@@ -194,18 +208,20 @@ public class UsageCmd implements CommandExecutor, TabCompleter {
         return biome;
     }
 
-    private void updateProgress(OfflinePlayer target) {
+    private void updateProgress(OfflinePlayer target, PlayerData data) {
         if (!target.isOnline()) return;
 
         Player onlinePlayer = target.getPlayer();
         Biome locBiome = onlinePlayer.getLocation().getBlock().getBiome();
         if (!configManager.isEnabledBiome(locBiome)) return;
 
-        BiomeLevel biomeLevel = playerDataManager.getPlayerData(onlinePlayer.getUniqueId()).getBiomeLevel(locBiome);
+        BiomeLevel biomeLevel = data.getBiomeLevel(locBiome);
         biomeLevel.updateProgress(locBiome);
     }
 
-    private void toggleReward(Player player, Biome biome, String value) {
+    private void toggleReward(PlayerData playerData, Biome biome, String value) {
+        Player player = playerData.getPlayer().getPlayer();
+
         int levelToClaim;
         try {
             levelToClaim = Integer.parseInt(value);
@@ -214,7 +230,6 @@ public class UsageCmd implements CommandExecutor, TabCompleter {
             return;
         }
 
-        PlayerData playerData = playerDataManager.getPlayerData(player.getUniqueId());
         BiomeLevel biomeLevel = playerData.getBiomeLevel(biome);
         int currentLevel = biomeLevel.getLevel();
         int maxLevel = biomeDataManager.getBiomeData(biome).getMaxLevel();
@@ -237,7 +252,7 @@ public class UsageCmd implements CommandExecutor, TabCompleter {
         }
 
         if (!reward.isSingular()) {
-            if (hasThisActiveReward(player, reward)) {
+            if (hasThisActiveReward(player, playerData, reward)) {
                 deactivateReward(player, reward);
                 return;
             }
@@ -254,8 +269,7 @@ public class UsageCmd implements CommandExecutor, TabCompleter {
         }
     }
 
-    private boolean hasThisActiveReward(Player player, Reward reward) {
-        PlayerData playerData = playerDataManager.getPlayerData(player.getUniqueId());
+    private boolean hasThisActiveReward(Player player, PlayerData playerData, Reward reward) {
         if (playerData.hasActiveRewards()) {
             if (reward instanceof PotionReward) {
                 PotionEffectType potion = ((PotionReward) reward).getPotion();
@@ -296,7 +310,7 @@ public class UsageCmd implements CommandExecutor, TabCompleter {
         else Utils.consoleMsg(message);
     }
 
-    private boolean checkPermission(CommandSender sender, String permission) {
+    private boolean hasPermission(CommandSender sender, String permission) {
         if (!(sender instanceof Player)) return true;
 
         Player player = (Player) sender;
@@ -314,68 +328,77 @@ public class UsageCmd implements CommandExecutor, TabCompleter {
 
         OfflinePlayer target;
         if (args.length == 2) {
+            if (isConsole(sender)) return;
             target = (Player) sender;
         } else {
-            if (!checkPermission(sender, "biomemastery.player.others")) return;
+            if (!hasPermission(sender, "biomemastery.player.others")) return;
             target = getTarget(sender, args[2]);
 
             if (target == null) return;
         }
 
-        displayBiomeInfo(sender, target, biome);
+        playerDataManager.getOrLoad(target)
+                .thenAcceptAsync(data -> displayBiomeInfo(sender, target, data, biome), BukkitExecutor.sync(main))
+                .exceptionally(error -> {
+                    customLogger.onlyLogToPlayer(sender, Utils.addColour(messageManager.get(Message.DATAERRORPLAYER)));
+                    customLogger.logToPlayer(sender, error, Utils.addColour(messageManager.getWithPlaceholder(Message.DATAERROR, sender.getName())));
+                    return null;
+                });
     }
 
-    private boolean infoPlayer(CommandSender sender, OfflinePlayer target, String[] args) {
+    private void infoPlayer(CommandSender sender, OfflinePlayer target, PlayerData playerData, String label, String[] args) {
 //      /bm info <player> <page>
         if (args.length == 3) {
             int page = validatePage(args[2], sender);
-            if (page == 0) return true;
+            if (page == 0) return;
             if (page < 0) {
                 sendMessage(sender, messageManager.getWithPlaceholder(Message.INVALIDNUMBER, args[2]));
-                return true;
+                return;
             }
 
-            displayInfo(sender, target, page);
-            return true;
+            displayInfo(sender, target, playerData, page);
+            return;
         }
 
 //      /bm info <player>
         if (args.length == 2) {
-            displayInfo(sender, target, 1);
-            return true;
+            displayInfo(sender, target, playerData, 1);
+            return;
         }
 
-        return false;
+        sendHelpMessage(sender, label);
+        return;
     }
 
-    private boolean rewardBiome(CommandSender sender, String[] args) {
-        if (args.length != 3) return false;
+    private Biome validateBiome(CommandSender sender, String label, String[] args) {
+        if (args.length != 3) {
+            sendHelpMessage(sender, label);
+            return null;
+        }
 
         Biome biome = validateBiome(args[1]);
 
         if (biome == null) {
             sendMessage(sender, messageManager.getWithPlaceholder(Message.INVALIDBIOME, args[1]));
-            return true;
+            return null;
         }
 
         if (!configManager.isEnabledBiome(biome)) {
             sendMessage(sender, messageManager.getWithPlaceholder(Message.BIOMEINFODISABLED, args[1]));
-            return true;
+            return null;
         }
 
-        toggleReward((Player) sender, biome, args[2]);
-        return true;
+        return biome;
     }
 
-    private void displayInfo(CommandSender sender, OfflinePlayer target, int page) {
+    private void displayInfo(CommandSender sender, OfflinePlayer target, PlayerData playerData, int page) {
         int cooldown = (int) cooldownManager.getCooldown(sender);
         if (cooldown > 0) {
             sendMessage(sender, messageManager.getWithPlaceholder(Message.CMDONCOOLDOWN, cooldown));
             return;
         }
 
-        updateProgress(target);
-        PlayerData playerData = playerDataManager.getPlayerData(target.getUniqueId());
+        updateProgress(target, playerData);
         StringBuilder builder = new StringBuilder();
 
         builder.append(messageManager.getWithPlaceholder(Message.BIOMEBASICINFOHEADER, target.getName())).append("\n");
@@ -469,15 +492,14 @@ public class UsageCmd implements CommandExecutor, TabCompleter {
         return component;
     }
 
-    private void displayBiomeInfo(CommandSender sender, OfflinePlayer target, Biome biome) {
+    private void displayBiomeInfo(CommandSender sender, OfflinePlayer target, PlayerData playerData, Biome biome) {
         int cooldown = (int) cooldownManager.getCooldown(sender);
         if (cooldown > 0) {
             sendMessage(sender, messageManager.getWithPlaceholder(Message.CMDONCOOLDOWN, cooldown));
             return;
         }
 
-        updateProgress(target);
-        PlayerData playerData = playerDataManager.getPlayerData(target.getUniqueId());
+        updateProgress(target, playerData);
         BiomeLevel biomeLevel = playerData.getBiomeLevel(biome);
         BiomeData biomeData = biomeDataManager.getBiomeData(biome);
         StringBuilder builder = new StringBuilder();
@@ -494,14 +516,14 @@ public class UsageCmd implements CommandExecutor, TabCompleter {
                     .append(messageManager.getWithPlaceholder(Message.BIOMEREWARDFORMAT,
                             i,
                             reward,
-                            getRewardStatus(target, biomeData, i, biomeLevel.getLevel())));
+                            getRewardStatus(target, playerData, biomeData, i, biomeLevel.getLevel())));
         }
 
         cooldownManager.addCooldown(sender);
         sendMessage(sender, builder.toString());
     }
 
-    private String getRewardStatus(OfflinePlayer player, BiomeData biomeData, int rewardLevel, int currentLevel) {
+    private String getRewardStatus(OfflinePlayer player, PlayerData playerData, BiomeData biomeData, int rewardLevel, int currentLevel) {
         if (currentLevel < rewardLevel) {
             String message = messageManager.get(Message.REWARDUNCLAIMED);
             return message == null ? "" : message;
@@ -519,7 +541,7 @@ public class UsageCmd implements CommandExecutor, TabCompleter {
         }
 
         Player onlinePlayer = player.getPlayer();
-        if (hasThisActiveReward(onlinePlayer, reward)) {
+        if (hasThisActiveReward(onlinePlayer, playerData, reward)) {
             String message = messageManager.get(Message.REWARDDEACTIVATE);
             return message == null ? "" : message;
         }

@@ -1,22 +1,23 @@
 package me.soapiee.common.data;
 
 import me.soapiee.common.BiomeMastery;
-import me.soapiee.common.logic.*;
+import me.soapiee.common.logic.BiomeLevel;
 import me.soapiee.common.manager.BiomeDataManager;
 import me.soapiee.common.manager.ConfigManager;
 import me.soapiee.common.util.Logger;
 import me.soapiee.common.util.Message;
 import me.soapiee.common.util.Utils;
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.block.Biome;
 import org.bukkit.configuration.file.YamlConfiguration;
-import org.bukkit.scheduler.BukkitRunnable;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.HashSet;
-import java.util.UUID;
+import java.util.*;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.CompletionException;
 
 public class PlayerFileStorage implements PlayerStorageHandler {
 
@@ -26,9 +27,9 @@ public class PlayerFileStorage implements PlayerStorageHandler {
     private final PlayerData playerData;
     private final Logger customLogger;
     private final Object fileLock = new Object();
+    private final Set<Biome> enabledBiomes;
 
     private final File file;
-    private YamlConfiguration contents;
     private final OfflinePlayer player;
 
     public PlayerFileStorage(BiomeMastery main, PlayerData playerData) {
@@ -38,117 +39,107 @@ public class PlayerFileStorage implements PlayerStorageHandler {
         this.playerData = playerData;
         customLogger = main.getCustomLogger();
         player = playerData.getPlayer();
+        enabledBiomes = Collections.unmodifiableSet(new HashSet<>(configManager.getEnabledBiomes()));
 
         UUID uuid = playerData.getPlayer().getUniqueId();
         file = new File(main.getDataFolder() + File.separator + "Data" + File.separator + "BiomeLevels", uuid + ".yml");
-
-        createPlayerLevels();
-    }
-
-    private void createPlayerLevels() {
-        for (Biome key : configManager.getEnabledBiomes()) {
-            playerData.getBiomesMap().put(key, new BiomeLevel(player, biomeDataManager.getBiomeData(key)));
-        }
     }
 
     @Override
-    public void readData() {
-        if (!file.exists()) {
-            createFile();
-            return;
-        }
+    public CompletableFuture<PlayerData> readData() {
+        CompletableFuture<Map<Biome, AsyncData>> completableFuture =
+                (file.exists() ? CompletableFuture.supplyAsync(this::getAsync) : CompletableFuture.supplyAsync(this::createFile));
 
-        contents = YamlConfiguration.loadConfiguration(file);
+        return completableFuture
+                .thenAcceptAsync(this::setBiomeLevelData, BukkitExecutor.sync(main))
+                .thenApplyAsync(ignored -> playerData);
+    }
 
-        synchronized (fileLock) {
+    private Map<Biome, AsyncData> getAsync() {
+        Map<Biome, AsyncData> loadedData = new HashMap<>();
+
+        try {
+            YamlConfiguration contents = YamlConfiguration.loadConfiguration(file);
             boolean updated = false;
 
-            for (Biome biome : configManager.getEnabledBiomes()) {
-                String biomeName = biome.name();
+            synchronized (fileLock) {
+                for (Biome biome : enabledBiomes) {
+                    String levelPath = biome.name() + ".Level";
+                    String progressPath = biome.name() + ".Progress";
 
-                if (!contents.isSet(biomeName + ".Level") || !contents.isSet(biomeName + ".Progress")) {
-                    contents.set(biomeName + ".Level", 0);
-                    contents.set(biomeName + ".Progress", 0);
-                    updated = true;
-                } else {
-                    setBiomeLevelData(biome);
+                    if (!contents.isSet(levelPath) || !contents.isSet(progressPath)) {
+                        contents.set(levelPath, 0);
+                        contents.set(progressPath, 0);
+                        updated = true;
+                        loadedData.put(biome, new AsyncData(0, 0));
+                    } else {
+                        int level = contents.getInt(levelPath);
+                        int progress = contents.getInt(progressPath);
+                        loadedData.put(biome, new AsyncData(level, progress));
+                    }
                 }
-            }
 
-            if (updated) {
-                try {
-                    contents.save(file);
-                } catch (IOException e) {
-                    customLogger.logToFile(e, "Failed to update missing biome data for " + player.getName());
-                }
+                if (updated) contents.save(file);
             }
+        } catch (IOException error) {
+            throw new CompletionException(error);
+        }
+
+        return loadedData;
+    }
+
+    private Map<Biome, AsyncData> createFile() {
+        Map<Biome, AsyncData> loadedData = new HashMap<>();
+
+        synchronized (fileLock) {
+            try {
+                YamlConfiguration localCopy = new YamlConfiguration();
+
+                for (Biome biome : enabledBiomes) {
+                    String biomeName = biome.name();
+                    localCopy.set(biomeName + ".Level", 0);
+                    localCopy.set(biomeName + ".Progress", 0);
+                    loadedData.put(biome, new AsyncData(0, 0));
+                }
+
+                localCopy.save(file);
+            } catch (IOException error) {
+                throw new CompletionException(error);
+            }
+        }
+
+        return loadedData;
+    }
+
+    private void setBiomeLevelData(Map<Biome, AsyncData> loadedData) {
+        for (Map.Entry<Biome, AsyncData> entry : loadedData.entrySet()) {
+            Biome biome = entry.getKey();
+            AsyncData data = entry.getValue();
+
+            BiomeLevel biomeLevel = new BiomeLevel(
+                    player,
+                    biomeDataManager.getBiomeData(biome),
+                    data.getLevel(),
+                    data.getProgress()
+            );
+
+            playerData.addBiomeLevel(biome, biomeLevel);
+            if (configManager.isDebugMode()) Utils.debugMsg(player.getName(),
+                    ChatColor.GREEN + biome.name() + " data set (" + data.getLevel() + ":" + data.getProgress() + ")");
         }
     }
 
     @Override
     public void saveData(boolean async) {
-        Runnable task = () -> saveRunnable(player.getName());
-        if (async) new BukkitRunnable() {
-            @Override
-            public void run() {
-                task.run();
-            }
-        }.runTaskAsynchronously(main);
-        else saveRunnable(player.getName());
+        if (async) saveAsync(player.getName());
+        else saveSync();
     }
 
-    private void setBiomeLevelData(Biome biome) {
-        String biomeName = biome.name();
-
-        int level = contents.getInt(biomeName + ".Level", 0);
-        int progress = contents.getInt(biomeName + ".Progress", 0);
-
-        BiomeLevel biomeLevel = playerData.getBiomesMap().get(biome);
-        biomeLevel.setLevel(level);
-        biomeLevel.initialiseProgress(progress);
-    }
-
-    private void createFile() {
-        final String playerName = player.getName();
-        final HashSet<String> biomes = new HashSet<>();
-        for (Biome biome : configManager.getEnabledBiomes()) {
-            biomes.add(biome.name());
-        }
-
-        new BukkitRunnable() {
-            @Override
-            public void run() {
-                synchronized (fileLock) {
-
-                    try {
-                        YamlConfiguration localCopy = new YamlConfiguration();
-                        contents = localCopy;
-
-                        for (String biome : biomes) {
-                            localCopy.set(biome + ".Level", 0);
-                            localCopy.set(biome + ".Progress", 0);
-                        }
-
-                        localCopy.save(file);
-                    } catch (IOException e) {
-                        customLogger.logToFile(e, "Could not create new data for " + playerName);
-                    }
-                }
-            }
-        }.runTaskAsynchronously(main);
-
-        for (Biome biome : configManager.getEnabledBiomes()) {
-            playerData.getBiomesMap().put(biome, new BiomeLevel(player, biomeDataManager.getBiomeData(biome)));
-            if (configManager.isDebugMode()) Utils.debugMsg(player.getName(),
-                    ChatColor.GREEN + biome.name() + " data set (0:0)");
-        }
-    }
-
-    private void saveRunnable(final String playerName) {
-        YamlConfiguration localCopy = contents;
+    private void saveSync() {
+        YamlConfiguration localCopy = YamlConfiguration.loadConfiguration(file);
 
         synchronized (fileLock) {
-            for (Biome biomeKey : playerData.getBiomesMap().keySet()) {
+            for (Biome biomeKey : enabledBiomes) {
                 String biome = biomeKey.name();
                 BiomeLevel level = playerData.getBiomeLevel(biomeKey);
                 localCopy.set(biome + ".Level", level.getLevel());
@@ -159,7 +150,35 @@ public class PlayerFileStorage implements PlayerStorageHandler {
         try {
             localCopy.save(file);
         } catch (IOException e) {
-            customLogger.logToFile(e, main.getMessageManager().getWithPlaceholder(Message.DATAERROR, playerName));
+            customLogger.logToFile(e, main.getMessageManager().getWithPlaceholder(Message.DATAERROR, player.getName()));
         }
+    }
+
+    private void saveAsync(final String playerName) {
+        Map<Biome, AsyncData> loadedData = new HashMap<>();
+        for (Biome biome : enabledBiomes) {
+            BiomeLevel level = playerData.getBiomeLevel(biome);
+            loadedData.put(biome, new AsyncData(level.getLevel(), (int) level.getProgress()));
+        }
+
+        Bukkit.getScheduler().runTaskAsynchronously(main, () -> {
+            YamlConfiguration contents = YamlConfiguration.loadConfiguration(file);
+
+            synchronized (fileLock) {
+                for (Map.Entry<Biome, AsyncData> entry : loadedData.entrySet()) {
+                    AsyncData data = entry.getValue();
+                    String biome = entry.getKey().name();
+
+                    contents.set(biome + ".Level", data.getLevel());
+                    contents.set(biome + ".Progress", data.getProgress());
+                }
+            }
+
+            try {
+                contents.save(file);
+            } catch (IOException e) {
+                customLogger.logToFile(e, main.getMessageManager().getWithPlaceholder(Message.DATAERROR, playerName));
+            }
+        });
     }
 }

@@ -31,6 +31,7 @@ public class EffectReward extends Reward {
     @Override
     public void give(Player player) {
         PlayerData playerData = playerDataManager.getPlayerData(player.getUniqueId());
+        if (playerData == null) return;
 
         Effect conflict = effect.hasConflict(playerData);
         if (conflict != null) {
@@ -45,7 +46,9 @@ public class EffectReward extends Reward {
 
     public void remove(Player player) {
         effect.deActivate(player);
-        playerDataManager.getPlayerData(player.getUniqueId()).clearActiveReward(this);
+
+        PlayerData playerData = playerDataManager.getPlayerData(player.getUniqueId());
+        if (playerData != null) playerData.clearActiveReward(this);
     }
 
     @Override

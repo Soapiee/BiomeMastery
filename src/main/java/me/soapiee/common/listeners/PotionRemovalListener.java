@@ -29,6 +29,7 @@ public class PotionRemovalListener implements Listener {
 
         UUID uuid = event.getPlayer().getUniqueId();
         PlayerData playerData = playerDataManager.getPlayerData(uuid);
+        if (playerData == null) return;
 
         if (!hasActivePotions(playerData)) return;
         clearPotionRewards(playerData);
@@ -40,6 +41,7 @@ public class PotionRemovalListener implements Listener {
 
         UUID uuid = event.getPlayer().getUniqueId();
         PlayerData playerData = playerDataManager.getPlayerData(uuid);
+        if (playerData == null) return;
 
         if (!hasActivePotions(playerData)) return;
         clearPotionRewards(playerData);
@@ -49,6 +51,7 @@ public class PotionRemovalListener implements Listener {
     public void onPlayerDeath(PlayerDeathEvent event){
         UUID uuid = event.getEntity().getUniqueId();
         PlayerData playerData = playerDataManager.getPlayerData(uuid);
+        if (playerData == null) return;
 
         if (!hasActivePotions(playerData)) return;
         clearPotionRewards(playerData);
