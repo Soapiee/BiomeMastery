@@ -5,7 +5,7 @@ import be.seeseemelk.mockbukkit.ServerMock;
 import be.seeseemelk.mockbukkit.WorldMock;
 import me.soapiee.common.BiomeMastery;
 import me.soapiee.common.manager.*;
-import me.soapiee.common.util.Logger;
+import me.soapiee.common.util.CustomLogger;
 import me.soapiee.common.util.PlayerCache;
 import org.bukkit.block.Biome;
 import org.junit.jupiter.api.AfterAll;
@@ -32,7 +32,7 @@ public final class PlayerListenerTest {
         PlayerDataManager mockPlayerDataManager = mock(PlayerDataManager.class);
         mockConfigManager = mock(ConfigManager.class);
         BiomeDataManager mockBiomeDataManager = mock(BiomeDataManager.class);
-        Logger mockLogger = mock(Logger.class);
+        CustomLogger mockLogger = mock(CustomLogger.class);
         MessageManager mockMessageManager = mock(MessageManager.class);
         PendingRewardsManager mockPendingRewardsManager = mock(PendingRewardsManager.class);
 

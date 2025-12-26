@@ -13,7 +13,7 @@ import me.soapiee.common.manager.DataManager;
 import me.soapiee.common.manager.MessageManager;
 import me.soapiee.common.manager.PlayerDataManager;
 import me.soapiee.common.manager.UpdateManager;
-import me.soapiee.common.util.Logger;
+import me.soapiee.common.util.CustomLogger;
 import me.soapiee.common.util.PlayerCache;
 import me.soapiee.common.util.Utils;
 import org.bukkit.Bukkit;
@@ -32,7 +32,7 @@ public class BiomeMastery extends JavaPlugin {
     @Getter private MessageManager messageManager;
     @Getter private PlayerCache playerCache;
     private VaultHook vaultHook;
-    @Getter private Logger customLogger;
+    @Getter private CustomLogger customLogger;
     @Getter private EffectsListener effectsListener;
     @Getter private UpdateManager updateChecker;
 
@@ -50,7 +50,7 @@ public class BiomeMastery extends JavaPlugin {
         saveDefaultConfig();
 
         playerCache = new PlayerCache(Bukkit.getServer().getOfflinePlayers());
-        customLogger = new Logger(this);
+        customLogger = new CustomLogger(this);
         messageManager = new MessageManager(this);
 
         dataManager = new DataManager(this);

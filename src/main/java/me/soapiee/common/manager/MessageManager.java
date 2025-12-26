@@ -4,7 +4,7 @@ import me.soapiee.common.BiomeMastery;
 import me.soapiee.common.logic.BiomeData;
 import me.soapiee.common.logic.BiomeLevel;
 import me.soapiee.common.logic.rewards.Reward;
-import me.soapiee.common.util.Logger;
+import me.soapiee.common.util.CustomLogger;
 import me.soapiee.common.util.Message;
 import me.soapiee.common.util.Utils;
 import org.bukkit.ChatColor;
@@ -16,7 +16,7 @@ import java.io.File;
 public class MessageManager {
 
     private final BiomeMastery main;
-    private final Logger customLogger;
+    private final CustomLogger customLogger;
 
     private final File file;
     private final YamlConfiguration contents;

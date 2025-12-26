@@ -6,7 +6,7 @@ import me.soapiee.common.manager.BiomeDataManager;
 import me.soapiee.common.manager.ConfigManager;
 import me.soapiee.common.manager.DataManager;
 import me.soapiee.common.manager.MessageManager;
-import me.soapiee.common.util.Logger;
+import me.soapiee.common.util.CustomLogger;
 import me.soapiee.common.util.Message;
 import me.soapiee.common.util.Utils;
 import org.bukkit.Bukkit;
@@ -30,7 +30,7 @@ public class PlayerDatabaseStorage implements PlayerStorageHandler {
     private final BiomeDataManager biomeDataManager;
     private final MessageManager messageManager;
     private final PlayerData playerData;
-    private final Logger logger;
+    private final CustomLogger logger;
     private final Set<Biome> enabledBiomes;
 
     private final UUID uuid;

@@ -5,7 +5,7 @@ import me.soapiee.common.logic.events.LevelUpEvent;
 import me.soapiee.common.logic.rewards.PendingReward;
 import me.soapiee.common.logic.rewards.Reward;
 import me.soapiee.common.manager.*;
-import me.soapiee.common.util.Logger;
+import me.soapiee.common.util.CustomLogger;
 import me.soapiee.common.util.Message;
 import me.soapiee.common.util.Utils;
 import org.bukkit.OfflinePlayer;
@@ -19,9 +19,9 @@ public class LevelUpListener implements Listener {
     private final ConfigManager configManager;
     private final MessageManager messageManager;
     private final PendingRewardsManager pendingRewardsManager;
-    private final Logger logger;
+    private final CustomLogger logger;
 
-    public LevelUpListener(MessageManager messageManager, Logger logger, DataManager dataManager) {
+    public LevelUpListener(MessageManager messageManager, CustomLogger logger, DataManager dataManager) {
         this.messageManager = messageManager;
         this.logger = logger;
         configManager = dataManager.getConfigManager();

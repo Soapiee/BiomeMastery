@@ -1,7 +1,7 @@
 package me.soapiee.common.manager;
 
 import me.soapiee.common.BiomeMastery;
-import me.soapiee.common.util.Logger;
+import me.soapiee.common.util.CustomLogger;
 import org.bukkit.command.ConsoleCommandSender;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -22,7 +22,7 @@ class CmdCooldownTest {
         BiomeMastery mockMain = mock(BiomeMastery.class);
         mockConsole = mock(ConsoleCommandSender.class);
         MessageManager mockMessageManager = mock(MessageManager.class);
-        Logger mockLogger = mock(Logger.class);
+        CustomLogger mockLogger = mock(CustomLogger.class);
         DataManager mockDataManager = mock(DataManager.class);
         PlayerDataManager mockPlayerDataManager = mock(PlayerDataManager.class);
 

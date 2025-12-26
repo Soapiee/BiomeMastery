@@ -7,7 +7,7 @@ import me.soapiee.common.logic.rewards.types.*;
 import me.soapiee.common.manager.EffectsManager;
 import me.soapiee.common.manager.MessageManager;
 import me.soapiee.common.manager.PlayerDataManager;
-import me.soapiee.common.util.Logger;
+import me.soapiee.common.util.CustomLogger;
 import org.bukkit.Material;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.inventory.ItemStack;
@@ -19,7 +19,7 @@ public class RewardFactory {
 
     private final BiomeMastery main;
     private final FileConfiguration config;
-    private final Logger customLogger;
+    private final CustomLogger customLogger;
     private final VaultHook vaultHook;
     private final MessageManager messageManager;
     private final PlayerDataManager playerDataManager;

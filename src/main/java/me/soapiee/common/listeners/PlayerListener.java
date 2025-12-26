@@ -5,7 +5,7 @@ import me.soapiee.common.data.BukkitExecutor;
 import me.soapiee.common.data.PlayerData;
 import me.soapiee.common.logic.BiomeLevel;
 import me.soapiee.common.manager.*;
-import me.soapiee.common.util.Logger;
+import me.soapiee.common.util.CustomLogger;
 import me.soapiee.common.util.Message;
 import me.soapiee.common.util.PlayerCache;
 import me.soapiee.common.util.Utils;
@@ -36,7 +36,7 @@ public class PlayerListener implements Listener {
     private final BiomeDataManager biomeDataManager;
     private final MessageManager messageManager;
     private final PendingRewardsManager pendingRewardsManager;
-    private final Logger logger;
+    private final CustomLogger logger;
 
     private final Map<UUID, Location> prevLocMap = new HashMap<>();
 

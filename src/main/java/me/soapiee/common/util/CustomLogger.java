@@ -15,11 +15,11 @@ import java.util.Date;
 import java.util.concurrent.CompletionException;
 
 
-public class Logger {
+public class CustomLogger {
 
     private final File logFile;
 
-    public Logger(BiomeMastery main) {
+    public CustomLogger(BiomeMastery main) {
         logFile = new File(main.getDataFolder() + File.separator + "logger.log");
         if (!logFile.exists()) {
             try {

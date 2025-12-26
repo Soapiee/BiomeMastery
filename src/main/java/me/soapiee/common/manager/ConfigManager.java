@@ -6,7 +6,7 @@ import me.soapiee.common.BiomeMastery;
 import me.soapiee.common.logic.effects.Effect;
 import me.soapiee.common.logic.rewards.Reward;
 import me.soapiee.common.logic.rewards.RewardFactory;
-import me.soapiee.common.util.Logger;
+import me.soapiee.common.util.CustomLogger;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
 import org.bukkit.block.Biome;
@@ -35,7 +35,7 @@ public class ConfigManager {
     @Getter private final HashMap<String, Effect> effects = new HashMap<>();
     @Getter private int updateInterval;
 
-    public ConfigManager(FileConfiguration config, Logger logger) {
+    public ConfigManager(FileConfiguration config, CustomLogger logger) {
         this.config = config;
         databaseEnabled = config.getBoolean("database.enabled", false);
         debugMode = config.getBoolean("debug_mode", false);
