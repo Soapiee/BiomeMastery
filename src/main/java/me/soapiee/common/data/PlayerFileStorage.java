@@ -4,7 +4,7 @@ import me.soapiee.common.BiomeMastery;
 import me.soapiee.common.logic.BiomeLevel;
 import me.soapiee.common.manager.BiomeDataManager;
 import me.soapiee.common.manager.ConfigManager;
-import me.soapiee.common.util.Logger;
+import me.soapiee.common.util.CustomLogger;
 import me.soapiee.common.util.Message;
 import me.soapiee.common.util.Utils;
 import org.bukkit.Bukkit;
@@ -25,7 +25,7 @@ public class PlayerFileStorage implements PlayerStorageHandler {
     private final ConfigManager configManager;
     private final BiomeDataManager biomeDataManager;
     private final PlayerData playerData;
-    private final Logger customLogger;
+    private final CustomLogger customLogger;
     private final Object fileLock = new Object();
     private final Set<Biome> enabledBiomes;
 

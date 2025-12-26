@@ -2,7 +2,7 @@ package me.soapiee.common.manager;
 
 import lombok.Getter;
 import me.soapiee.common.BiomeMastery;
-import me.soapiee.common.util.Logger;
+import me.soapiee.common.util.CustomLogger;
 import me.soapiee.common.util.Message;
 import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.file.YamlConfiguration;
@@ -12,7 +12,7 @@ import java.io.File;
 public class EffectsManager {
 
     private final BiomeMastery main;
-    private final Logger customLogger;
+    private final CustomLogger customLogger;
     private final MessageManager messageManager;
 
     private final File file;

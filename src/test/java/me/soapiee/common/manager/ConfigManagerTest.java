@@ -1,7 +1,7 @@
 package me.soapiee.common.manager;
 
 import me.soapiee.common.BiomeMastery;
-import me.soapiee.common.util.Logger;
+import me.soapiee.common.util.CustomLogger;
 import org.bukkit.block.Biome;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.junit.jupiter.api.AfterEach;
@@ -23,7 +23,7 @@ class ConfigManagerTest {
     void beforeEach() {
         BiomeMastery mockMain = mock(BiomeMastery.class);
         FileConfiguration mockConfig = mock(FileConfiguration.class);
-        Logger mockLogger = mock(Logger.class);
+        CustomLogger mockLogger = mock(CustomLogger.class);
 
         // mock BiomeMastery behavior
         when(mockMain.getConfig()).thenReturn(mockConfig);

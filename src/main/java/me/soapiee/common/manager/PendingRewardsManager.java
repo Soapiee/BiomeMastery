@@ -4,7 +4,7 @@ import me.soapiee.common.BiomeMastery;
 import me.soapiee.common.logic.BiomeData;
 import me.soapiee.common.logic.rewards.PendingReward;
 import me.soapiee.common.logic.rewards.Reward;
-import me.soapiee.common.util.Logger;
+import me.soapiee.common.util.CustomLogger;
 import me.soapiee.common.util.Message;
 import me.soapiee.common.util.Utils;
 import org.bukkit.Bukkit;
@@ -20,7 +20,7 @@ import java.util.UUID;
 
 public class PendingRewardsManager {
 
-    private final Logger customLogger;
+    private final CustomLogger customLogger;
     private final BiomeDataManager biomeDataManager;
     private final MessageManager messageManager;
 

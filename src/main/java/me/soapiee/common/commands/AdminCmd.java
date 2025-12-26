@@ -11,7 +11,7 @@ import me.soapiee.common.logic.rewards.Reward;
 import me.soapiee.common.logic.rewards.types.EffectReward;
 import me.soapiee.common.logic.rewards.types.PotionReward;
 import me.soapiee.common.manager.*;
-import me.soapiee.common.util.Logger;
+import me.soapiee.common.util.CustomLogger;
 import me.soapiee.common.util.Message;
 import me.soapiee.common.util.PlayerCache;
 import me.soapiee.common.util.Utils;
@@ -43,7 +43,7 @@ public class AdminCmd implements CommandExecutor, TabCompleter {
     private final EffectsManager effectsManager;
     private final PlayerCache playerCache;
     private final MessageManager messageManager;
-    private final Logger customLogger;
+    private final CustomLogger customLogger;
     private final PendingRewardsManager pendingRewardsManager;
 
     public AdminCmd(BiomeMastery main) {

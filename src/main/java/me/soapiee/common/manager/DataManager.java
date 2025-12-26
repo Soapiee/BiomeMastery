@@ -6,7 +6,7 @@ import me.soapiee.common.BiomeMastery;
 import me.soapiee.common.data.HikariCPConnection;
 import me.soapiee.common.logic.ProgressChecker;
 import me.soapiee.common.logic.rewards.RewardFactory;
-import me.soapiee.common.util.Logger;
+import me.soapiee.common.util.CustomLogger;
 import me.soapiee.common.util.Utils;
 import org.bukkit.ChatColor;
 import org.bukkit.configuration.file.FileConfiguration;
@@ -27,15 +27,16 @@ public class DataManager {
     @Getter private EffectsManager effectsManager;
     @Getter private RewardFactory rewardFactory;
     @Getter private HikariCPConnection database;
+    private final CustomLogger customLogger;
 
     private ProgressChecker progressChecker;
 
     public DataManager(BiomeMastery main) {
         FileConfiguration mainConfig = main.getConfig();
-        Logger logger = main.getCustomLogger();
+        customLogger = main.getCustomLogger();
 
         playerDataManager = new PlayerDataManager(main);
-        configManager = new ConfigManager(mainConfig, logger);
+        configManager = new ConfigManager(mainConfig, customLogger);
         checkDirectory(main);
         cooldownManager = new CmdCooldownManager(main, mainConfig.getInt("settings.command_cooldown", 3));
         pendingRewardsManager = new PendingRewardsManager(main, biomeDataManager);
@@ -47,7 +48,7 @@ public class DataManager {
         try {
             Files.createDirectories(Paths.get(main.getDataFolder() + File.separator + "Data"));
         } catch (IOException e) {
-            main.getCustomLogger().logToFile(e, ChatColor.RED + "Data folder could not be created");
+            customLogger.logToFile(e, ChatColor.RED + "Data folder could not be created");
         }
     }
 
@@ -59,7 +60,7 @@ public class DataManager {
                 initialiseDatabase(mainConfig);
                 Utils.consoleMsg(ChatColor.DARK_GREEN + "Database enabled.");
             } catch (SQLException | HikariPool.PoolInitializationException e) {
-                main.getCustomLogger().logToFile(e, ChatColor.RED + "Database could not connect. Switching to file storage");
+                customLogger.logToFile(e, ChatColor.RED + "Database could not connect. Switching to file storage");
                 initialiseFiles(main);
             }
 

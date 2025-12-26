@@ -9,7 +9,7 @@ import me.soapiee.common.manager.DataManager;
 import me.soapiee.common.manager.EffectsManager;
 import me.soapiee.common.manager.MessageManager;
 import me.soapiee.common.manager.PlayerDataManager;
-import me.soapiee.common.util.Logger;
+import me.soapiee.common.util.CustomLogger;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.configuration.file.FileConfiguration;
@@ -40,7 +40,7 @@ class RewardFactoryTest {
         mockConfig = mock(FileConfiguration.class);
         MessageManager mockMessageManager = mock(MessageManager.class);
         VaultHook mockVaultHook = mock(VaultHook.class);
-        Logger mockLogger = mock(Logger.class);
+        CustomLogger mockLogger = mock(CustomLogger.class);
         DataManager mockDataManager = mock(DataManager.class);
         PlayerDataManager mockPlayerDataManager = mock(PlayerDataManager.class);
         EffectsManager mockEffectsManager = mock(EffectsManager.class);

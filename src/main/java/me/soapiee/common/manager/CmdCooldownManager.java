@@ -1,7 +1,7 @@
 package me.soapiee.common.manager;
 
 import me.soapiee.common.BiomeMastery;
-import me.soapiee.common.util.Logger;
+import me.soapiee.common.util.CustomLogger;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
@@ -17,7 +17,7 @@ import java.util.UUID;
 
 public class CmdCooldownManager {
 
-    private final Logger customLogger;
+    private final CustomLogger customLogger;
     private final File file;
     private YamlConfiguration contents;
 

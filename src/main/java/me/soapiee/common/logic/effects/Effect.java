@@ -48,7 +48,7 @@ public interface Effect {
                 try {
                     result.add(EffectType.valueOf(conflict.toUpperCase()));
                 } catch (IllegalArgumentException ignored) {
-//                main.getLogger().warning("Invalid conflict type: " + conflict);
+//                main.getCustomLogger().warning("Invalid conflict type: " + conflict);
                 }
             }
         }
