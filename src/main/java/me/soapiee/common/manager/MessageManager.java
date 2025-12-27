@@ -70,6 +70,9 @@ public class MessageManager {
                 || messageEnum == Message.BIOMEDETAILEDFORMAT
                 || messageEnum == Message.BIOMEDETAILEDMAX
                 || messageEnum == Message.BIOMEREWARDFORMAT
+                || messageEnum == Message.DISABLEHOVER
+                || messageEnum == Message.WORLDTEXTCOLOR
+                || messageEnum == Message.BIOMETEXTCOLOR
                 || messageEnum == Message.REWARDUNCLAIMED
                 || messageEnum == Message.REWARDCLAIMED
                 || messageEnum == Message.REWARDCLAIMINBIOME
@@ -131,6 +134,7 @@ public class MessageManager {
                 .replace("%cmd_label%", string)
                 .replace("%world%", string)
                 .replace("%reward%", string)
+                .replace("%input%", string)
                 .replace("%biome%", Utils.capitalise(string));
     }
 
@@ -155,6 +159,7 @@ public class MessageManager {
                 .replace("%progress%",Utils.formatTargetDuration(value))
                 .replace("%max_level%",valueString)
                 .replace("%input%",input)
+                .replace("%total_pages%", String.valueOf(value))
                 .replace("%biome%", input);
     }
 

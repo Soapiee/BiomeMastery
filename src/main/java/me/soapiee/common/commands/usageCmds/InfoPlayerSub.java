@@ -2,12 +2,10 @@ package me.soapiee.common.commands.usageCmds;
 
 import lombok.Getter;
 import me.soapiee.common.BiomeMastery;
-import me.soapiee.common.commands.SubCmd;
 import me.soapiee.common.data.BukkitExecutor;
 import me.soapiee.common.data.PlayerData;
 import me.soapiee.common.logic.BiomeData;
 import me.soapiee.common.logic.BiomeLevel;
-import me.soapiee.common.manager.CmdCooldownManager;
 import me.soapiee.common.manager.PlayerDataManager;
 import me.soapiee.common.util.CustomLogger;
 import me.soapiee.common.util.Message;
@@ -22,22 +20,19 @@ import org.bukkit.entity.Player;
 import java.util.ArrayList;
 import java.util.List;
 
-public class InfoPlayerSub extends InfoSub implements SubCmd {
+public class InfoPlayerSub extends AbstractUsageSub {
 
     @Getter private final String IDENTIFIER = "infoplayer";
-    @Getter private final String PERMISSION = "biomemastery.player.others";
-    @Getter private final int MIN_ARGS = 2;
-    @Getter private final int MAX_ARGS = 3;
 
     public InfoPlayerSub(BiomeMastery main) {
-        super(main);
+        super(main, "biomemastery.player.others", 2, 3);
     }
 
     // /bm info [player]
     // /bm info [player] [page]
     @Override
     public void execute(CommandSender sender, String label, String[] args) {
-        if (!checkRequirements(sender, main, args, label)) return;
+        if (!checkRequirements(sender, args, label)) return;
 
         OfflinePlayer target = getTarget(sender, args);
         if (target == null) return;
@@ -80,7 +75,7 @@ public class InfoPlayerSub extends InfoSub implements SubCmd {
         int totalPages = ((enabledBiomesCount % maxBiomes) == 0 ? (enabledBiomesCount / maxBiomes) : (enabledBiomesCount / maxBiomes) + 1);
 
         if (page < 1 || page > totalPages) {
-            sendMessage(sender, messageManager.getWithPlaceholder(Message.INVALIDPAGE, page, totalPages));
+            sendMessage(sender, messageManager.getWithPlaceholder(Message.INVALIDPAGE, totalPages, args[1]));
             return -1;
         }
 
@@ -88,10 +83,7 @@ public class InfoPlayerSub extends InfoSub implements SubCmd {
     }
 
     public void displayInfo(CommandSender sender, OfflinePlayer target, PlayerData playerData, int pageNumber) {
-        CmdCooldownManager cmdCooldownManager = main.getDataManager().getCooldownManager();
-        if (hasCooldown(sender, cmdCooldownManager, messageManager)) return;
-
-        updateProgress(target, playerData, configManager);
+        updateProgress(target, playerData);
         cmdCooldownManager.addCooldown(sender);
 
         sendMessage(sender, createInfoString(target, playerData, pageNumber));

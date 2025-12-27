@@ -2,7 +2,6 @@ package me.soapiee.common.commands.usageCmds;
 
 import lombok.Getter;
 import me.soapiee.common.BiomeMastery;
-import me.soapiee.common.commands.SubCmd;
 import me.soapiee.common.data.BukkitExecutor;
 import me.soapiee.common.data.PlayerData;
 import me.soapiee.common.logic.BiomeLevel;
@@ -12,7 +11,6 @@ import me.soapiee.common.logic.rewards.types.EffectReward;
 import me.soapiee.common.logic.rewards.types.PotionReward;
 import me.soapiee.common.manager.BiomeDataManager;
 import me.soapiee.common.manager.ConfigManager;
-import me.soapiee.common.manager.MessageManager;
 import me.soapiee.common.manager.PlayerDataManager;
 import me.soapiee.common.util.CustomLogger;
 import me.soapiee.common.util.Message;
@@ -26,19 +24,12 @@ import org.bukkit.potion.PotionEffectType;
 import java.util.ArrayList;
 import java.util.List;
 
-public class RewardSub implements SubCmd {
-
-    private final BiomeMastery main;
-    private final MessageManager messageManager;
+public class RewardSub extends AbstractUsageSub {
 
     @Getter private final String IDENTIFIER = "reward";
-    @Getter private final String PERMISSION = null;
-    @Getter private final int MIN_ARGS = 3;
-    @Getter private final int MAX_ARGS = 3;
 
     public RewardSub(BiomeMastery main) {
-        this.main = main;
-        messageManager = main.getMessageManager();
+        super(main, null, 3, 3);
     }
 
     // /bm reward <biome> <level>
@@ -49,7 +40,7 @@ public class RewardSub implements SubCmd {
             return;
         }
 
-        if (!checkRequirements(sender, main, args, label)) return;
+        if (!checkRequirements(sender, args, label)) return;
 
         Biome biome = validateBiome(sender, args, label);
         if (biome == null) return;

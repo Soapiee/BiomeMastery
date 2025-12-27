@@ -2,27 +2,18 @@ package me.soapiee.common.commands.usageCmds;
 
 import lombok.Getter;
 import me.soapiee.common.BiomeMastery;
-import me.soapiee.common.commands.SubCmd;
-import me.soapiee.common.manager.MessageManager;
 import me.soapiee.common.util.Message;
 import org.bukkit.command.CommandSender;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class GUISub implements SubCmd {
-
-    private final BiomeMastery main;
-    private final MessageManager messageManager;
+public class GUISub extends AbstractUsageSub {
 
     @Getter private final String IDENTIFIER = "gui";
-    @Getter private final String PERMISSION = null;
-    @Getter private final int MIN_ARGS = 0;
-    @Getter private final int MAX_ARGS = 0;
 
     public GUISub(BiomeMastery main) {
-        this.main = main;
-        messageManager = main.getMessageManager();
+        super(main, null, 0, 0);
     }
 
     @Override
