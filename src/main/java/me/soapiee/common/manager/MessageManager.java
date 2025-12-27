@@ -70,6 +70,9 @@ public class MessageManager {
                 || messageEnum == Message.BIOMEDETAILEDFORMAT
                 || messageEnum == Message.BIOMEDETAILEDMAX
                 || messageEnum == Message.BIOMEREWARDFORMAT
+                || messageEnum == Message.DISABLEHOVER
+                || messageEnum == Message.WORLDTEXTCOLOR
+                || messageEnum == Message.BIOMETEXTCOLOR
                 || messageEnum == Message.REWARDUNCLAIMED
                 || messageEnum == Message.REWARDCLAIMED
                 || messageEnum == Message.REWARDCLAIMINBIOME

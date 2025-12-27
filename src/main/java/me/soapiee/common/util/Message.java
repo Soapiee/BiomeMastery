@@ -81,7 +81,9 @@ public enum Message {
             + "\n#01d54a/%cmd_label% setprogress|addprogress|removeprogress [player] [biome] [amount] &7- Modify the players progress for their current level"
             + "\n#01d54a/%cmd_label% reset [player] <biome> &7- Clears all of the players data or just for a specified biome"),
     WORLDLISTHEADER("world_list_header", "#01d54a--------- Worlds List ---------"),
+    WORLDTEXTCOLOR("world_text_color", "#01d54a"),
     BIOMELISTHEADER("biome_list_header", "#01d54a--------- Biome List ---------"),
+    BIOMETEXTCOLOR("biome_text_color", "#01d54a"),
     INVALIDWORLDBIOME("invalid_world_biome", "&cYou need to enter a valid World or Biome"),
     WORLDALREADYENABLED("world_already_enabled", "&cThis world is already enabled in the config"),
     WORLDENABLED("world_successfully_enabled", "&aBiomes inside the world \"%world%\" will now be registered. The server must be restarted for it to take effect"),
@@ -91,6 +93,7 @@ public enum Message {
     BIOMEENABLED("biome_successfully_enabled", "&aThe %biome% biome had been added to the enabled Biomes list. The server must be restarted for it to take effect"),
     BIOMEALREADYDISABLED("biome_already_disabled", "&cThis biome is already disabled in the config"),
     BIOMEDISABLED("biome_successfully_disabled", "&aThe %biome% biome had been removed from the enabled Biomes list. The server must be restarted for it to take effect"),
+    DISABLEHOVER("disable_hover", "&cClick to disable"),
     INVALIDNEGNUMBER("invalid_negative_no", "&cYou need to enter a value above 0"),
     ADDERROR("add_error", "&cYou cannot add on to this as &e%player_name% &cis already max level"),
     DISABLEDBIOME("disabled_biome", "&cYou cannot edit player data for a disabled biome"),
