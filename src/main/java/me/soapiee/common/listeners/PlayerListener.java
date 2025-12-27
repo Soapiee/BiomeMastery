@@ -9,6 +9,7 @@ import me.soapiee.common.util.CustomLogger;
 import me.soapiee.common.util.Message;
 import me.soapiee.common.util.PlayerCache;
 import me.soapiee.common.util.Utils;
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.block.Biome;
@@ -56,7 +57,6 @@ public class PlayerListener implements Listener {
         Player player = event.getPlayer();
 
         if (!player.hasPlayedBefore()) playerCache.addOfflinePlayer(player);
-        if (player.hasPermission("biomemastery.admin")) updateNotif(player);
 
         playerDataManager.getOrLoad(player)
                 .thenAcceptAsync(data -> setupPlayer(player, data), BukkitExecutor.sync(main))
@@ -64,6 +64,10 @@ public class PlayerListener implements Listener {
                     logger.logToFile(error, "Could not create new data for " + player.getName());
                     return null;
                 });
+
+        Bukkit.getScheduler().runTaskLater(main, () -> {
+            if (player.hasPermission("biomemastery.admin")) updateNotif(player);
+        }, 20);
     }
 
     private void setupPlayer(Player player, PlayerData playerData) {

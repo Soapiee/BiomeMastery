@@ -2,9 +2,6 @@ package me.soapiee.common.commands.adminCmds;
 
 import lombok.Getter;
 import me.soapiee.common.BiomeMastery;
-import me.soapiee.common.commands.SubCmd;
-import me.soapiee.common.manager.ConfigManager;
-import me.soapiee.common.manager.MessageManager;
 import me.soapiee.common.util.Message;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
@@ -15,28 +12,19 @@ import org.bukkit.configuration.file.FileConfiguration;
 import java.util.ArrayList;
 import java.util.List;
 
-public class EnableSub implements SubCmd {
-
-    private final BiomeMastery main;
-    private final MessageManager messageManager;
-    private final ConfigManager configManager;
+public class EnableSub extends AbstractAdminSub {
 
     @Getter private final String IDENTIFIER = "enable";
-    @Getter private final String PERMISSION = null;
-    @Getter private final int MIN_ARGS = 2;
-    @Getter private final int MAX_ARGS = 2;
 
     public EnableSub(BiomeMastery main) {
-        this.main = main;
-        messageManager = main.getMessageManager();
-        configManager = main.getDataManager().getConfigManager();
+        super(main, null, 2, 2);
     }
 
     // /abm enable <world>
     // /abm enable <biome>
     @Override
     public void execute(CommandSender sender, String label, String[] args) {
-        if (!checkRequirements(sender, main, args, label)) return;
+        if (!checkRequirements(sender, args, label)) return;
 
         World inputWorld = validateWorld(args[1]);
         Biome inputBiome = validateBiome(args[1]);
@@ -67,11 +55,10 @@ public class EnableSub implements SubCmd {
 
     private void enableWorld(CommandSender sender, World inputWorld) {
         Message message;
+        List<World> configEnabledWorlds = configManager.generateEnabledWorldsList();
 
-        if (configManager.isEnabledWorld(inputWorld)) {
-            message = Message.WORLDALREADYENABLED;
-        } else {
-            // Run async
+        if (configEnabledWorlds.contains(inputWorld)) message = Message.WORLDALREADYENABLED;
+        else {
             saveWorldList(inputWorld.getName());
             message = Message.WORLDENABLED;
         }
@@ -93,8 +80,9 @@ public class EnableSub implements SubCmd {
 
     private void enableBiome(CommandSender sender, Biome inputBiome) {
         Message message;
+        List<Biome> configEnabledBiomes = configManager.generateEnabledBiomesList();
 
-        if (configManager.isEnabledBiome(inputBiome)) message = Message.BIOMEALREADYENABLED;
+        if (configEnabledBiomes.contains(inputBiome)) message = Message.BIOMEALREADYENABLED;
         else {
             saveBiomeList(inputBiome.name());
             message = Message.BIOMEENABLED;

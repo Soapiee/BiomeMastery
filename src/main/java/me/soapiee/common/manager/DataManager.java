@@ -90,8 +90,8 @@ public class DataManager {
         biomeDataManager = new BiomeDataManager(configManager, rewardFactory, mainConfig);
     }
 
-    public void reloadData(BiomeMastery main, DataManager dataManager) {
-        configManager.reload(main, dataManager);
+    public void reloadData(BiomeMastery main) {
+        configManager.reload(main, this);
         startChecker(main);
     }
 

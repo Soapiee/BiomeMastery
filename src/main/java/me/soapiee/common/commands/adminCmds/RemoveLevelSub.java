@@ -2,7 +2,6 @@ package me.soapiee.common.commands.adminCmds;
 
 import lombok.Getter;
 import me.soapiee.common.BiomeMastery;
-import me.soapiee.common.commands.SubCmd;
 import me.soapiee.common.data.BukkitExecutor;
 import me.soapiee.common.data.PlayerData;
 import me.soapiee.common.logic.BiomeData;
@@ -25,21 +24,18 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-public class RemoveLevelSub extends ModifySub implements SubCmd {
+public class RemoveLevelSub extends AbstractAdminSub {
 
     @Getter private final String IDENTIFIER = "removelevel";
-    @Getter private final String PERMISSION = null;
-    @Getter private final int MIN_ARGS = 4;
-    @Getter private final int MAX_ARGS = 4;
 
     public RemoveLevelSub(BiomeMastery main) {
-        super(main);
+        super(main, null, 4, 4);
     }
 
     // /abm removeLevel <player> <biome> <value>
     @Override
     public void execute(CommandSender sender, String label, String[] args) {
-        if (!checkRequirements(sender, main, args, label)) return;
+        if (!checkRequirements(sender, args, label)) return;
 
         OfflinePlayer target = getTarget(sender, args[1]);
         if (target == null) return;

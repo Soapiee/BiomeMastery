@@ -205,4 +205,12 @@ public class ConfigManager {
     public boolean isEnabledBiome(Biome biome) {
         return enabledBiomes.contains(biome);
     }
+
+    public List<Biome> generateEnabledBiomesList(){
+        return setUpEnabledBiomes();
+    }
+
+    public List<World> generateEnabledWorldsList(){
+        return setUpEnabledWords();
+    }
 }

@@ -2,8 +2,10 @@ package me.soapiee.common.commands;
 
 import me.soapiee.common.BiomeMastery;
 import me.soapiee.common.commands.adminCmds.*;
-import me.soapiee.common.manager.*;
-import me.soapiee.common.util.CustomLogger;
+import me.soapiee.common.manager.BiomeDataManager;
+import me.soapiee.common.manager.ConfigManager;
+import me.soapiee.common.manager.DataManager;
+import me.soapiee.common.manager.MessageManager;
 import me.soapiee.common.util.Message;
 import me.soapiee.common.util.PlayerCache;
 import me.soapiee.common.util.Utils;
@@ -22,31 +24,20 @@ import java.util.stream.Collectors;
 
 public class AdminCmd implements CommandExecutor, TabCompleter {
 
-    private final BiomeMastery main;
-    private final DataManager dataManager;
-    private final PlayerDataManager playerDataManager;
     private final BiomeDataManager biomeDataManager;
     private final ConfigManager configManager;
-    private final EffectsManager effectsManager;
     private final PlayerCache playerCache;
     private final MessageManager messageManager;
-    private final CustomLogger customLogger;
-    private final PendingRewardsManager pendingRewardsManager;
 
     private final String PERMISSION = "biomemastery.admin";
     private final Map<String, SubCmd> subCommands = new HashMap<>();
 
     public AdminCmd(BiomeMastery main) {
-        this.main = main;
-        dataManager = main.getDataManager();
-        playerDataManager = dataManager.getPlayerDataManager();
+        DataManager dataManager = main.getDataManager();
         biomeDataManager = dataManager.getBiomeDataManager();
         configManager = dataManager.getConfigManager();
-        effectsManager = dataManager.getEffectsManager();
         playerCache = main.getPlayerCache();
         messageManager = main.getMessageManager();
-        customLogger = main.getCustomLogger();
-        pendingRewardsManager = dataManager.getPendingRewardsManager();
 
         register(new ReloadSub(main));
         register(new ListSub(main));

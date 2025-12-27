@@ -2,9 +2,6 @@ package me.soapiee.common.commands.adminCmds;
 
 import lombok.Getter;
 import me.soapiee.common.BiomeMastery;
-import me.soapiee.common.commands.SubCmd;
-import me.soapiee.common.manager.ConfigManager;
-import me.soapiee.common.manager.MessageManager;
 import me.soapiee.common.util.Message;
 import me.soapiee.common.util.Utils;
 import org.bukkit.World;
@@ -14,28 +11,19 @@ import org.bukkit.command.CommandSender;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ListSub implements SubCmd {
-
-    private final BiomeMastery main;
-    private final MessageManager messageManager;
-    private final ConfigManager configManager;
+public class ListSub extends AbstractAdminSub{
 
     @Getter private final String IDENTIFIER = "list";
-    @Getter private final String PERMISSION = null;
-    @Getter private final int MIN_ARGS = 1;
-    @Getter private final int MAX_ARGS = 2;
 
     public ListSub(BiomeMastery main) {
-        this.main = main;
-        messageManager = main.getMessageManager();
-        configManager = main.getDataManager().getConfigManager();
+        super(main, null, 1, 2);
     }
 
     // /abm list worlds
     // /abm list biomes
     @Override
     public void execute(CommandSender sender, String label, String[] args) {
-        if (!checkRequirements(sender, main, args, label)) return;
+        if (!checkRequirements(sender, args, label)) return;
 
         String listType = args[1];
         switch (listType){

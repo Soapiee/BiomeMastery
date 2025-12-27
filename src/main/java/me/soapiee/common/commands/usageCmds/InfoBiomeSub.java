@@ -2,7 +2,6 @@ package me.soapiee.common.commands.usageCmds;
 
 import lombok.Getter;
 import me.soapiee.common.BiomeMastery;
-import me.soapiee.common.commands.SubCmd;
 import me.soapiee.common.data.BukkitExecutor;
 import me.soapiee.common.data.PlayerData;
 import me.soapiee.common.logic.BiomeData;
@@ -11,7 +10,6 @@ import me.soapiee.common.logic.effects.Effect;
 import me.soapiee.common.logic.rewards.Reward;
 import me.soapiee.common.logic.rewards.types.EffectReward;
 import me.soapiee.common.logic.rewards.types.PotionReward;
-import me.soapiee.common.manager.CmdCooldownManager;
 import me.soapiee.common.manager.PlayerDataManager;
 import me.soapiee.common.util.CustomLogger;
 import me.soapiee.common.util.Message;
@@ -26,16 +24,13 @@ import org.bukkit.potion.PotionEffectType;
 import java.util.ArrayList;
 import java.util.List;
 
-public class InfoBiomeSub extends InfoSub implements SubCmd {
+public class InfoBiomeSub extends AbstractUsageSub {
 
     @Getter private final String IDENTIFIER = "infobiome";
-    @Getter private final String PERMISSION = null;
-    @Getter private final int MIN_ARGS = 2;
-    @Getter private final int MAX_ARGS = 3;
     private final String PERMISSION_OTHER = "biomemastery.player.others";
 
     public InfoBiomeSub(BiomeMastery main) {
-        super(main);
+        super(main, null, 2, 3);
     }
 
     // /bm info [biome]
@@ -47,7 +42,7 @@ public class InfoBiomeSub extends InfoSub implements SubCmd {
             return;
         }
 
-        if (!checkRequirements(sender, main, args, label)) return;
+        if (!checkRequirements(sender, args, label)) return;
 
         Biome biome = getBiome(sender, args[1]);
         if (biome == null) return;
@@ -106,11 +101,7 @@ public class InfoBiomeSub extends InfoSub implements SubCmd {
     }
 
     public void displayInfo(CommandSender sender, OfflinePlayer target, PlayerData playerData, Biome biome) {
-        CmdCooldownManager cmdCooldownManager = main.getDataManager().getCooldownManager();
-        if (hasCooldown(sender, cmdCooldownManager, messageManager)) return;
-
-        updateProgress(target, playerData, configManager);
-
+        updateProgress(target, playerData);
         cmdCooldownManager.addCooldown(sender);
         sendMessage(sender, createInfoString(target, playerData, biome));
     }

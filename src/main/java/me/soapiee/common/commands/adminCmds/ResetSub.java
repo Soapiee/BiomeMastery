@@ -2,7 +2,6 @@ package me.soapiee.common.commands.adminCmds;
 
 import lombok.Getter;
 import me.soapiee.common.BiomeMastery;
-import me.soapiee.common.commands.SubCmd;
 import me.soapiee.common.data.BukkitExecutor;
 import me.soapiee.common.data.PlayerData;
 import me.soapiee.common.logic.BiomeData;
@@ -11,7 +10,7 @@ import me.soapiee.common.logic.rewards.PendingReward;
 import me.soapiee.common.logic.rewards.Reward;
 import me.soapiee.common.logic.rewards.types.EffectReward;
 import me.soapiee.common.logic.rewards.types.PotionReward;
-import me.soapiee.common.manager.*;
+import me.soapiee.common.manager.PlayerDataManager;
 import me.soapiee.common.util.CustomLogger;
 import me.soapiee.common.util.Message;
 import me.soapiee.common.util.Utils;
@@ -25,33 +24,20 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-public class ResetSub implements SubCmd {
-
-    private final BiomeMastery main;
-    private final MessageManager messageManager;
-    private final ConfigManager configManager;
-    private final BiomeDataManager biomeDataManager;
-    private final PendingRewardsManager pendingRewardsManager;
+public class ResetSub extends AbstractAdminSub {
 
     @Getter private final String IDENTIFIER = "reset";
     @Getter private final String PERMISSION = "biomemastery.reset";
-    @Getter private final int MIN_ARGS = 2;
-    @Getter private final int MAX_ARGS = 3;
 
     public ResetSub(BiomeMastery main) {
-        this.main = main;
-        messageManager = main.getMessageManager();
-        DataManager dataManager = main.getDataManager();
-        configManager = dataManager.getConfigManager();
-        biomeDataManager = dataManager.getBiomeDataManager();
-        pendingRewardsManager = dataManager.getPendingRewardsManager();
+        super(main, "biomemastery.reset", 2, 3);
     }
 
     // /abm reset <player>
     // /abm reset <player> <biome>
     @Override
     public void execute(CommandSender sender, String label, String[] args) {
-        if (!checkRequirements(sender, main, args, label)) return;
+        if (!checkRequirements(sender, args, label)) return;
 
         OfflinePlayer target = getTarget(sender, args);
         if (target == null) return;
@@ -100,27 +86,6 @@ public class ResetSub implements SubCmd {
         }
 
         pendingRewardsManager.removeAll(target.getUniqueId());
-    }
-
-    private Biome getBiome(CommandSender sender, String value) {
-        Biome biome;
-        try {
-            biome = Biome.valueOf(value.toUpperCase());
-        } catch (IllegalArgumentException error) {
-            biome = null;
-        }
-
-        if (biome == null) {
-            sendMessage(sender, messageManager.getWithPlaceholder(Message.INVALIDBIOME, value));
-            return null;
-        }
-
-        if (!configManager.isEnabledBiome(biome)) {
-            sendMessage(sender, messageManager.getWithPlaceholder(Message.BIOMEINFODISABLED, value));
-            return null;
-        }
-
-        return biome;
     }
 
     private void resetBiome(CommandSender sender, PlayerData playerData, OfflinePlayer target, Biome inputBiome) {

@@ -131,6 +131,7 @@ public class MessageManager {
                 .replace("%cmd_label%", string)
                 .replace("%world%", string)
                 .replace("%reward%", string)
+                .replace("%input%", string)
                 .replace("%biome%", Utils.capitalise(string));
     }
 
@@ -155,6 +156,7 @@ public class MessageManager {
                 .replace("%progress%",Utils.formatTargetDuration(value))
                 .replace("%max_level%",valueString)
                 .replace("%input%",input)
+                .replace("%total_pages%", String.valueOf(value))
                 .replace("%biome%", input);
     }
 

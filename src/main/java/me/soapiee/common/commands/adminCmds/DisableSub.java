@@ -2,9 +2,6 @@ package me.soapiee.common.commands.adminCmds;
 
 import lombok.Getter;
 import me.soapiee.common.BiomeMastery;
-import me.soapiee.common.commands.SubCmd;
-import me.soapiee.common.manager.ConfigManager;
-import me.soapiee.common.manager.MessageManager;
 import me.soapiee.common.util.Message;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
@@ -15,28 +12,19 @@ import org.bukkit.configuration.file.FileConfiguration;
 import java.util.ArrayList;
 import java.util.List;
 
-public class DisableSub implements SubCmd {
-
-    private final BiomeMastery main;
-    private final MessageManager messageManager;
-    private final ConfigManager configManager;
+public class DisableSub extends AbstractAdminSub {
 
     @Getter private final String IDENTIFIER = "disable";
-    @Getter private final String PERMISSION = null;
-    @Getter private final int MIN_ARGS = 2;
-    @Getter private final int MAX_ARGS = 2;
 
     public DisableSub(BiomeMastery main) {
-        this.main = main;
-        messageManager = main.getMessageManager();
-        configManager = main.getDataManager().getConfigManager();
+        super(main, null, 2, 2);
     }
 
     // /abm disable <world>
     // /abm disable <biome>
     @Override
     public void execute(CommandSender sender, String label, String[] args) {
-        if (!checkRequirements(sender, main, args, label)) return;
+        if (!checkRequirements(sender, args, label)) return;
 
         World inputWorld = validateWorld(args[1]);
         Biome inputBiome = validateBiome(args[1]);
@@ -68,10 +56,10 @@ public class DisableSub implements SubCmd {
     private void disableWorld(CommandSender sender, World inputWorld) {
         Message message;
 
-        if (!configManager.isEnabledWorld(inputWorld)) {
-            message = Message.WORLDALREADYDISABLED;
-        } else {
-            // Run async
+        List<World> configEnabledWorlds = configManager.generateEnabledWorldsList();
+
+        if (!configEnabledWorlds.contains(inputWorld)) message = Message.WORLDALREADYDISABLED;
+        else {
             saveWorldList(inputWorld.getName());
             message = Message.WORLDDISABLED;
         }
@@ -87,20 +75,15 @@ public class DisableSub implements SubCmd {
         if (config.isSet(worldListPath)) worldList.addAll(config.getStringList(worldListPath));
         worldList.remove(worldString);
 
-//        for (String world : config.getStringList(worldListPath)) {
-//            if (world.equalsIgnoreCase(worldString)) continue;
-//
-//            worldList.add(world);
-//        }
-
         config.set("default_biome_settings.enabled_worlds", worldList);
         main.saveConfig();
     }
 
     private void disableBiome(CommandSender sender, Biome inputBiome) {
         Message message;
+        List<Biome> configEnabledBiomes = configManager.generateEnabledBiomesList();
 
-        if (!configManager.isEnabledBiome(inputBiome)) message = Message.BIOMEALREADYDISABLED;
+        if (!configEnabledBiomes.contains(inputBiome)) message = Message.BIOMEALREADYDISABLED;
         else {
             saveBiomeList(inputBiome.name());
             message = Message.BIOMEDISABLED;
