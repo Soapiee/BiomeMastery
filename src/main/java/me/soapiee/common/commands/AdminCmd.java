@@ -1,36 +1,23 @@
 package me.soapiee.common.commands;
 
 import me.soapiee.common.BiomeMastery;
-import me.soapiee.common.data.BukkitExecutor;
-import me.soapiee.common.data.PlayerData;
-import me.soapiee.common.logic.BiomeData;
-import me.soapiee.common.logic.BiomeLevel;
-import me.soapiee.common.logic.events.LevelUpEvent;
-import me.soapiee.common.logic.rewards.PendingReward;
-import me.soapiee.common.logic.rewards.Reward;
-import me.soapiee.common.logic.rewards.types.EffectReward;
-import me.soapiee.common.logic.rewards.types.PotionReward;
+import me.soapiee.common.commands.adminCmds.*;
 import me.soapiee.common.manager.*;
 import me.soapiee.common.util.CustomLogger;
 import me.soapiee.common.util.Message;
 import me.soapiee.common.util.PlayerCache;
 import me.soapiee.common.util.Utils;
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
-import org.bukkit.OfflinePlayer;
-import org.bukkit.World;
 import org.bukkit.block.Biome;
 import org.bukkit.block.CommandBlock;
-import org.bukkit.command.*;
-import org.bukkit.configuration.file.FileConfiguration;
+import org.bukkit.command.Command;
+import org.bukkit.command.CommandExecutor;
+import org.bukkit.command.CommandSender;
+import org.bukkit.command.TabCompleter;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
-import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 import java.util.stream.Collectors;
 
 public class AdminCmd implements CommandExecutor, TabCompleter {
@@ -46,6 +33,9 @@ public class AdminCmd implements CommandExecutor, TabCompleter {
     private final CustomLogger customLogger;
     private final PendingRewardsManager pendingRewardsManager;
 
+    private final String PERMISSION = "biomemastery.admin";
+    private final Map<String, SubCmd> subCommands = new HashMap<>();
+
     public AdminCmd(BiomeMastery main) {
         this.main = main;
         dataManager = main.getDataManager();
@@ -57,224 +47,36 @@ public class AdminCmd implements CommandExecutor, TabCompleter {
         messageManager = main.getMessageManager();
         customLogger = main.getCustomLogger();
         pendingRewardsManager = dataManager.getPendingRewardsManager();
+
+        register(new ReloadSub(main));
+        register(new ListSub(main));
+        register(new EnableSub(main));
+        register(new DisableSub(main));
+        register(new ResetSub(main));
+        register(new SetLevelSub(main));
+        register(new AddLevelSub(main));
+        register(new RemoveLevelSub(main));
+        register(new SetProgressSub(main));
+        register(new AddProgressSub(main));
+        register(new RemoveProgressSub(main));
+    }
+
+    private void register(SubCmd cmd) {
+        subCommands.put(cmd.getIDENTIFIER(), cmd);
     }
 
     @Override
     public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, String[] args) {
         if (sender instanceof CommandBlock) return true;
-        if (!checkPermission(sender, "biomemastery.admin")) return true;
+        if (!hasPermission(sender)) return true;
 
-        //DEBUG for effects
-//        if (args[0].equalsIgnoreCase("effect")) {
-//            if (!(sender instanceof Player)) return true;
-//            Player player = ((Player) sender).getPlayer();
-//
-//            EffectReward reward = new EffectReward(main, playerDataManager, effectsManager, EffectType.LAVASWIMMER, true);
-//            Effect effect = reward.getEffect();
-//
-//            if (effect.isActive(player)) {
-//                reward.remove(player);
-//                sendMessage(sender, "&cEffect de-activated");
-//            } else {
-//                reward.give(player);
-//            }
-//
-//            return true;
-//        }
-
-        // /abm reload
-        if (args.length == 1) {
-            if (args[0].equalsIgnoreCase("reload")) {
-                if (!checkPermission(sender, "biomemastery.reload")) return true;
-                reload(sender);
-                return true;
-            }
-
-            sendHelpMessage(sender, label);
+        SubCmd cmd = subCommands.get(args[0]);
+        if (cmd == null) {
+            sendMessage(sender, messageManager.getWithPlaceholder(Message.ADMINHELP, label));
             return true;
         }
 
-        // /abm list worlds
-        // /abm list biomes
-        if (args.length == 2 && args[0].equalsIgnoreCase("list")) {
-            switch (args[1]) {
-                case "worlds":
-                    listWorlds(sender);
-                    break;
-                case "biomes":
-                    listBiomes(sender);
-                    break;
-                default:
-                    sendHelpMessage(sender, label);
-                    break;
-            }
-            return true;
-        }
-
-        // /abm enable|disable <world> - Enables/Disables a world
-        // /abm enable|disable <biome> - Enables/Disables a biome
-        if (args.length == 2 && ((args[0].equalsIgnoreCase("enable")) || (args[0].equalsIgnoreCase("disable")))) {
-            World inputWorld = validateWorld(args[1]);
-            Biome inputBiome = validateBiome(args[1]);
-
-            if (inputWorld == null && inputBiome == null) {
-                sendMessage(sender, messageManager.get(Message.INVALIDWORLDBIOME));
-                return true;
-            }
-
-            boolean toEnable;
-            if (args[0].equalsIgnoreCase("enable")) toEnable = true;
-            else if (args[0].equalsIgnoreCase("disable")) toEnable = false;
-            else {
-                sendHelpMessage(sender, label);
-                return true;
-            }
-
-            if (inputWorld != null) toggleWorld(sender, inputWorld, toEnable);
-            if (inputBiome != null) toggleBiome(sender, inputBiome, toEnable);
-            return true;
-        }
-
-        // Incorrect command
-        if (args.length < 2 || args.length > 4) {
-            sendHelpMessage(sender, label);
-            return true;
-        }
-
-        // /abm reset <player>
-        // /abm reset <player> <biome>
-        // /abm set|add|remove <player> <biome> <value>
-        OfflinePlayer target = playerCache.getOfflinePlayer(args[1]);
-        if (target == null) {
-            sendMessage(sender, messageManager.get(Message.PLAYERNOTFOUND));
-            return true;
-        }
-
-        // /abm reset <player>
-        if (args.length == 2) {
-            if (!args[0].equalsIgnoreCase("reset")) {
-                sendHelpMessage(sender, label);
-                return true;
-            }
-
-            if (!checkPermission(sender, "biomemastery.reset")) return true;
-
-            playerDataManager.getOrLoad(target)
-                    .thenAcceptAsync(data -> resetPlayer(sender, target, data), BukkitExecutor.sync(main))
-                    .exceptionally(error -> {
-                        customLogger.logToPlayer(sender, error, Utils.addColour(messageManager.getWithPlaceholder(Message.DATAERROR, target.getName())));
-                        return null;
-                    });
-            return true;
-        }
-
-        Biome inputBiome = validateBiome(args[2]);
-        if (inputBiome == null) {
-            sendMessage(sender, messageManager.getWithPlaceholder(Message.INVALIDBIOME, args[2]));
-            return true;
-        }
-
-        if (!configManager.isEnabledBiome(inputBiome)) {
-            sendMessage(sender, messageManager.getWithPlaceholder(Message.DISABLEDBIOME, args[2]));
-            return true;
-        }
-
-        // /abm reset <player> <biome>
-        if (args.length == 3) {
-            if (!args[0].equalsIgnoreCase("reset")) {
-                sendHelpMessage(sender, label);
-                return true;
-            }
-
-            if (!checkPermission(sender, "biomemastery.reset")) return true;
-
-            playerDataManager.getOrLoad(target)
-                    .thenAcceptAsync(data -> resetBiome(sender, target, data, inputBiome), BukkitExecutor.sync(main))
-                    .exceptionally(error -> {
-                        customLogger.logToPlayer(sender, error, Utils.addColour(messageManager.getWithPlaceholder(Message.DATAERROR, target.getName())));
-                        return null;
-                    });
-            return true;
-        }
-
-        // /abm set|add|remove <player> <biome> <value>
-        int inputValue;
-        try {
-            inputValue = Integer.parseInt(args[3]);
-        } catch (NumberFormatException error) {
-            sendMessage(sender, messageManager.getWithPlaceholder(Message.INVALIDNUMBER, args[3]));
-            return true;
-        }
-
-        if (inputValue < 0) {
-            sendMessage(sender, messageManager.getWithPlaceholder(Message.INVALIDNEGNUMBER, args[3]));
-            return true;
-        }
-
-        String argument = args[0].toLowerCase();
-        switch (argument) {
-            // /abm setlevel <biome> <player> X - Sets the players level
-            case "setlevel":
-                playerDataManager.getOrLoad(target)
-                        .thenAcceptAsync(data -> setLevel(sender, target, data, inputBiome, inputValue), BukkitExecutor.sync(main))
-                        .exceptionally(error -> {
-                            customLogger.logToPlayer(sender, error, Utils.addColour(messageManager.getWithPlaceholder(Message.DATAERROR, target.getName())));
-                            return null;
-                        });
-                break;
-
-            // /abm addlevel <biome> <player> X - Adds to the players level
-            case "addlevel":
-                playerDataManager.getOrLoad(target)
-                        .thenAcceptAsync(data -> addLevel(sender, target, data.getBiomeLevel(inputBiome), inputValue), BukkitExecutor.sync(main))
-                        .exceptionally(error -> {
-                            customLogger.logToPlayer(sender, error, Utils.addColour(messageManager.getWithPlaceholder(Message.DATAERROR, target.getName())));
-                            return null;
-                        });
-                break;
-
-            // /abm removelevel <biome> <player> X - Removes levels from the player
-            case "removelevel":
-                playerDataManager.getOrLoad(target)
-                        .thenAcceptAsync(data -> removeLevel(sender, target, data, inputBiome, inputValue), BukkitExecutor.sync(main))
-                        .exceptionally(error -> {
-                            customLogger.logToPlayer(sender, error, Utils.addColour(messageManager.getWithPlaceholder(Message.DATAERROR, target.getName())));
-                            return null;
-                        });
-                break;
-
-            // /abm setprogress <biome> <player> X - Sets the players progress
-            case "setprogress":
-                playerDataManager.getOrLoad(target)
-                        .thenAcceptAsync(data -> setProgress(sender, target, data.getBiomeLevel(inputBiome), inputValue), BukkitExecutor.sync(main))
-                        .exceptionally(error -> {
-                            customLogger.logToPlayer(sender, error, Utils.addColour(messageManager.getWithPlaceholder(Message.DATAERROR, target.getName())));
-                            return null;
-                        });
-                break;
-
-            // /abm addprogress <biome> <player> X - Adds to the players progress
-            case "addprogress":
-                playerDataManager.getOrLoad(target)
-                        .thenAcceptAsync(data -> addProgress(sender, target, data.getBiomeLevel(inputBiome), inputValue), BukkitExecutor.sync(main))
-                        .exceptionally(error -> {
-                            customLogger.logToPlayer(sender, error, Utils.addColour(messageManager.getWithPlaceholder(Message.DATAERROR, target.getName())));
-                            return null;
-                        });
-                break;
-
-            // /abm removeprogress <biome> <player> X - Removes progress from the player
-            case "removeprogress":
-                playerDataManager.getOrLoad(target)
-                        .thenAcceptAsync(data -> removeProgress(sender, target, data.getBiomeLevel(inputBiome), inputValue), BukkitExecutor.sync(main))
-                        .exceptionally(error -> {
-                            customLogger.logToPlayer(sender, error, Utils.addColour(messageManager.getWithPlaceholder(Message.DATAERROR, target.getName())));
-                            return null;
-                        });
-                break;
-            default:
-                sendHelpMessage(sender, label);
-        }
+        cmd.execute(sender, label, args);
         return true;
     }
 
@@ -289,403 +91,14 @@ public class AdminCmd implements CommandExecutor, TabCompleter {
         return biome;
     }
 
-    private World validateWorld(String input) {
-        return Bukkit.getWorld(input);
-    }
-
-    private void updateProgress(OfflinePlayer target, BiomeLevel biomeLevel) {
-        if (!target.isOnline()) return;
-
-        Player onlinePlayer = target.getPlayer();
-        Biome locBiome = onlinePlayer.getLocation().getBlock().getBiome();
-        if (!configManager.isEnabledBiome(locBiome)) return;
-
-        biomeLevel.updateProgress(locBiome);
-    }
-
-    private void resetPlayer(CommandSender sender, OfflinePlayer target, PlayerData playerData) {
-        for (BiomeLevel biomeLevel : playerData.getBiomeLevels()) {
-            biomeLevel.reset();
-        }
-
-        sendMessage(sender, messageManager.getWithPlaceholder(Message.RESETPLAYER, target.getName()));
-        if (target.isOnline()) {
-            playerData.clearActiveRewards();
-
-            if (sender instanceof ConsoleCommandSender || sender instanceof Player && sender != target.getPlayer())
-                sendMessage(target.getPlayer(), messageManager.get(Message.ADMINRESETALL));
-        }
-
-        pendingRewardsManager.removeAll(target.getUniqueId());
-    }
-
-    private void resetBiome(CommandSender sender, OfflinePlayer target, PlayerData playerData, Biome inputBiome) {
-        String biomeName = inputBiome.name();
-        BiomeLevel biomeLevel = playerData.getBiomeLevel(inputBiome);
-
-        if (target.isOnline()) {
-            removeActiveRewards(target, playerData, inputBiome, biomeLevel.getLevel(), 0);
-
-            if (sender instanceof ConsoleCommandSender || sender instanceof Player && sender != target.getPlayer())
-                sendMessage(target.getPlayer(), messageManager.getWithPlaceholder(Message.ADMINRESETBIOME, biomeName));
-        }
-
-        biomeLevel.reset();
-        sendMessage(sender, messageManager.getWithPlaceholder(Message.RESETPLAYERBIOME, biomeName, target.getName()));
-
-        UUID uuid = target.getUniqueId();
-        if (pendingRewardsManager.has(uuid))
-            removeBiomePendingRewards(uuid, pendingRewardsManager.get(uuid), biomeLevel.getBiome());
-    }
-
-    private void removeBiomePendingRewards(UUID uuid, ArrayList<PendingReward> rewards, Biome biome) {
-        ArrayList<PendingReward> list = new ArrayList<>();
-
-        for (PendingReward reward : rewards) {
-            if (reward.getBiome().equalsIgnoreCase(biome.name())) continue;
-            list.add(reward);
-        }
-
-        pendingRewardsManager.addAll(uuid, list);
-    }
-
-    private void playerIsMaxLevel(CommandSender sender, String targetName) {
-        sendMessage(sender, messageManager.getWithPlaceholder(
-                Message.ADDERROR, targetName));
-    }
-
-    private void setLevel(CommandSender sender, OfflinePlayer player, PlayerData playerData, Biome inputBiome, int inputValue) {
-        BiomeLevel biomeLevel = playerData.getBiomeLevel(inputBiome);
-        updateProgress(player, biomeLevel);
-
-        int oldLevel = biomeLevel.getLevel();
-        Biome biome = biomeLevel.getBiome();
-        String biomeName = biomeLevel.getBiomeName();
-
-        Message message = Message.LEVELSETERROR;
-        if (biomeLevel.setLevel(inputValue) != -1) {
-            message = Message.LEVELSET;
-
-            if (player.isOnline())
-                if (sender instanceof ConsoleCommandSender || sender instanceof Player && sender != player.getPlayer())
-                    sendMessage(player.getPlayer(), messageManager.getWithPlaceholder(Message.ADMINSETLEVEL, inputValue, biomeName));
-
-
-            if (oldLevel < inputValue) giveRewards(oldLevel, inputValue, player, biomeLevel);
-            if (oldLevel > inputValue) {
-                removeActiveRewards(player, playerData, inputBiome, oldLevel, inputValue);
-                UUID uuid = player.getUniqueId();
-                if (pendingRewardsManager.has(uuid)) {
-                    removePendingRewards(uuid, pendingRewardsManager.get(uuid), biome, inputValue);
-                }
-            }
-        }
-
-        sendMessage(sender, messageManager.getWithPlaceholder(
-                message, player.getName(), inputValue, biomeName));
-    }
-
-    private void addLevel(CommandSender sender, OfflinePlayer player, BiomeLevel biomeLevel, int inputValue) {
-        updateProgress(player, biomeLevel);
-
-        if (biomeLevel.isMaxLevel()) {
-            playerIsMaxLevel(sender, player.getName());
-            return;
-        }
-
-        int oldLevel = biomeLevel.getLevel();
-        int newLevel = oldLevel + inputValue;
-
-        Message message = Message.LEVELADDERROR;
-        if (inputValue > 0 && biomeLevel.setLevel(newLevel) != -1) {
-            message = Message.LEVELADDED;
-
-            if (player.isOnline())
-                if (sender instanceof ConsoleCommandSender || sender instanceof Player && sender != player.getPlayer())
-                    sendMessage(player.getPlayer(), messageManager.getWithPlaceholder(Message.ADMINADDEDLEVEL, inputValue, biomeLevel.getBiomeName()));
-
-            giveRewards(oldLevel, newLevel, player, biomeLevel);
-        }
-
-        sendMessage(sender, messageManager.getWithPlaceholder(
-                message, player.getName(), inputValue, biomeLevel.getBiomeName()));
-    }
-
-    private void removeLevel(CommandSender sender, OfflinePlayer player, PlayerData playerData, Biome inputBiome, int inputValue) {
-        BiomeLevel biomeLevel = playerData.getBiomeLevel(inputBiome);
-        updateProgress(player, biomeLevel);
-
-        boolean wasMaxLevel = biomeLevel.isMaxLevel();
-        int oldLevel = biomeLevel.getLevel();
-        int newLevel = biomeLevel.getLevel() - inputValue;
-
-        Message message = Message.LEVELREMOVEERROR;
-        if (biomeLevel.setLevel(newLevel) != -1) {
-            message = Message.LEVELREMOVED;
-
-            if (player.isOnline())
-                if (sender instanceof ConsoleCommandSender || sender instanceof Player && sender != player.getPlayer())
-                    sendMessage(player.getPlayer(), messageManager.getWithPlaceholder(Message.ADMINREMOVEDLEVEL, inputValue, biomeLevel.getBiomeName()));
-
-            removeActiveRewards(player, playerData, inputBiome, oldLevel, newLevel);
-        }
-
-        sendMessage(sender, messageManager.getWithPlaceholder(
-                message, player.getName(), inputValue, biomeLevel.getBiomeName()));
-
-        UUID uuid = player.getUniqueId();
-        if (pendingRewardsManager.has(uuid))
-            removePendingRewards(uuid, pendingRewardsManager.get(uuid), biomeLevel.getBiome(), newLevel);
-        if (wasMaxLevel) biomeLevel.setEntryTime(LocalDateTime.now());
-    }
-
-    private void giveRewards(int oldLevel, int newLevel, OfflinePlayer player, BiomeLevel biomeLevel) {
-        for (int i = oldLevel; i <= newLevel; i++) {
-            if (i == oldLevel) continue;
-
-            LevelUpEvent event = new LevelUpEvent(player, i, biomeLevel);
-            Bukkit.getPluginManager().callEvent(event);
-        }
-    }
-
-    private void removePendingRewards(UUID uuid, ArrayList<PendingReward> rewards, Biome biome, int newLevel) {
-        ArrayList<PendingReward> list = new ArrayList<>();
-
-        for (PendingReward reward : rewards) {
-            if (reward.getBiome().equalsIgnoreCase(biome.name()) && reward.getLevel() > newLevel) continue;
-            list.add(reward);
-        }
-
-        pendingRewardsManager.addAll(uuid, list);
-    }
-
-    private void removeActiveRewards(OfflinePlayer player, PlayerData playerData, Biome biome, int oldLevel, int newLevel) {
-        BiomeData biomeData = biomeDataManager.getBiomeData(biome);
-
-        for (int i = oldLevel; i > newLevel; i--) {
-            Reward reward = biomeData.getReward(i);
-            if (player.isOnline()) checkRewardType(player.getPlayer(), playerData, reward);
-        }
-    }
-
-    private void checkRewardType(Player player, PlayerData playerData, Reward reward) {
-        if (reward instanceof PotionReward) {
-            ((PotionReward) reward).remove(player);
-            playerData.clearActiveReward(reward);
-        }
-
-        if (reward instanceof EffectReward) {
-            ((EffectReward) reward).remove(player);
-            playerData.clearActiveReward(reward);
-        }
-    }
-
-    private void setProgress(CommandSender sender, OfflinePlayer player, BiomeLevel biomeLevel, int inputValue) {
-        Message message = Message.PROGRESSSET;
-        updateProgress(player, biomeLevel);
-
-        long outcome = biomeLevel.setProgress(inputValue);
-        if (outcome == -1) message = Message.PROGRESSSETERROR;
-        if (outcome == -2) message = Message.PROGRESSSETMAX;
-
-        if (outcome >= 0)
-            if (player.isOnline())
-                if (sender instanceof ConsoleCommandSender || sender instanceof Player && sender != player.getPlayer())
-                    sendMessage(player.getPlayer(), messageManager.getWithPlaceholder(Message.ADMINSETPROGRESS, inputValue, biomeLevel.getBiomeName()));
-
-        sendMessage(sender, messageManager.getWithPlaceholder(
-                message, player.getName(), inputValue, biomeLevel.getBiomeName()));
-    }
-
-    private void addProgress(CommandSender sender, OfflinePlayer player, BiomeLevel biomeLevel, int inputValue) {
-        updateProgress(player, biomeLevel);
-
-        if (biomeLevel.isMaxLevel()) {
-            playerIsMaxLevel(sender, player.getName());
-            return;
-        }
-
-        long newProgress = biomeLevel.getProgress() + inputValue;
-        long outcome = biomeLevel.setProgress(newProgress);
-
-        Message message = Message.PROGRESSADDED;
-        if (inputValue < 1) message = Message.PROGRESSADDERROR;
-        else if (outcome == -1) message = Message.PROGRESSADDERROR;
-        else if (outcome == -2) message = Message.PROGRESSADDEDMAX;
-
-        if (outcome >= 0)
-            if (player.isOnline())
-                if (sender instanceof ConsoleCommandSender || sender instanceof Player && sender != player.getPlayer())
-                    sendMessage(player.getPlayer(), messageManager.getWithPlaceholder(Message.ADMINADDEDPROGRESS, inputValue, biomeLevel.getBiomeName()));
-
-        sendMessage(sender, messageManager.getWithPlaceholder(
-                message, player.getName(), inputValue, biomeLevel.getBiomeName()));
-    }
-
-    private void removeProgress(CommandSender sender, OfflinePlayer player, BiomeLevel biomeLevel, int inputValue) {
-        updateProgress(player, biomeLevel);
-
-        long newProgress = biomeLevel.getProgress() - inputValue;
-        long outcome = biomeLevel.setProgress(newProgress);
-
-        Message message = Message.PROGRESSREMOVEERROR;
-        if (outcome != -1) message = Message.PROGRESSREMOVED;
-
-        if (outcome >= 0)
-            if (player.isOnline())
-                if (sender instanceof ConsoleCommandSender || sender instanceof Player && sender != player.getPlayer())
-                    sendMessage(player.getPlayer(), messageManager.getWithPlaceholder(Message.ADMINREMOVEDPROGRESS, inputValue, biomeLevel.getBiomeName()));
-
-        sendMessage(sender, messageManager.getWithPlaceholder(
-                message, player.getName(), inputValue, biomeLevel.getBiomeName()));
-    }
-
-    private void toggleWorld(CommandSender sender, World inputWorld, boolean enable) {
-        Message message;
-        if (enable) {
-            if (configManager.isEnabledWorld(inputWorld)) {
-                message = Message.WORLDALREADYENABLED;
-            } else {
-                saveWorldList(true, inputWorld.getName());
-                message = Message.WORLDENABLED;
-            }
-        } else {
-            if (!configManager.isEnabledWorld(inputWorld)) {
-                message = Message.WORLDALREADYDISABLED;
-            } else {
-                saveWorldList(false, inputWorld.getName());
-                message = Message.WORLDDISABLED;
-            }
-        }
-
-        sendMessage(sender, messageManager.getWithPlaceholder(message, inputWorld.getName()));
-    }
-
-    private void saveWorldList(boolean enable, String worldString) {
-        FileConfiguration config = main.getConfig();
-        ArrayList<String> worldList = new ArrayList<>();
-
-        if (!config.isSet("default_biome_settings.enabled_worlds")) {
-            config.set("default_biome_settings.enabled_worlds", worldList);
-        }
-
-        if (enable) worldList.add(worldString);
-        for (String world : config.getStringList("default_biome_settings.enabled_worlds")) {
-            if (!enable && world.equalsIgnoreCase(worldString)) continue;
-
-            worldList.add(world);
-        }
-
-        config.set("default_biome_settings.enabled_worlds", worldList);
-        main.saveConfig();
-    }
-
-    private void toggleBiome(CommandSender sender, Biome inputBiome, boolean enable) {
-        Message message;
-
-        if (enable) {
-            if (configManager.isEnabledBiome(inputBiome)) message = Message.BIOMEALREADYENABLED;
-            else {
-                saveBiomeList(true, inputBiome.name());
-                message = Message.BIOMEENABLED;
-            }
-        } else {
-            if (!configManager.isEnabledBiome(inputBiome)) message = Message.BIOMEALREADYDISABLED;
-            else {
-                saveBiomeList(false, inputBiome.name());
-                message = Message.BIOMEDISABLED;
-            }
-        }
-
-        sendMessage(sender, messageManager.getWithPlaceholder(message, inputBiome.name()));
-    }
-
-    private void saveBiomeList(boolean enable, String biomeString) {
-        FileConfiguration config = main.getConfig();
-        boolean whiteList = config.getBoolean("default_biome_settings.use_blacklist_as_whitelist");
-
-        if (!config.isSet("default_biome_settings.biomes_blacklist")) {
-            config.set("default_biome_settings.biomes_blacklist", new ArrayList<>());
-        }
-        List<String> biomeList = config.getStringList("default_biome_settings.biomes_blacklist");
-
-        if (whiteList) {
-            if (enable) biomeList.add(biomeString);
-            else biomeList.remove(biomeString);
-        } else {
-            if (enable) biomeList.remove(biomeString);
-            else biomeList.add(biomeString);
-        }
-
-        config.set("default_biome_settings.biomes_blacklist", biomeList);
-        main.saveConfig();
-    }
-
-    private void listWorlds(CommandSender sender) {
-        StringBuilder enabledWorlds = new StringBuilder();
-        enabledWorlds.append(messageManager.get(Message.WORLDLISTHEADER));
-
-        for (World world : configManager.getEnabledWorlds()) {
-            enabledWorlds.append("\n").append(Utils.capitalise(world.getName())).append(", ");
-        }
-
-        try {
-            enabledWorlds.deleteCharAt(enabledWorlds.lastIndexOf(","));
-        } catch (StringIndexOutOfBoundsException ignored) {
-        }
-
-        sendMessage(sender, enabledWorlds.toString());
-    }
-
-    private void listBiomes(CommandSender sender) {
-        StringBuilder enabledBiomes = new StringBuilder();
-        enabledBiomes.append(messageManager.get(Message.BIOMELISTHEADER));
-
-        for (Biome biome : configManager.getEnabledBiomes()) {
-            enabledBiomes.append("\n").append(Utils.capitalise(biome.name())).append(", ");
-        }
-
-        try {
-            enabledBiomes.deleteCharAt(enabledBiomes.lastIndexOf(","));
-        } catch (StringIndexOutOfBoundsException ignored) {
-        }
-
-        sendMessage(sender, enabledBiomes.toString());
-    }
-
-    private boolean checkPermission(CommandSender sender, String permission) {
+    private boolean hasPermission(CommandSender sender) {
         if (!(sender instanceof Player)) return true;
 
         Player player = (Player) sender;
-        if (!player.hasPermission(permission))
+        if (!player.hasPermission(PERMISSION))
             sendMessage(player, messageManager.get(Message.NOPERMISSION));
 
-        return player.hasPermission(permission);
-    }
-
-    private void reload(CommandSender sender) {
-        sendMessage(sender, messageManager.get(Message.RELOADINPROGRESS));
-        String reloadOutcome = messageManager.get(Message.RELOADSUCCESS);
-
-        boolean errors = false;
-        dataManager.reloadData(main, dataManager);
-        if (!messageManager.load(sender)) errors = true;
-
-        if (errors) reloadOutcome = messageManager.get(Message.RELOADERROR);
-
-        if (sender instanceof Player) {
-            if (reloadOutcome != null)
-                Utils.consoleMsg(ChatColor.GOLD + sender.getName() + " " + reloadOutcome.replace("[BM] ", ""));
-        }
-
-        sendMessage(sender, reloadOutcome);
-    }
-
-    private void sendHelpMessage(CommandSender sender, String label) {
-        String message = messageManager.getWithPlaceholder(Message.ADMINHELP, label);
-        if (message == null) return;
-
-        sendMessage(sender, message);
+        return player.hasPermission(PERMISSION);
     }
 
     private void sendMessage(CommandSender sender, String message) {
