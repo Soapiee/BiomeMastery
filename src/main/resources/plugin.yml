@@ -1,5 +1,5 @@
 name: BiomeMastery
-main: me.soapiee.common.BiomeMastery
+main: me.soapiee.biomemastery.BiomeMastery
 version: 1.0.3
 author: Soapiee
 prefix: BiomeMastery
