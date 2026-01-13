@@ -97,7 +97,7 @@ public class UsageCmd implements CommandExecutor, TabCompleter {
     private boolean validateBiome(String value) {
         try {
             Biome.valueOf(value);
-        } catch (IllegalArgumentException ignored) {
+        } catch (IllegalArgumentException | NullPointerException ignored) {
             return false;
         }
 

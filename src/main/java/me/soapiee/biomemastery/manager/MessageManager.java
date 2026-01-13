@@ -67,6 +67,7 @@ public class MessageManager {
                 || messageEnum == Message.NEXTBUTTONHOVER
                 || messageEnum == Message.BIOMEBASICINFOFORMAT
                 || messageEnum == Message.BIOMEBASICINFOMAX
+                || messageEnum == Message.BIOMEBASICINFOHOVER
                 || messageEnum == Message.BIOMEDETAILEDFORMAT
                 || messageEnum == Message.BIOMEDETAILEDMAX
                 || messageEnum == Message.BIOMEREWARDFORMAT

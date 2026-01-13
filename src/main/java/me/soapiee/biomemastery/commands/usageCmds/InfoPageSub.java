@@ -38,9 +38,7 @@ public class InfoPageSub extends AbstractUsageSub {
         }
 
         Player player = (Player) sender;
-
         if (!checkRequirements(sender, args, label)) return;
-        sendMessage(sender, "&aPassed requirements");
 
         int pageNumber = getPageNumber(sender, args);
         if (pageNumber == -1) return;
@@ -76,7 +74,7 @@ public class InfoPageSub extends AbstractUsageSub {
         updateProgress(sender, playerData);
         cmdCooldownManager.addCooldown(sender);
 
-        sendMessage(sender, createInfoString(sender, playerData, pageNumber));
+        senderDynamicInfo(sender, playerData, pageNumber);
         sendDynamicPageFooter(sender, pageNumber, calcTotalPages());
     }
 
@@ -87,14 +85,14 @@ public class InfoPageSub extends AbstractUsageSub {
         return ((enabledBiomesCount % maxBiomes) == 0 ? (enabledBiomesCount / maxBiomes) : (enabledBiomesCount / maxBiomes) + 1);
     }
 
-    private String createInfoString(Player sender, PlayerData playerData, int pageNumber){
-        StringBuilder builder = new StringBuilder();
-
-        builder.append(messageManager.getWithPlaceholder(Message.BIOMEBASICINFOHEADER, sender.getName())).append("\n");
+    private void senderDynamicInfo(Player sender, PlayerData playerData, int pageNumber){
+        sendMessage(sender, messageManager.getWithPlaceholder(Message.BIOMEBASICINFOHEADER, sender.getName()));
 
         int maxBiomes = configManager.getBiomesPerPage();
         int startPoint = (pageNumber * maxBiomes) - (maxBiomes - 1);
         int endPoint = startPoint + maxBiomes;
+
+        ComponentBuilder builder = new ComponentBuilder();
 
         for (int i = startPoint; i < endPoint; i++) {
             if (i > enabledBiomes.size()) break;
@@ -106,11 +104,11 @@ public class InfoPageSub extends AbstractUsageSub {
             Message message = Message.BIOMEBASICINFOFORMAT;
             if (biomeLevel.getLevel() == biomeData.getMaxLevel()) message = Message.BIOMEBASICINFOMAX;
 
-            builder.append(messageManager.getWithPlaceholder(message, sender.getName(), biomeData, biomeLevel));
-            builder.append("\n");
+            builder.append(createBiomeInfo(messageManager.getWithPlaceholder(message, sender.getName(), biomeData, biomeLevel), biome));
+            if (i != endPoint -1) builder.append("\n");
         }
 
-        return builder.toString();
+        sender.spigot().sendMessage(builder.create());
     }
 
     private void sendDynamicPageFooter(CommandSender sender, int page, int totalPages) {
@@ -125,12 +123,7 @@ public class InfoPageSub extends AbstractUsageSub {
 
         //Previous button
         if (page - 1 > 0) {
-            TextComponent prevButton = createTextComponent(
-                    messageManager.get(Message.BIOMEBASICINFOPREVBUTTON),
-                    "/biome info " + (page - 1),
-                    messageManager.get(Message.PREVBUTTONHOVER)
-            );
-
+            TextComponent prevButton = createPrevButton(page);
             if (prevButton != null) builder.append(prevButton);
         }
 
@@ -142,12 +135,7 @@ public class InfoPageSub extends AbstractUsageSub {
 
         //Next button
         if (page + 1 <= totalPages) {
-            TextComponent nextButton = createTextComponent(
-                    messageManager.get(Message.BIOMEBASICINFONEXTBUTTON),
-                    "/biome info " + (page + 1),
-                    messageManager.get(Message.NEXTBUTTONHOVER)
-            );
-
+            TextComponent nextButton = createNextButton(page);
             if (nextButton != null) builder.append(nextButton);
         }
 
@@ -173,6 +161,30 @@ public class InfoPageSub extends AbstractUsageSub {
         }
 
         return component;
+    }
+
+    private TextComponent createPrevButton(int page){
+        return createTextComponent(
+                messageManager.get(Message.BIOMEBASICINFOPREVBUTTON),
+                "/biome info " + (page - 1),
+                messageManager.get(Message.PREVBUTTONHOVER)
+        );
+    }
+
+    private TextComponent createNextButton(int page){
+        return createTextComponent(
+                messageManager.get(Message.BIOMEBASICINFONEXTBUTTON),
+                "/biome info " + (page + 1),
+                messageManager.get(Message.NEXTBUTTONHOVER)
+        );
+    }
+
+    private TextComponent createBiomeInfo(String message, Biome biome){
+        return createTextComponent(
+                message,
+                "/biome info " + biome.name().toLowerCase(),
+                messageManager.get(Message.BIOMEBASICINFOHOVER)
+        );
     }
 
     @Override
