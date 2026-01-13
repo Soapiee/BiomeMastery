@@ -44,7 +44,7 @@ public abstract class AbstractAdminSub implements SubCmd {
         }
 
         if (!checkArgs(args)) {
-            sendMessage(sender, messageManager.getWithPlaceholder(Message.PLAYERHELP, label));
+            sendMessage(sender, messageManager.getWithPlaceholder(Message.ADMINHELP, label));
             return false;
         }
 

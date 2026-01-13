@@ -16,6 +16,7 @@ import me.soapiee.biomemastery.manager.UpdateManager;
 import me.soapiee.biomemastery.util.CustomLogger;
 import me.soapiee.biomemastery.util.PlayerCache;
 import me.soapiee.biomemastery.util.Utils;
+import org.bstats.bukkit.Metrics;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
@@ -63,17 +64,8 @@ public class BiomeMastery extends JavaPlugin {
             return;
         }
 
-//        if (getServer().getPluginManager().getPlugin("PlaceholderAPI") != null) {
-//            new PlaceHolderAPIHook(messageManager, dataManager).register();
-//            Utils.consoleMsg(ChatColor.GREEN + "Hooked into PlaceholderAPI");
-//        }
-        if (getServer().getPluginManager().getPlugin("Vault") != null) {
-            vaultHook = new VaultHook();
-            Utils.consoleMsg(ChatColor.GREEN + "Hooked into Vault");
-        } else {
-            vaultHook = null;
-            Utils.consoleMsg(ChatColor.RED + "Error hooking into Vault");
-        }
+        registerHooks();
+        new Metrics(this, 28832);
 
         effectsListener = new EffectsListener(this);
         getServer().getPluginManager().registerEvents(effectsListener, this);
@@ -114,5 +106,20 @@ public class BiomeMastery extends JavaPlugin {
 
     public VaultHook getVaultHook() {
         return (getServer().getPluginManager().getPlugin("Vault") == null) ? null : vaultHook;
+    }
+
+    private void registerHooks() {
+//        if (getServer().getPluginManager().getPlugin("PlaceholderAPI") != null) {
+//            new PlaceHolderAPIHook(messageManager, dataManager).register();
+//            Utils.consoleMsg(ChatColor.GREEN + "Hooked into PlaceholderAPI");
+//        }
+
+        if (getServer().getPluginManager().getPlugin("Vault") != null) {
+            vaultHook = new VaultHook();
+            Utils.consoleMsg(ChatColor.GREEN + "Hooked into Vault");
+        } else {
+            vaultHook = null;
+            Utils.consoleMsg(ChatColor.RED + "Error hooking into Vault");
+        }
     }
 }

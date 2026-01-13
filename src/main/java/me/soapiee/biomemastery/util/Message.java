@@ -38,6 +38,7 @@ public enum Message {
     REWARDNOTACHIEVED("player_reward_not_available", "&cYou have not achieved this level yet. You are level %current_level%"),
     BIOMEBASICINFOHEADER("player_biome_info_header", "#01d54a--------- %player_name%s Biome Info ---------"),
     BIOMEBASICINFOFORMAT("player_biome_info_format", "&2> &a%biome% &7[Lvl &a%player_level%&7/%biome_max_level% : &a%player_progress%&7/%target_duration_formatted%]"),
+    BIOMEBASICINFOHOVER("player_biome_info_hover", "#01d54aClick me"),
     BIOMEBASICINFOMAX("player_biome_info_max", "&2> &a%biome% &7[Lvl %player_level%/%biome_max_level%]"),
     BIOMEBASICINFOFOOTER("player_biome_info_footer", "#01d54a<-- [%current_page%/%total_pages%] -->"),
     BIOMEBASICINFOPREVBUTTON("player_biome_prev_button", "#087014Previous Page"),
