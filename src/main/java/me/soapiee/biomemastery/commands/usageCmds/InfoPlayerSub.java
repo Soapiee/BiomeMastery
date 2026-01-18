@@ -45,8 +45,8 @@ public class InfoPlayerSub extends AbstractUsageSub {
         playerDataManager.getOrLoad(target)
                 .thenAcceptAsync(data -> displayInfo(sender, target, data, pageNumber), BukkitExecutor.sync(main))
                 .exceptionally(error -> {
-                    logger.onlyLogToPlayer(sender, Utils.addColour(messageManager.get(Message.DATAERRORPLAYER)));
-                    logger.logToPlayer(sender, error, Utils.addColour(messageManager.getWithPlaceholder(Message.DATAERROR, sender.getName())));
+//                    logger.onlyLogToPlayer(sender, Utils.addColour(messageManager.get(Message.DATAERRORPLAYER)));
+                    logger.logToPlayer(sender, error, Utils.addColour(messageManager.getWithPlaceholder(Message.DATAERROR, target.getName())));
                     return null;
                 });
     }

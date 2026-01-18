@@ -11,18 +11,13 @@ import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
 
-import java.util.HashSet;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
-public class FreeFoodEffect implements Effect {
+public class FreeFoodEffect extends Effect {
 
-    private final BiomeMastery main;
-
-    @Getter private final EffectType type = EffectType.FREEFOOD;
-    private final String identifier;
-    @Getter private final HashSet<EffectType> conflicts = new HashSet<>();
+    private static final EffectType TYPE = EffectType.FREEFOOD;
     @Getter private final Map<UUID, BukkitTask> activePlayers = new ConcurrentHashMap<>();
 
     private final long cooldown;
@@ -34,11 +29,9 @@ public class FreeFoodEffect implements Effect {
     private static final int HUNGER_DEFAULT = 1;
 
     public FreeFoodEffect(BiomeMastery main, FileConfiguration config) {
-        this.main = main;
-        String key = type.name();
-        identifier = config.getString(key + ".friendly_name", key);
-        conflicts.addAll(loadConflicts(config));
+        super(main, config, TYPE);
 
+        String key = TYPE.name();
         cooldown = loadCooldown(config, key);
         hungerToIncrease = loadHungerIncrease(config, key);
     }
@@ -59,6 +52,7 @@ public class FreeFoodEffect implements Effect {
     public void activate(Player player) {
         UUID uuid = player.getUniqueId();
 
+        playerSound(player);
         activePlayers.computeIfAbsent(uuid, id -> new BukkitRunnable() {
             @Override
             public void run() {
@@ -86,10 +80,5 @@ public class FreeFoodEffect implements Effect {
     @Override
     public boolean isActive(Player player) {
         return activePlayers.containsKey(player.getUniqueId());
-    }
-
-    @Override
-    public String toString() {
-        return identifier;
     }
 }

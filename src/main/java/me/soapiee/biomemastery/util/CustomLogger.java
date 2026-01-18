@@ -1,8 +1,8 @@
 package me.soapiee.biomemastery.util;
 
 import me.soapiee.biomemastery.BiomeMastery;
+import me.soapiee.biomemastery.manager.MessageManager;
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
@@ -17,15 +17,20 @@ import java.util.concurrent.CompletionException;
 
 public class CustomLogger {
 
+    private final MessageManager messageManager;
+    private final BiomeMastery main;
     private final File logFile;
 
     public CustomLogger(BiomeMastery main) {
+        this.main = main;
+        messageManager = main.getMessageManager();
+
         logFile = new File(main.getDataFolder() + File.separator + "logger.log");
         if (!logFile.exists()) {
             try {
                 logFile.createNewFile();
             } catch (IOException e) {
-                Utils.consoleMsg(ChatColor.RED + "Error creating logger file");
+                Utils.consoleMsg(messageManager.get(Message.LOGGERFILEERROR));
             }
         }
     }
@@ -45,9 +50,9 @@ public class CustomLogger {
             writer.write(System.lineSeparator());
             writer.write(time + " [" + logType.name() + "] " + string);
             writer.write(System.lineSeparator());
-            writer.write("BiomeMastery Version: " + Bukkit.getPluginManager().getPlugin("BiomeMastery").getDescription().getVersion());
+            writer.write(messageManager.get(Message.PLUGINVERSIONSTRING) + Bukkit.getPluginManager().getPlugin("BiomeMastery").getDescription().getVersion());
             writer.write(System.lineSeparator());
-            writer.write("Server Version: " + Bukkit.getBukkitVersion());
+            writer.write(messageManager.get(Message.SERVERVERSIONSTRING) + Bukkit.getBukkitVersion());
             writer.write(System.lineSeparator());
             if (cause != null) {
                 writer.write(System.lineSeparator());
@@ -57,66 +62,29 @@ public class CustomLogger {
             writer.write(System.lineSeparator());
             writer.write(System.lineSeparator());
             writer.close();
-            Utils.consoleMsg(ChatColor.RED + "An error has been added to the logger.log file");
+            Utils.consoleMsg(messageManager.get(Message.LOGGERLOGSUCCESS));
         } catch (IOException e) {
-            Utils.consoleMsg(ChatColor.RED + "There was an error whilst writing to the logger file");
+            Utils.consoleMsg(messageManager.get(Message.LOGGERLOGERROR));
         }
     }
 
-//    public void logToFile(Throwable error, String string) {
-//        LogType logType = (error == null) ? LogType.WARNING : LogType.SEVERE;
-//        if (!string.isEmpty()) Utils.consoleMsg(string);
-//
-//        try {
-//            PrintWriter writer = new PrintWriter(new FileWriter(logFile, true), true);
-//            Date dt = new Date();
-//            SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-//            String time = df.format(dt);
-//            writer.write("--------------------------------------------------------------------------------------------------");
-//            writer.write(System.lineSeparator());
-//            writer.write(time + " [" + logType.name() + "] " + string);
-//            writer.write(System.lineSeparator());
-//            writer.write("BiomeMastery Version: " + Bukkit.getPluginManager().getPlugin("BiomeMastery").getDescription().getVersion());
-//            writer.write(System.lineSeparator());
-//            writer.write("Server Version: " + Bukkit.getBukkitVersion());
-//            writer.write(System.lineSeparator());
-//            if (error != null) {
-//                writer.write(System.lineSeparator());
-//                error.printStackTrace(writer);
-//            }
-//            writer.write("--------------------------------------------------------------------------------------------------");
-//            writer.write(System.lineSeparator());
-//            writer.write(System.lineSeparator());
-//            writer.close();
-//            Utils.consoleMsg(ChatColor.RED + "An error has been added to the logger.log file");
-//        } catch (IOException e) {
-//            Utils.consoleMsg(ChatColor.RED + "There was an error whilst writing to the logger file");
-//        }
-//    }
-
     public void logToPlayer(CommandSender sender, Throwable error, String string) {
-        Throwable cause = (error instanceof CompletionException && error.getCause() != null) ? error.getCause() : error;
-        if (!string.contains(" successfully created")) logToFile(cause, string);
+        if (error != null){
+            Throwable cause = (error instanceof CompletionException) ? error.getCause() : error;
+            if (!string.contains(" successfully created")) logToFile(cause, string);
+        }
 
         if (sender == null) return;
         if (string.isEmpty()) return;
 
-        if (sender instanceof Player)
-            if (((Player) sender).isOnline()) {
-                sender.sendMessage(Utils.addColour(string));
-            }
-    }
-
-    public void onlyLogToPlayer(CommandSender sender, String string) {
-        if (string.isEmpty()) return;
-
-        if (sender instanceof Player)
-            if (((Player) sender).isOnline()) {
+        Bukkit.getScheduler().runTaskLater(main, () -> {
+            if (sender instanceof Player && ((Player) sender).isOnline()) {
                 sender.sendMessage(Utils.addColour(string));
                 return;
             }
 
-        Utils.consoleMsg(string);
+            Utils.consoleMsg(string);
+        }, 20L);
     }
 
     enum LogType {

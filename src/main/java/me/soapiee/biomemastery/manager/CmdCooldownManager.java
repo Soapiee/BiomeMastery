@@ -1,9 +1,10 @@
 package me.soapiee.biomemastery.manager;
 
+import lombok.Setter;
 import me.soapiee.biomemastery.BiomeMastery;
 import me.soapiee.biomemastery.util.CustomLogger;
+import me.soapiee.biomemastery.util.Message;
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
@@ -18,18 +19,20 @@ import java.util.UUID;
 public class CmdCooldownManager {
 
     private final CustomLogger customLogger;
+    private final MessageManager messageManager;
     private final File file;
     private YamlConfiguration contents;
 
     private final HashMap<UUID, LocalDateTime> cooldowns;
-    private int threshold;
+    @Setter private int threshold;
 
-    public CmdCooldownManager(BiomeMastery main, int threshold) {
+    public CmdCooldownManager(BiomeMastery main, ConfigManager configManager) {
         customLogger = main.getCustomLogger();
+        messageManager = main.getMessageManager();
         file = new File(main.getDataFolder() + File.separator + "Data", "cooldowns.yml");
         contents = new YamlConfiguration();
         cooldowns = new HashMap<>();
-        this.threshold = Math.max(threshold, 1);
+        this.threshold = configManager.getCmdCooldown();
 
         load();
     }
@@ -40,7 +43,7 @@ public class CmdCooldownManager {
                 file.createNewFile();
                 contents.save(file);
             } catch (Exception error) {
-                customLogger.logToFile(error, ChatColor.RED + "Could not create the cooldowns file");
+                customLogger.logToFile(error, messageManager.get(Message.COOLDOWNFILECREATE));
             }
             return;
         }
@@ -59,7 +62,7 @@ public class CmdCooldownManager {
             }
 
         } catch (Exception error) {
-            customLogger.logToFile(error, ChatColor.RED + "Could not load the cooldowns file");
+            customLogger.logToFile(error, messageManager.get(Message.COOLDOWNFILELOAD));
         }
     }
 
@@ -74,12 +77,8 @@ public class CmdCooldownManager {
 
             contents.save(file);
         } catch (Exception error) {
-            customLogger.logToFile(error, ChatColor.RED + "Could not save the cooldowns file");
+            customLogger.logToFile(error, messageManager.get(Message.COOLDOWNFILESAVE));
         }
-    }
-
-    public void updateThreshold(int threshold) {
-        this.threshold = Math.max(threshold, 1);
     }
 
     public void addCooldown(CommandSender sender) {

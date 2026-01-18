@@ -24,14 +24,16 @@ class CmdCooldownTest {
         MessageManager mockMessageManager = mock(MessageManager.class);
         CustomLogger mockLogger = mock(CustomLogger.class);
         DataManager mockDataManager = mock(DataManager.class);
+        ConfigManager mockConfigManager = mock(ConfigManager.class);
         PlayerDataManager mockPlayerDataManager = mock(PlayerDataManager.class);
 
         when(mockMain.getMessageManager()).thenReturn(mockMessageManager);
         when(mockMain.getCustomLogger()).thenReturn(mockLogger);
         when(mockMain.getDataManager()).thenReturn(mockDataManager);
         when(mockDataManager.getPlayerDataManager()).thenReturn(mockPlayerDataManager);
+        when(mockConfigManager.getCmdCooldown()).thenReturn(5);
 
-        mockCooldownManager = new CmdCooldownManager(mockMain, 5);
+        mockCooldownManager = new CmdCooldownManager(mockMain, mockConfigManager);
     }
 
     @AfterEach
@@ -56,7 +58,7 @@ class CmdCooldownTest {
 
     @Test
     void givenNewThreshold_whenUpdateThreshold_thenReturnNewThreshold() {
-        mockCooldownManager.updateThreshold(2);
+        mockCooldownManager.setThreshold(2);
         mockCooldownManager.addCooldown(mockConsole);
         assertEquals(2, mockCooldownManager.getCooldown(mockConsole));
     }

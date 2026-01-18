@@ -131,7 +131,7 @@ public class PlayerDatabaseStorage implements PlayerStorageHandler {
             }
 
         } catch (SQLException error) {
-            logger.logToFile(error, ChatColor.RED + player.getName() + "'s data could not be saved");
+            logger.logToFile(error, messageManager.getWithPlaceholder(Message.DATASAVEERROR, player.getName()));
         }
     }
 
@@ -157,7 +157,7 @@ public class PlayerDatabaseStorage implements PlayerStorageHandler {
                 }
 
             } catch (SQLException error) {
-                logger.logToFile(error, main.getMessageManager().getWithPlaceholder(Message.DATAERROR, playerName));
+                logger.logToFile(error, main.getMessageManager().getWithPlaceholder(Message.DATASAVEERROR, playerName));
             }
         });
     }

@@ -8,7 +8,6 @@ import me.soapiee.biomemastery.util.CustomLogger;
 import me.soapiee.biomemastery.util.Message;
 import me.soapiee.biomemastery.util.Utils;
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
@@ -45,7 +44,7 @@ public class PendingRewardsManager {
                 file.createNewFile();
                 contents.save(file);
             } catch (Exception error) {
-                customLogger.logToFile(error, ChatColor.RED + "Could not create the pendingrewards file");
+                customLogger.logToFile(error, messageManager.get(Message.PENDINGFILECREATE));
             }
             return;
         }
@@ -63,7 +62,7 @@ public class PendingRewardsManager {
             }
 
         } catch (Exception error) {
-            customLogger.logToFile(error, ChatColor.RED + "Could not load the pendingrewards file");
+            customLogger.logToFile(error, messageManager.get(Message.PENDINGFILELOAD));
         }
     }
 
@@ -84,7 +83,7 @@ public class PendingRewardsManager {
 
             contents.save(file);
         } catch (Exception error) {
-            customLogger.logToFile(error, ChatColor.RED + "Could not save the pendingrewards file");
+            customLogger.logToFile(error, messageManager.get(Message.PENDINGFILESAVE));
         }
     }
 

@@ -66,7 +66,7 @@ public class AddProgressSub extends AbstractAdminSub {
             if (outcome == -1) message = Message.PROGRESSADDERROR;
             else if (outcome == -2) message = Message.PROGRESSADDEDMAX;
 
-            if (outcome >= 0) sendAdminUpdateMsg(sender, target, messageManager.getWithPlaceholder(Message.ADMINSETPROGRESS, value, biomeLevel.getBiomeName()));
+            if (outcome >= 0) sendAdminUpdateMsg(sender, target, messageManager.getWithPlaceholder(Message.ADMINADDEDPROGRESS, value, biomeLevel.getBiomeName()));
         } else message = Message.PROGRESSADDERROR;
 
         sendMessage(sender, messageManager.getWithPlaceholder(

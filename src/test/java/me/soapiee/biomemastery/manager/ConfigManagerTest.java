@@ -29,7 +29,7 @@ class ConfigManagerTest {
         when(mockMain.getConfig()).thenReturn(mockConfig);
         when(mockMain.getConfig().isConfigurationSection("groups")).thenReturn(false);
 
-        configManager = new ConfigManager(mockConfig, mockLogger);
+        configManager = new ConfigManager(mockMain);
     }
 
     @AfterEach

@@ -59,7 +59,7 @@ public class RemoveProgressSub extends AbstractAdminSub {
         if (outcome != -1) message = Message.PROGRESSREMOVED;
 
         if (outcome >= 0)
-            sendAdminUpdateMsg(sender, target, messageManager.getWithPlaceholder(Message.ADMINSETPROGRESS, value, biomeLevel.getBiomeName()));
+            sendAdminUpdateMsg(sender, target, messageManager.getWithPlaceholder(Message.ADMINREMOVEDPROGRESS, value, biomeLevel.getBiomeName()));
 
         sendMessage(sender, messageManager.getWithPlaceholder(
                 message, target.getName(), value, biomeLevel.getBiomeName()));

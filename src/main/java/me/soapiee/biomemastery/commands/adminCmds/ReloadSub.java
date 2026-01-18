@@ -6,7 +6,6 @@ import me.soapiee.biomemastery.util.Message;
 import me.soapiee.biomemastery.util.Utils;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
-import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.entity.Player;
 
 import java.util.ArrayList;
@@ -23,11 +22,6 @@ public class ReloadSub extends AbstractAdminSub {
     // /abm reload
     @Override
     public void execute(CommandSender sender, String label, String[] args) {
-        if (sender instanceof ConsoleCommandSender) {
-            sendMessage(sender, Utils.addColour(messageManager.get(Message.MUSTBEPLAYERERROR)));
-            return;
-        }
-
         if (!checkRequirements(sender, args, label)) return;
 
         reload(sender);
@@ -44,8 +38,7 @@ public class ReloadSub extends AbstractAdminSub {
         if (errors) reloadOutcome = messageManager.get(Message.RELOADERROR);
 
         if (sender instanceof Player) {
-            if (reloadOutcome != null)
-                Utils.consoleMsg(ChatColor.GOLD + sender.getName() + " " + reloadOutcome.replace("[BM] ", ""));
+            Utils.consoleMsg(messageManager.getPrefix(Message.RELOADSUCCESS) + ChatColor.GOLD + sender.getName() + reloadOutcome.replace("[BM]", ""));
         }
 
         sendMessage(sender, reloadOutcome);
