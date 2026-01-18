@@ -1,8 +1,15 @@
 package me.soapiee.biomemastery.logic.effects;
 
+import lombok.Getter;
+import me.soapiee.biomemastery.BiomeMastery;
 import me.soapiee.biomemastery.data.PlayerData;
+import me.soapiee.biomemastery.listeners.EffectsListener;
 import me.soapiee.biomemastery.logic.rewards.RewardType;
 import me.soapiee.biomemastery.logic.rewards.types.EffectReward;
+import me.soapiee.biomemastery.manager.MessageManager;
+import me.soapiee.biomemastery.util.CustomLogger;
+import me.soapiee.biomemastery.util.Message;
+import org.bukkit.Sound;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
 
@@ -10,36 +17,51 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public interface Effect {
+public abstract class Effect implements EffectInterface{
 
-    EffectType getType();
+    protected final BiomeMastery main;
+    protected final CustomLogger customLogger;
+    protected final MessageManager messageManager;
+    protected final EffectsListener listener;
 
-    HashSet<EffectType> getConflicts();
+    @Getter private final EffectType type;
+    protected final String identifier;
+    private final Sound sound;
+    @Getter private final HashSet<EffectType> conflicts = new HashSet<>();
 
-    default Effect hasConflict(PlayerData playerData) {
-        if (getConflicts().isEmpty()) return null;
+    public Effect(BiomeMastery main, FileConfiguration config, EffectType effectType) {
+        this.main = main;
+        customLogger = main.getCustomLogger();
+        messageManager = main.getMessageManager();
+        listener = main.getEffectsListener();
+        type = effectType;
 
-        List<EffectReward> activeEffects = getActiveEffects(playerData);
-        if (activeEffects.isEmpty()) return null;
+        String key = type.name();
+        identifier = config.getString(key + ".friendly_name", key);
+        sound = validateSound(config.getString(key + ".activation_sound", null));
+        conflicts.addAll(loadConflicts(config));
+    }
 
-        for (EffectType type : getConflicts()) {
-            for (EffectReward reward : activeEffects) {
-                Effect conflict = reward.getEffect();
-                if (conflict.getType() == type) return conflict;
-            }
+    protected Sound validateSound(String string){
+        if (string == null || string.equalsIgnoreCase("null")) return null;
+
+        Sound sound;
+        try {
+            sound = Sound.valueOf(string);
+        } catch (IllegalArgumentException error){
+            sound = null;
+            customLogger.logToFile(error, messageManager.getWithPlaceholder(Message.INVALIDSOUND, string));
         }
 
-        return null;
+        return sound;
     }
 
-    default List<EffectReward> getActiveEffects(PlayerData playerData){
-        return playerData.getActiveRewards().stream()
-                .filter(r -> r.getType() == RewardType.EFFECT)
-                .map(r -> (EffectReward) r)
-                .collect(Collectors.toList());
+    protected void playerSound(Player player){
+        if (sound == null) return;
+        player.playSound(player.getLocation(), sound, 5, 1);
     }
 
-    default HashSet<EffectType> loadConflicts(FileConfiguration config) {
+    private HashSet<EffectType> loadConflicts(FileConfiguration config) {
         HashSet<EffectType> result = new HashSet<>();
 
         String stringType = getType().name();
@@ -47,8 +69,8 @@ public interface Effect {
             for (String conflict : config.getStringList(stringType + ".effect_conflicts")) {
                 try {
                     result.add(EffectType.valueOf(conflict.toUpperCase()));
-                } catch (IllegalArgumentException ignored) {
-//                main.getCustomLogger().warning("Invalid conflict type: " + conflict);
+                } catch (IllegalArgumentException error) {
+                    customLogger.logToFile(error, messageManager.getWithPlaceholder(Message.INVALIDCONFLICTTYPE, stringType, conflict));
                 }
             }
         }
@@ -66,9 +88,41 @@ public interface Effect {
         return result;
     }
 
-    void activate(Player player);
+    public Effect hasConflict(PlayerData playerData) {
+        if (getConflicts().isEmpty()) return null;
 
-    void deActivate(Player player);
+        List<EffectReward> activeEffects = getActiveEffects(playerData);
+        if (activeEffects.isEmpty()) return null;
 
-    boolean isActive(Player player);
+        for (EffectType type : getConflicts()) {
+            for (EffectReward reward : activeEffects) {
+                Effect conflict = reward.getEffect();
+                if (conflict.getType() == type) return conflict;
+            }
+        }
+
+        return null;
+    }
+
+    private List<EffectReward> getActiveEffects(PlayerData playerData){
+        return playerData.getActiveRewards().stream()
+                .filter(r -> r.getType() == RewardType.EFFECT)
+                .map(r -> (EffectReward) r)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public abstract void activate(Player player);
+
+    @Override
+    public abstract void deActivate(Player player);
+
+    @Override
+    public abstract boolean isActive(Player player);
+
+    @Override
+    public String toString() {
+        return identifier;
+    }
+
 }

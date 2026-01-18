@@ -29,6 +29,12 @@ settings:
   # Default: 5
   biomes_per_page: 5
 
+  # If you would like a sound to be played when a player levels up in a biome,
+  # set one here. If you do not want a sound, set to "null".
+  # Find sounds here: https://hub.spigotmc.org/javadocs/bukkit/org/bukkit/Sound.html
+  # Default: null
+  levelup_sound: null
+
 default_biome_settings:
   # List the worlds you want this plugin to work on
   enabled_worlds:

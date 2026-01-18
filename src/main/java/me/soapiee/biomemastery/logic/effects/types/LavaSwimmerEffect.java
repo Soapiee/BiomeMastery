@@ -1,33 +1,25 @@
 package me.soapiee.biomemastery.logic.effects.types;
 
-import lombok.Getter;
 import me.soapiee.biomemastery.BiomeMastery;
-import me.soapiee.biomemastery.listeners.EffectsListener;
 import me.soapiee.biomemastery.logic.effects.Effect;
 import me.soapiee.biomemastery.logic.effects.EffectType;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
 
-import java.util.HashSet;
 import java.util.UUID;
 
-public class LavaSwimmerEffect implements Effect {
+public class LavaSwimmerEffect extends Effect {
 
-    @Getter private final EffectType type = EffectType.LAVASWIMMER;
-    private final String identifier;
-    @Getter private final HashSet<EffectType> conflicts = new HashSet<>();
-    private final EffectsListener listener;
+    private static final EffectType TYPE = EffectType.LAVASWIMMER;
 
     private static final int SPEED_MIN = 10;
     private static final int SPEED_MAX = 50;
     private static final int SPEED_DEFAULT = 10;
 
     public LavaSwimmerEffect(BiomeMastery main, FileConfiguration config) {
-        listener = main.getEffectsListener();
-        String key = type.name();
-        identifier = config.getString(key + ".friendly_name", key);
-        conflicts.addAll(loadConflicts(config));
+        super(main, config, TYPE);
 
+        String key = TYPE.name();
         int speed = loadSpeed(config, key);
         listener.setLavaSwimmingSpeed(speed / 100.0);
     }
@@ -42,26 +34,23 @@ public class LavaSwimmerEffect implements Effect {
     @Override
     public void activate(Player player) {
         UUID uuid = player.getUniqueId();
-        if (listener.hasActiveEffect(type, uuid)) return;
+        if (listener.hasActiveEffect(TYPE, uuid)) return;
 
-        listener.addActiveEffect(type, uuid);
+        playerSound(player);
+        listener.addActiveEffect(TYPE, uuid);
     }
 
     @Override
     public void deActivate(Player player) {
         UUID uuid = player.getUniqueId();
-        if (!listener.hasActiveEffect(type, uuid)) return;
+        if (!listener.hasActiveEffect(TYPE, uuid)) return;
 
-        listener.removeActiveEffect(type, uuid);
+        listener.removeActiveEffect(TYPE, uuid);
     }
 
     @Override
     public boolean isActive(Player player) {
-        return listener.hasActiveEffect(type, player.getUniqueId());
+        return listener.hasActiveEffect(TYPE, player.getUniqueId());
     }
 
-    @Override
-    public String toString() {
-        return identifier;
-    }
 }

@@ -6,7 +6,7 @@ import me.soapiee.biomemastery.data.BukkitExecutor;
 import me.soapiee.biomemastery.data.PlayerData;
 import me.soapiee.biomemastery.logic.BiomeData;
 import me.soapiee.biomemastery.logic.BiomeLevel;
-import me.soapiee.biomemastery.logic.effects.Effect;
+import me.soapiee.biomemastery.logic.effects.EffectInterface;
 import me.soapiee.biomemastery.logic.rewards.Reward;
 import me.soapiee.biomemastery.logic.rewards.types.EffectReward;
 import me.soapiee.biomemastery.logic.rewards.types.PotionReward;
@@ -55,8 +55,8 @@ public class InfoBiomeSub extends AbstractUsageSub {
         playerDataManager.getOrLoad(target)
                 .thenAcceptAsync(data -> displayInfo(sender, target, data, biome), BukkitExecutor.sync(main))
                 .exceptionally(error -> {
-                    logger.onlyLogToPlayer(sender, Utils.addColour(messageManager.get(Message.DATAERRORPLAYER)));
-                    logger.logToPlayer(sender, error, Utils.addColour(messageManager.getWithPlaceholder(Message.DATAERROR, sender.getName())));
+//                    logger.logToPlayer(target, null, Utils.addColour(messageManager.get(Message.DATAERRORPLAYER)));
+                    logger.logToPlayer(sender, error, Utils.addColour(messageManager.getWithPlaceholder(Message.DATAERROR, target.getName())));
                     return null;
                 });
     }
@@ -170,7 +170,7 @@ public class InfoBiomeSub extends AbstractUsageSub {
             }
 
             if (reward instanceof EffectReward) {
-                Effect effect = ((EffectReward) reward).getEffect();
+                EffectInterface effect = ((EffectReward) reward).getEffect();
                 return (effect.isActive(player));
             }
         }

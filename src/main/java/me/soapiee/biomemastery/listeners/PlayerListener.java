@@ -61,7 +61,7 @@ public class PlayerListener implements Listener {
         playerDataManager.getOrLoad(player)
                 .thenAcceptAsync(data -> setupPlayer(player, data), BukkitExecutor.sync(main))
                 .exceptionally(error -> {
-                    logger.logToFile(error, "Could not create new data for " + player.getName());
+                    logger.logToFile(error, messageManager.getWithPlaceholder(Message.DATAERROR, player.getName()));
                     return null;
                 });
 
@@ -91,7 +91,7 @@ public class PlayerListener implements Listener {
         PlayerData playerData = playerDataManager.getPlayerData(uuid);
 
         if (playerData == null) {
-            logger.logToFile(new NullPointerException(), "Could not find " + player.getName() + " players data");
+            logger.logToFile(new NullPointerException(), messageManager.getWithPlaceholder(Message.DATASAVEERROR, player.getName()));
             return;
         }
 

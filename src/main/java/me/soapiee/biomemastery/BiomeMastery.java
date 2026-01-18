@@ -14,11 +14,11 @@ import me.soapiee.biomemastery.manager.MessageManager;
 import me.soapiee.biomemastery.manager.PlayerDataManager;
 import me.soapiee.biomemastery.manager.UpdateManager;
 import me.soapiee.biomemastery.util.CustomLogger;
+import me.soapiee.biomemastery.util.Message;
 import me.soapiee.biomemastery.util.PlayerCache;
 import me.soapiee.biomemastery.util.Utils;
 import org.bstats.bukkit.Metrics;
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.PluginDescriptionFile;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -51,15 +51,16 @@ public class BiomeMastery extends JavaPlugin {
         saveDefaultConfig();
 
         playerCache = new PlayerCache(Bukkit.getServer().getOfflinePlayers());
-        customLogger = new CustomLogger(this);
         messageManager = new MessageManager(this);
+        customLogger = new CustomLogger(this);
+        messageManager.setCustomLogger(customLogger);
 
         dataManager = new DataManager(this);
 
         try {
             dataManager.initialise(this);
         } catch (IOException e) {
-            customLogger.logToFile(e, ChatColor.RED + "There was an error creating/retrieving player data. Disabling plugin..");
+            customLogger.logToFile(e, messageManager.get(Message.MAJORDATAERROR));
             Bukkit.getPluginManager().disablePlugin(this);
             return;
         }
@@ -111,15 +112,15 @@ public class BiomeMastery extends JavaPlugin {
     private void registerHooks() {
 //        if (getServer().getPluginManager().getPlugin("PlaceholderAPI") != null) {
 //            new PlaceHolderAPIHook(messageManager, dataManager).register();
-//            Utils.consoleMsg(ChatColor.GREEN + "Hooked into PlaceholderAPI");
+//            Utils.consoleMsg(messageManager.get(Message.HOOKEDPLACEHOLDERAPI);
 //        }
 
         if (getServer().getPluginManager().getPlugin("Vault") != null) {
             vaultHook = new VaultHook();
-            Utils.consoleMsg(ChatColor.GREEN + "Hooked into Vault");
+            Utils.consoleMsg(messageManager.get(Message.HOOKEDVAULT));
         } else {
             vaultHook = null;
-            Utils.consoleMsg(ChatColor.RED + "Error hooking into Vault");
+            Utils.consoleMsg(messageManager.get(Message.HOOKEDVAULTERROR));
         }
     }
 }

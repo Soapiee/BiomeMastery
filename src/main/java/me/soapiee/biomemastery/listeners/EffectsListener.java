@@ -27,7 +27,7 @@ public class EffectsListener implements Listener {
         this.main = main;
     }
 
-    public HashSet<UUID> getSet(EffectType type) {
+    public HashSet<UUID> getActivePlayerList(EffectType type) {
         return activeEffects.get(type);
     }
 
@@ -41,11 +41,11 @@ public class EffectsListener implements Listener {
     }
 
     public void addActiveEffect(EffectType type, UUID uuid) {
-        getSet(type).add(uuid);
+        getActivePlayerList(type).add(uuid);
     }
 
     public void removeActiveEffect(EffectType type, UUID uuid) {
-        getSet(type).remove(uuid);
+        getActivePlayerList(type).remove(uuid);
     }
 
     @EventHandler

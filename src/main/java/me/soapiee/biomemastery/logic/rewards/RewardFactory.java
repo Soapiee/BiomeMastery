@@ -8,6 +8,7 @@ import me.soapiee.biomemastery.manager.EffectsManager;
 import me.soapiee.biomemastery.manager.MessageManager;
 import me.soapiee.biomemastery.manager.PlayerDataManager;
 import me.soapiee.biomemastery.util.CustomLogger;
+import me.soapiee.biomemastery.util.Message;
 import org.bukkit.Material;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.inventory.ItemStack;
@@ -41,8 +42,7 @@ public class RewardFactory {
             rewardType = RewardType.valueOf(config.getString(path + "reward_type").toUpperCase());
         } catch (NullPointerException | IllegalArgumentException e) {
             rewardType = RewardType.NONE;
-            String[] pathParts = path.split("\\.");
-            customLogger.logToFile(e, "&cBiome " + pathParts[1] + " at level " + pathParts[2] + " has an invalid reward type");
+            createLog(path, e, Message.INVALIDREWARDTYPE);
         }
 
         switch (rewardType) {
@@ -81,9 +81,9 @@ public class RewardFactory {
             potionType = PotionType.valueOf(potionParts[0].toUpperCase());
         } catch (IllegalArgumentException error) {
             if (error instanceof NumberFormatException)
-                createLog(path, error, "potion amplifier value");
+                createLog(path, error, Message.INVALIDPOTIONAMP);
             else
-                createLog(path, error, "potion type");
+                createLog(path, error, Message.INVALIDPOTIONTYPE);
 
             return new NullReward();
         }
@@ -100,7 +100,7 @@ public class RewardFactory {
             String effectString = config.getString(path + "reward_item").toUpperCase();
             effectType = EffectType.valueOf(effectString.replace("_", ""));
         } catch (IllegalArgumentException error) {
-            createLog(path, error, "effect type");
+            createLog(path, error, Message.INVALIDEFFECTTYPE);
             return new NullReward();
         }
 
@@ -111,7 +111,7 @@ public class RewardFactory {
 
     private Reward currencyReward(String path) {
         if (vaultHook == null) {
-            createLog(path, null, "vault hook");
+            createLog(path, null, Message.INVALIDVAULTHOOK);
             return new NullReward();
         }
 
@@ -121,12 +121,12 @@ public class RewardFactory {
         try {
             money = Double.parseDouble(rawDouble);
         } catch (IllegalArgumentException error) {
-            createLog(path, error, "amount");
+            createLog(path, error, Message.INVALIDAMOUNT);
             return new NullReward();
         }
 
         if (money <= 0) {
-            createLog(path, null, "amount");
+            createLog(path, null, Message.INVALIDAMOUNT);
             return new NullReward();
         }
 
@@ -140,12 +140,12 @@ public class RewardFactory {
         try {
             experience = Integer.parseInt(rawInt);
         } catch (IllegalArgumentException error) {
-            createLog(path, error, "amount");
+            createLog(path, error, Message.INVALIDAMOUNT);
             return new NullReward();
         }
 
         if (experience <= 0) {
-            createLog(path, null, "amount");
+            createLog(path, null, Message.INVALIDAMOUNT);
             return new NullReward();
         }
 
@@ -167,9 +167,9 @@ public class RewardFactory {
             } catch (IllegalArgumentException | NullPointerException error) {
 
                 if (error instanceof NumberFormatException)
-                    createLog(path, error, "quantity");
+                    createLog(path, error, Message.INVALIDQUANTITY);
                 else
-                    createLog(path, error, "material");
+                    createLog(path, error, Message.INVALIDMATERIAL);
             }
         }
 
@@ -183,9 +183,9 @@ public class RewardFactory {
                 } catch (IllegalArgumentException | NullPointerException error) {
 
                     if (error instanceof NumberFormatException)
-                        createLog(path, error, "quantity");
+                        createLog(path, error, Message.INVALIDQUANTITY);
                     else
-                        createLog(path, error, "material");
+                        createLog(path, error, Message.INVALIDMATERIAL);
                 }
             }
         }
@@ -199,7 +199,7 @@ public class RewardFactory {
         ArrayList<String> permissionList = new ArrayList<>();
 
         if (vaultHook == null) {
-            createLog(path, null, "vault hook");
+            createLog(path, null, Message.INVALIDVAULTHOOK);
             return new NullReward();
         }
 
@@ -210,7 +210,7 @@ public class RewardFactory {
             permissionList.addAll(config.getStringList(path + "reward_item"));
 
         if (permissionList.isEmpty()) {
-            createLog(path, null, "permission");
+            createLog(path, null, Message.INVALIDPERMISSION);
             return new NullReward();
         }
 
@@ -227,7 +227,7 @@ public class RewardFactory {
             commandList.addAll(config.getStringList(path + "reward_item"));
 
         if (commandList.isEmpty()) {
-            createLog(path, null, "command");
+            createLog(path, null, Message.INVALIDCOMMAND);
             return new NullReward();
         }
 
@@ -236,10 +236,14 @@ public class RewardFactory {
         return new CommandReward(main, commandList, description);
     }
 
-    private void createLog(String path, Exception error, String invalidObject) {
+    private void createLog(String path, Exception error, Message invalidObject) {
         String[] pathParts = path.split("\\.");
-        customLogger.logToFile(error, "&cBiome "
-                + (pathParts[1].equals("levels") ? "&edefault&c" : pathParts[1])
-                + " at level " + pathParts[2] + " has an invalid " + invalidObject);
+
+        customLogger.logToFile(error,
+                messageManager.getWithPlaceholder(
+                        Message.INVALIDREWARD,
+                        pathParts[1],
+                        pathParts[2],
+                        invalidObject));
     }
 }

@@ -48,8 +48,8 @@ public class InfoPageSub extends AbstractUsageSub {
         playerDataManager.getOrLoad(player)
                 .thenAcceptAsync(data -> displayInfo(player, data, pageNumber), BukkitExecutor.sync(main))
                 .exceptionally(error -> {
-                    logger.onlyLogToPlayer(sender, Utils.addColour(messageManager.get(Message.DATAERRORPLAYER)));
-                    logger.logToPlayer(sender, error, Utils.addColour(messageManager.getWithPlaceholder(Message.DATAERROR, sender.getName())));
+                    logger.logToPlayer(sender, error, Utils.addColour(messageManager.get(Message.DATAERRORPLAYER)));
+//                    logger.logToPlayer(sender, error, Utils.addColour(messageManager.getWithPlaceholder(Message.DATAERROR, player.getName())));
                     return null;
                 });
     }

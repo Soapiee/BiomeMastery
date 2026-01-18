@@ -4,6 +4,7 @@ import me.soapiee.biomemastery.BiomeMastery;
 import me.soapiee.biomemastery.logic.BiomeLevel;
 import me.soapiee.biomemastery.manager.BiomeDataManager;
 import me.soapiee.biomemastery.manager.ConfigManager;
+import me.soapiee.biomemastery.manager.MessageManager;
 import me.soapiee.biomemastery.util.CustomLogger;
 import me.soapiee.biomemastery.util.Message;
 import me.soapiee.biomemastery.util.Utils;
@@ -26,6 +27,7 @@ public class PlayerFileStorage implements PlayerStorageHandler {
     private final BiomeDataManager biomeDataManager;
     private final PlayerData playerData;
     private final CustomLogger customLogger;
+    private final MessageManager messageManager;
     private final Object fileLock = new Object();
     private final Set<Biome> enabledBiomes;
 
@@ -38,6 +40,7 @@ public class PlayerFileStorage implements PlayerStorageHandler {
         biomeDataManager = main.getDataManager().getBiomeDataManager();
         this.playerData = playerData;
         customLogger = main.getCustomLogger();
+        messageManager = main.getMessageManager();
         player = playerData.getPlayer();
         enabledBiomes = Collections.unmodifiableSet(new HashSet<>(configManager.getEnabledBiomes()));
 
@@ -150,7 +153,7 @@ public class PlayerFileStorage implements PlayerStorageHandler {
         try {
             localCopy.save(file);
         } catch (IOException e) {
-            customLogger.logToFile(e, main.getMessageManager().getWithPlaceholder(Message.DATAERROR, player.getName()));
+            customLogger.logToFile(e, messageManager.getWithPlaceholder(Message.DATASAVEERROR, player.getName()));
         }
     }
 
@@ -177,7 +180,7 @@ public class PlayerFileStorage implements PlayerStorageHandler {
             try {
                 contents.save(file);
             } catch (IOException e) {
-                customLogger.logToFile(e, main.getMessageManager().getWithPlaceholder(Message.DATAERROR, playerName));
+                customLogger.logToFile(e, messageManager.getWithPlaceholder(Message.DATASAVEERROR, playerName));
             }
         });
     }

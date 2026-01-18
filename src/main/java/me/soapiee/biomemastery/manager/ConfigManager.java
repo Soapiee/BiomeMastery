@@ -3,11 +3,13 @@ package me.soapiee.biomemastery.manager;
 import lombok.Getter;
 import lombok.Setter;
 import me.soapiee.biomemastery.BiomeMastery;
-import me.soapiee.biomemastery.logic.effects.Effect;
+import me.soapiee.biomemastery.logic.effects.EffectInterface;
 import me.soapiee.biomemastery.logic.rewards.Reward;
 import me.soapiee.biomemastery.logic.rewards.RewardFactory;
 import me.soapiee.biomemastery.util.CustomLogger;
+import me.soapiee.biomemastery.util.Message;
 import org.bukkit.Bukkit;
+import org.bukkit.Sound;
 import org.bukkit.World;
 import org.bukkit.block.Biome;
 import org.bukkit.configuration.ConfigurationSection;
@@ -21,30 +23,51 @@ import java.util.List;
 public class ConfigManager {
 
     private FileConfiguration config;
+    private final CustomLogger customLogger;
+    private final MessageManager messageManager;
 
-    @Getter
-    @Setter
-    private boolean databaseEnabled;
+    @Getter @Setter private boolean databaseEnabled;
     @Getter private boolean debugMode;
     @Getter private boolean updateNotif;
     @Getter private int biomesPerPage;
+    @Getter private int cmdCooldown;
+    @Getter private Sound lvlUpSound;
     @Getter private final HashSet<World> enabledWorlds = new HashSet<>();
     @Getter private final HashSet<Biome> enabledBiomes = new HashSet<>();
     @Getter private final HashMap<Integer, Integer> defaultLevelsThresholds = new HashMap<>();
     @Getter private final HashMap<Integer, Reward> defaultRewards = new HashMap<>();
-    @Getter private final HashMap<String, Effect> effects = new HashMap<>();
+    @Getter private final HashMap<String, EffectInterface> effects = new HashMap<>();
     @Getter private int updateInterval;
 
-    public ConfigManager(FileConfiguration config, CustomLogger logger) {
-        this.config = config;
+    public ConfigManager(BiomeMastery main) {
+        config = main.getConfig();
+        customLogger = main.getCustomLogger();
+        messageManager = main.getMessageManager();
+
         databaseEnabled = config.getBoolean("database.enabled", false);
         debugMode = config.getBoolean("debug_mode", false);
         updateNotif = config.getBoolean("settings.plugin_update_notification", true);
         updateInterval = Math.max(config.getInt("settings.update_interval", 60), 1);
         biomesPerPage = Math.max(config.getInt("settings.biomes_per_page", 5), 1);
+        cmdCooldown = Math.max(config.getInt("settings.command_cooldown", 3), 1);
+        lvlUpSound = validateSound(config.getString("settings.levelup_sound", null));
 
         enabledWorlds.addAll(setUpEnabledWords());
         enabledBiomes.addAll(setUpEnabledBiomes());
+    }
+
+    private Sound validateSound(String string){
+        if (string == null || string.equalsIgnoreCase("null")) return null;
+
+        Sound sound;
+        try {
+            sound = Sound.valueOf(string);
+        } catch (IllegalArgumentException error){
+            sound = null;
+            customLogger.logToFile(error, messageManager.getWithPlaceholder(Message.INVALIDSOUND, string));
+        }
+
+        return sound;
     }
 
     public ArrayList<World> setUpEnabledWords() {
@@ -85,9 +108,11 @@ public class ConfigManager {
         config = main.getConfig();
         debugMode = config.getBoolean("debug_mode", false);
         updateNotif = config.getBoolean("settings.plugin_update_notification", true);
-        updateInterval = config.getInt("settings.update_interval", 60);
+        updateInterval = Math.max(config.getInt("settings.update_interval", 60), 1);
         biomesPerPage = Math.max(config.getInt("settings.biomes_per_page", 5), 1);
-        dataManager.getCooldownManager().updateThreshold(config.getInt("settings.command_cooldown", 3));
+        cmdCooldown = Math.max(config.getInt("settings.command_cooldown", 3), 1);
+        dataManager.getCooldownManager().setThreshold(cmdCooldown);
+        lvlUpSound = validateSound(config.getString("settings.levelup_sound", null));
     }
 
     public Biome[] getAllMCBiomes() {

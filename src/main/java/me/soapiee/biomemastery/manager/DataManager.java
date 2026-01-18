@@ -7,8 +7,8 @@ import me.soapiee.biomemastery.data.HikariCPConnection;
 import me.soapiee.biomemastery.logic.ProgressChecker;
 import me.soapiee.biomemastery.logic.rewards.RewardFactory;
 import me.soapiee.biomemastery.util.CustomLogger;
+import me.soapiee.biomemastery.util.Message;
 import me.soapiee.biomemastery.util.Utils;
-import org.bukkit.ChatColor;
 import org.bukkit.configuration.file.FileConfiguration;
 
 import java.io.File;
@@ -28,17 +28,18 @@ public class DataManager {
     @Getter private RewardFactory rewardFactory;
     @Getter private HikariCPConnection database;
     private final CustomLogger customLogger;
+    private final MessageManager messageManager;
 
     private ProgressChecker progressChecker;
 
     public DataManager(BiomeMastery main) {
-        FileConfiguration mainConfig = main.getConfig();
         customLogger = main.getCustomLogger();
+        messageManager = main.getMessageManager();
 
         playerDataManager = new PlayerDataManager(main);
-        configManager = new ConfigManager(mainConfig, customLogger);
+        configManager = new ConfigManager(main);
         checkDirectory(main);
-        cooldownManager = new CmdCooldownManager(main, mainConfig.getInt("settings.command_cooldown", 3));
+        cooldownManager = new CmdCooldownManager(main, configManager);
         pendingRewardsManager = new PendingRewardsManager(main, biomeDataManager);
     }
 
@@ -48,7 +49,7 @@ public class DataManager {
         try {
             Files.createDirectories(Paths.get(main.getDataFolder() + File.separator + "Data"));
         } catch (IOException e) {
-            customLogger.logToFile(e, ChatColor.RED + "Data folder could not be created");
+            customLogger.logToFile(e, messageManager.get(Message.FILEFOLDERERROR));
         }
     }
 
@@ -58,9 +59,9 @@ public class DataManager {
         if (configManager.isDatabaseEnabled()) {
             try {
                 initialiseDatabase(mainConfig);
-                Utils.consoleMsg(ChatColor.DARK_GREEN + "Database enabled.");
+                Utils.consoleMsg(messageManager.get(Message.DATABASECONNECTED));
             } catch (SQLException | HikariPool.PoolInitializationException e) {
-                customLogger.logToFile(e, ChatColor.RED + "Database could not connect. Switching to file storage");
+                customLogger.logToFile(e, messageManager.get(Message.DATABASEFAILED));
                 initialiseFiles(main);
             }
 
@@ -77,7 +78,7 @@ public class DataManager {
         database = null;
 
         Files.createDirectories(Paths.get(main.getDataFolder() + File.separator + "Data" + File.separator + "BiomeLevels"));
-        Utils.consoleMsg(ChatColor.DARK_GREEN + "File Storage enabled.");
+        Utils.consoleMsg(messageManager.get(Message.FILESYSTEMACTIVATED));
     }
 
     public void initialiseRewards(BiomeMastery main) {

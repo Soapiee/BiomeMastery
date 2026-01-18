@@ -4,7 +4,10 @@ import me.soapiee.biomemastery.logic.BiomeLevel;
 import me.soapiee.biomemastery.logic.events.LevelUpEvent;
 import me.soapiee.biomemastery.logic.rewards.PendingReward;
 import me.soapiee.biomemastery.logic.rewards.Reward;
-import me.soapiee.biomemastery.manager.*;
+import me.soapiee.biomemastery.manager.ConfigManager;
+import me.soapiee.biomemastery.manager.DataManager;
+import me.soapiee.biomemastery.manager.MessageManager;
+import me.soapiee.biomemastery.manager.PendingRewardsManager;
 import me.soapiee.biomemastery.util.CustomLogger;
 import me.soapiee.biomemastery.util.Message;
 import me.soapiee.biomemastery.util.Utils;
@@ -44,6 +47,7 @@ public class LevelUpListener implements Listener {
 
         Player player = offlinePlayer.getPlayer();
         player.sendMessage(Utils.addColour(messageManager.getWithPlaceholder(Message.LEVELLEDUP, event.getNewLevel(), biomeName)));
+        playLevelUpSound(player);
 
         if (!reward.isSingular())
             if (!playerInCorrectBiome(player, biomeLevel.getBiome(), reward)) return;
@@ -60,7 +64,7 @@ public class LevelUpListener implements Listener {
 
     private boolean rewardIsValid(Reward reward, String biomeName) {
         if (reward == null) {
-            logger.logToFile(new NullPointerException(), "The reward is null for biome: " + biomeName);
+            logger.logToFile(new NullPointerException(), messageManager.getWithPlaceholder(Message.MISSINGREWARD, biomeName));
             return false;
         }
 
@@ -75,6 +79,12 @@ public class LevelUpListener implements Listener {
             return false;
         }
         return true;
+    }
+
+    private void playLevelUpSound(Player player){
+         if (configManager.getLvlUpSound() == null) return;
+
+         player.playSound(player.getLocation(), configManager.getLvlUpSound(), 5, 1);
     }
 
 }
