@@ -4,6 +4,7 @@ import lombok.Getter;
 import me.soapiee.biomemastery.commands.AdminCmd;
 import me.soapiee.biomemastery.commands.UsageCmd;
 import me.soapiee.biomemastery.data.PlayerData;
+import me.soapiee.biomemastery.hooks.PlaceHolderAPIHook;
 import me.soapiee.biomemastery.hooks.VaultHook;
 import me.soapiee.biomemastery.listeners.EffectsListener;
 import me.soapiee.biomemastery.listeners.LevelUpListener;
@@ -110,10 +111,10 @@ public class BiomeMastery extends JavaPlugin {
     }
 
     private void registerHooks() {
-//        if (getServer().getPluginManager().getPlugin("PlaceholderAPI") != null) {
-//            new PlaceHolderAPIHook(messageManager, dataManager).register();
-//            Utils.consoleMsg(messageManager.get(Message.HOOKEDPLACEHOLDERAPI);
-//        }
+        if (getServer().getPluginManager().getPlugin("PlaceholderAPI") != null) {
+            new PlaceHolderAPIHook(this).register();
+            Utils.consoleMsg(messageManager.get(Message.HOOKEDPLACEHOLDERAPI));
+        }
 
         if (getServer().getPluginManager().getPlugin("Vault") != null) {
             vaultHook = new VaultHook();
