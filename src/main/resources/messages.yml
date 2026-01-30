@@ -1,4 +1,4 @@
-#                    --->    GENERAL MESSAGES    <---
+# # # #                --->    GENERAL MESSAGES    <---                # # # #
 messages_prefix: "&5&l[BM]&r" # Replace to "" if you want no prefix
 must_be_player: "&cYou must be a player to use this command"
 console_usage_error: "&cYou must enter a players name"
@@ -41,7 +41,7 @@ admin_removed_progress: "&eAn admin removed &c%progress% &efrom your &c%biome% &
 admin_reset_all: "&eAn admin reset all of your data"
 admin_reset_biome: "&eAn admin reset your &c%biome% &edata"
 
-#                    --->    CONFIG FEEDBACK MESSAGES    <---
+# # # #                --->    CONFIG FEEDBACK MESSAGES    <---                # # # #
 invalid_reward: "&cBiome %biome% at level %config_level% has an invalid %invalid_field%"
 invalid_field_reward_type: "&cBiome %biome% at level %config_level% has an invalid reward type"
 invalid_field_potion_amplifier: "potion amplifier value"
@@ -56,7 +56,7 @@ invalid_field_command: "command"
 invalid_field_sound: "&cThe input (""%input%"") for the level up sound is invalid. No sound will be played."
 invalid_field_effect_conflict: "&cThe effect %effect% has an invalid conflict (""%input%"")"
 
-#                    --->    PLAYER CMD MESSAGES    <---
+# # # #                --->    PLAYER CMD MESSAGES    <---                # # # #
 player_help:
   - "#01d54a--------- BiomeMastery Help ---------"
   - "#01d54aKey: < > = Optional | [ ] = Required"
@@ -105,7 +105,7 @@ pending_reward_received: "&aYou levelled up to level &e%level% &ain the &e%biome
 reward_already_claimed: "&cYou've already claimed this reward and you can only claim it once."
 not_inside_biome: "&cYou must be inside the &e%biome% &cbiome to activate the &e%reward% &creward"
 
-#                    --->    ADMIN CMD MESSAGES    <---
+# # # #                --->    ADMIN CMD MESSAGES    <---                # # # #
 update_available: "&aThere is an update available for BiomeMastery"
 admin_help:
   - "#01d54a--------- BiomeMastery Admin Help ---------"
