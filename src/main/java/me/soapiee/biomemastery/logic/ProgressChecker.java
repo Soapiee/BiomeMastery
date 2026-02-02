@@ -5,7 +5,7 @@ import me.soapiee.biomemastery.data.PlayerData;
 import me.soapiee.biomemastery.manager.ConfigManager;
 import me.soapiee.biomemastery.manager.DataManager;
 import me.soapiee.biomemastery.manager.PlayerDataManager;
-import me.soapiee.biomemastery.util.Utils;
+import me.soapiee.biomemastery.utils.Utils;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.block.Biome;

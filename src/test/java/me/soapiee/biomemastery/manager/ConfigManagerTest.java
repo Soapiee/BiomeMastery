@@ -1,7 +1,7 @@
 package me.soapiee.biomemastery.manager;
 
 import me.soapiee.biomemastery.BiomeMastery;
-import me.soapiee.biomemastery.util.CustomLogger;
+import me.soapiee.biomemastery.utils.CustomLogger;
 import org.bukkit.block.Biome;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.junit.jupiter.api.AfterEach;

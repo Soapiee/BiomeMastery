@@ -9,8 +9,8 @@ import me.soapiee.biomemastery.logic.rewards.Reward;
 import me.soapiee.biomemastery.logic.rewards.RewardType;
 import me.soapiee.biomemastery.manager.EffectsManager;
 import me.soapiee.biomemastery.manager.PlayerDataManager;
-import me.soapiee.biomemastery.util.Message;
-import me.soapiee.biomemastery.util.Utils;
+import me.soapiee.biomemastery.utils.Message;
+import me.soapiee.biomemastery.utils.Utils;
 import org.bukkit.entity.Player;
 
 public class EffectReward extends Reward {

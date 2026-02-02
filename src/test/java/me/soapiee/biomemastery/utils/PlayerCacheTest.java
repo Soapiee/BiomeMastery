@@ -1,4 +1,4 @@
-package me.soapiee.biomemastery.util;
+package me.soapiee.biomemastery.utils;
 
 import org.bukkit.OfflinePlayer;
 import org.junit.jupiter.api.AfterEach;

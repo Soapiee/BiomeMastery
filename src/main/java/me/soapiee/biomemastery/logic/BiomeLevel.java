@@ -4,7 +4,7 @@ import lombok.Getter;
 import lombok.Setter;
 import me.soapiee.biomemastery.logic.events.LevelUpEvent;
 import me.soapiee.biomemastery.logic.rewards.Reward;
-import me.soapiee.biomemastery.util.Utils;
+import me.soapiee.biomemastery.utils.Utils;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.block.Biome;

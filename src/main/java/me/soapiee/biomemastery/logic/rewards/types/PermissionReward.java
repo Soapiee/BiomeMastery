@@ -4,8 +4,8 @@ import me.soapiee.biomemastery.BiomeMastery;
 import me.soapiee.biomemastery.logic.rewards.Reward;
 import me.soapiee.biomemastery.logic.rewards.RewardType;
 import me.soapiee.biomemastery.hooks.VaultHook;
-import me.soapiee.biomemastery.util.Message;
-import me.soapiee.biomemastery.util.Utils;
+import me.soapiee.biomemastery.utils.Message;
+import me.soapiee.biomemastery.utils.Utils;
 import org.bukkit.entity.Player;
 
 import java.util.ArrayList;

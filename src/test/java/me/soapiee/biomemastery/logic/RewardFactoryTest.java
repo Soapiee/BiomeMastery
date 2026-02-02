@@ -9,7 +9,7 @@ import me.soapiee.biomemastery.manager.DataManager;
 import me.soapiee.biomemastery.manager.EffectsManager;
 import me.soapiee.biomemastery.manager.MessageManager;
 import me.soapiee.biomemastery.manager.PlayerDataManager;
-import me.soapiee.biomemastery.util.CustomLogger;
+import me.soapiee.biomemastery.utils.CustomLogger;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.configuration.file.FileConfiguration;

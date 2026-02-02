@@ -4,7 +4,7 @@ import lombok.Getter;
 import me.soapiee.biomemastery.BiomeMastery;
 import me.soapiee.biomemastery.logic.effects.Effect;
 import me.soapiee.biomemastery.logic.effects.EffectType;
-import me.soapiee.biomemastery.util.Utils;
+import me.soapiee.biomemastery.utils.Utils;
 import org.bukkit.ChatColor;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;

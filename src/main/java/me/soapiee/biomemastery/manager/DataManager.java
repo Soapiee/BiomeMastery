@@ -6,9 +6,9 @@ import me.soapiee.biomemastery.BiomeMastery;
 import me.soapiee.biomemastery.data.HikariCPConnection;
 import me.soapiee.biomemastery.logic.ProgressChecker;
 import me.soapiee.biomemastery.logic.rewards.RewardFactory;
-import me.soapiee.biomemastery.util.CustomLogger;
-import me.soapiee.biomemastery.util.Message;
-import me.soapiee.biomemastery.util.Utils;
+import me.soapiee.biomemastery.utils.CustomLogger;
+import me.soapiee.biomemastery.utils.Message;
+import me.soapiee.biomemastery.utils.Utils;
 import org.bukkit.configuration.file.FileConfiguration;
 
 import java.io.File;

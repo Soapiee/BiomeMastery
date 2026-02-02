@@ -2,7 +2,7 @@ package me.soapiee.biomemastery.commands.usageCmds;
 
 import lombok.Getter;
 import me.soapiee.biomemastery.BiomeMastery;
-import me.soapiee.biomemastery.util.Message;
+import me.soapiee.biomemastery.utils.Message;
 import org.bukkit.command.CommandSender;
 
 import java.util.ArrayList;

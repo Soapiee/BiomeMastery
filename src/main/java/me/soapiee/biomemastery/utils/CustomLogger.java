@@ -1,4 +1,4 @@
-package me.soapiee.biomemastery.util;
+package me.soapiee.biomemastery.utils;
 
 import me.soapiee.biomemastery.BiomeMastery;
 import me.soapiee.biomemastery.manager.MessageManager;

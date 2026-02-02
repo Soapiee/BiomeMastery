@@ -1,4 +1,4 @@
-package me.soapiee.biomemastery.util;
+package me.soapiee.biomemastery.utils;
 
 import net.md_5.bungee.api.ChatColor;
 import org.bukkit.Bukkit;

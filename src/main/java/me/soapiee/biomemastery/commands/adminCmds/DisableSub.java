@@ -2,7 +2,7 @@ package me.soapiee.biomemastery.commands.adminCmds;
 
 import lombok.Getter;
 import me.soapiee.biomemastery.BiomeMastery;
-import me.soapiee.biomemastery.util.Message;
+import me.soapiee.biomemastery.utils.Message;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
 import org.bukkit.block.Biome;

@@ -2,8 +2,8 @@ package me.soapiee.biomemastery.commands.adminCmds;
 
 import lombok.Getter;
 import me.soapiee.biomemastery.BiomeMastery;
-import me.soapiee.biomemastery.util.Message;
-import me.soapiee.biomemastery.util.Utils;
+import me.soapiee.biomemastery.utils.Message;
+import me.soapiee.biomemastery.utils.Utils;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;

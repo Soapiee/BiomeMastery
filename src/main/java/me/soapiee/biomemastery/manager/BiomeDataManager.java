@@ -3,7 +3,7 @@ package me.soapiee.biomemastery.manager;
 import lombok.Getter;
 import me.soapiee.biomemastery.logic.BiomeData;
 import me.soapiee.biomemastery.logic.rewards.RewardFactory;
-import me.soapiee.biomemastery.util.Utils;
+import me.soapiee.biomemastery.utils.Utils;
 import org.bukkit.block.Biome;
 import org.bukkit.configuration.file.FileConfiguration;
 
