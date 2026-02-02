@@ -19,7 +19,7 @@ public enum Message {
     HOOKEDVAULTERROR("hooked_vault_error", "&cError hooking into Vault"),
     MAJORDATAERROR("data_error_disabling_plugin", "There was an error creating/retrieving player data. Disabling plugin.."),
     DATABASECONNECTED("database_connected", "&2Database connected."),
-    DATABASEFAILED("database_connected_error", "Database could not connect. Switching to file storage"),
+    DATABASEFAILED("database_connected_error", "&cDatabase could not connect. Switching to file storage"),
     FILESYSTEMACTIVATED("file_storage_enabled", "&2File Storage enabled."),
     FILEFOLDERERROR("file_storage_error", "&cData folder could not be created"),
     LOGGERFILEERROR("logger_file_error", "&cThe logger.log file could not be created"),
@@ -58,8 +58,8 @@ public enum Message {
     INVALIDMATERIAL("invalid_field_material", "material"),
     INVALIDPERMISSION("invalid_field_permission", "permission"),
     INVALIDCOMMAND("invalid_field_command", "command"),
-    INVALIDSOUND("invalid_field_sound", "&cThe input (\"%input%\") for the level up sound is invalid. No sound will be played."),
-    INVALIDCONFLICTTYPE("invalid_field_effect_conflict", "&cThe effect %effect% has an invalid conflict (\"%input%\")"),
+    INVALIDSOUND("invalid_field_sound", "&cThe input (\"\"%input%\"\") for the level up sound is invalid. No sound will be played."),
+    INVALIDCONFLICTTYPE("invalid_field_effect_conflict", "&cThe effect %effect% has an invalid conflict (\"\"%input%\"\")"),
 
     //                    --->    PLAYER CMD MESSAGES    <---
     PLAYERHELP("player_help", "#01d54a--------- BiomeMastery Help ---------"
