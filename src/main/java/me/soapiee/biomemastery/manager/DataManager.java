@@ -35,9 +35,9 @@ public class DataManager {
     public DataManager(BiomeMastery main) {
         customLogger = main.getCustomLogger();
         messageManager = main.getMessageManager();
+        configManager = main.getConfigManager();
 
         playerDataManager = new PlayerDataManager(main);
-        configManager = new ConfigManager(main);
         checkDirectory(main);
         cooldownManager = new CmdCooldownManager(main, configManager);
         pendingRewardsManager = new PendingRewardsManager(main, biomeDataManager);
@@ -87,8 +87,8 @@ public class DataManager {
         configManager.setUpDefaultRewards(rewardFactory);
     }
 
-    public void initialiseBiomeData(FileConfiguration mainConfig) {
-        biomeDataManager = new BiomeDataManager(configManager, rewardFactory, mainConfig);
+    public void initialiseBiomeData(BiomeMastery main) {
+        biomeDataManager = new BiomeDataManager(main, rewardFactory);
     }
 
     public void reloadData(BiomeMastery main) {

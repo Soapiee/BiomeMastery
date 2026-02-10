@@ -1,6 +1,6 @@
 package me.soapiee.biomemastery.manager;
 
-import me.soapiee.biomemastery.handlers.InventoryHandler;
+import me.soapiee.biomemastery.gui.core.InventoryHandler;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;

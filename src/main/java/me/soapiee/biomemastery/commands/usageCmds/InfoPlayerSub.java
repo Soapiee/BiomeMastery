@@ -6,8 +6,6 @@ import me.soapiee.biomemastery.data.BukkitExecutor;
 import me.soapiee.biomemastery.data.PlayerData;
 import me.soapiee.biomemastery.logic.BiomeData;
 import me.soapiee.biomemastery.logic.BiomeLevel;
-import me.soapiee.biomemastery.manager.PlayerDataManager;
-import me.soapiee.biomemastery.utils.CustomLogger;
 import me.soapiee.biomemastery.utils.Message;
 import me.soapiee.biomemastery.utils.Utils;
 import net.md_5.bungee.api.chat.*;
@@ -40,13 +38,11 @@ public class InfoPlayerSub extends AbstractUsageSub {
         int pageNumber = getPageNumber(sender, args);
         if (pageNumber == -1) return;
 
-        PlayerDataManager playerDataManager = main.getDataManager().getPlayerDataManager();
-        CustomLogger logger = main.getCustomLogger();
         playerDataManager.getOrLoad(target)
                 .thenAcceptAsync(data -> displayInfo(sender, target, data, pageNumber), BukkitExecutor.sync(main))
                 .exceptionally(error -> {
 //                    logger.onlyLogToPlayer(sender, Utils.addColour(messageManager.get(Message.DATAERRORPLAYER)));
-                    logger.logToPlayer(sender, error, Utils.addColour(messageManager.getWithPlaceholder(Message.DATAERROR, target.getName())));
+                    customLogger.logToPlayer(sender, error, Utils.addColour(messageManager.getWithPlaceholder(Message.DATAERROR, target.getName())));
                     return null;
                 });
     }
@@ -70,7 +66,7 @@ public class InfoPlayerSub extends AbstractUsageSub {
             return -1;
         }
 
-        int enabledBiomesCount = enabledBiomes.size();
+        int enabledBiomesCount = orderedBiomeData.size();
         int maxBiomes = configManager.getBiomesPerPage();
         int totalPages = ((enabledBiomesCount % maxBiomes) == 0 ? (enabledBiomesCount / maxBiomes) : (enabledBiomesCount / maxBiomes) + 1);
 
@@ -92,7 +88,7 @@ public class InfoPlayerSub extends AbstractUsageSub {
 
     private int calcTotalPages(){
         int maxBiomes = configManager.getBiomesPerPage();
-        int enabledBiomesCount = enabledBiomes.size();
+        int enabledBiomesCount = orderedBiomeData.size();
 
         return ((enabledBiomesCount % maxBiomes) == 0 ? (enabledBiomesCount / maxBiomes) : (enabledBiomesCount / maxBiomes) + 1);
     }
@@ -107,11 +103,11 @@ public class InfoPlayerSub extends AbstractUsageSub {
         int endPoint = startPoint + maxBiomes;
 
         for (int i = startPoint; i < endPoint; i++) {
-            if (i > enabledBiomes.size()) break;
+            if (i > orderedBiomeData.size()) break;
 
-            Biome biome = enabledBiomes.get(i);
+            BiomeData biomeData = orderedBiomeData.get(i);
+            Biome biome = biomeData.getBiome();
             BiomeLevel biomeLevel = playerData.getBiomeLevel(biome);
-            BiomeData biomeData = biomeDataManager.getBiomeData(biome);
 
             Message message = Message.BIOMEBASICINFOFORMAT;
             if (biomeLevel.getLevel() == biomeData.getMaxLevel()) message = Message.BIOMEBASICINFOMAX;

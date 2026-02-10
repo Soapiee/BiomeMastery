@@ -10,8 +10,6 @@ import me.soapiee.biomemastery.logic.effects.EffectInterface;
 import me.soapiee.biomemastery.logic.rewards.Reward;
 import me.soapiee.biomemastery.logic.rewards.types.EffectReward;
 import me.soapiee.biomemastery.logic.rewards.types.PotionReward;
-import me.soapiee.biomemastery.manager.PlayerDataManager;
-import me.soapiee.biomemastery.utils.CustomLogger;
 import me.soapiee.biomemastery.utils.Message;
 import me.soapiee.biomemastery.utils.Utils;
 import org.bukkit.OfflinePlayer;
@@ -50,13 +48,10 @@ public class InfoBiomeSub extends AbstractUsageSub {
         OfflinePlayer target = getTarget(sender, args);
         if (target == null) return;
 
-        PlayerDataManager playerDataManager = main.getDataManager().getPlayerDataManager();
-        CustomLogger logger = main.getCustomLogger();
         playerDataManager.getOrLoad(target)
                 .thenAcceptAsync(data -> displayInfo(sender, target, data, biome), BukkitExecutor.sync(main))
                 .exceptionally(error -> {
-//                    logger.logToPlayer(target, null, Utils.addColour(messageManager.get(Message.DATAERRORPLAYER)));
-                    logger.logToPlayer(sender, error, Utils.addColour(messageManager.getWithPlaceholder(Message.DATAERROR, target.getName())));
+                    customLogger.logToPlayer(sender, error, Utils.addColour(messageManager.getWithPlaceholder(Message.DATAERROR, target.getName())));
                     return null;
                 });
     }

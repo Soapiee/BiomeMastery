@@ -2,6 +2,7 @@ package me.soapiee.biomemastery.manager;
 
 import lombok.Setter;
 import me.soapiee.biomemastery.BiomeMastery;
+import me.soapiee.biomemastery.gui.core.Path;
 import me.soapiee.biomemastery.logic.BiomeData;
 import me.soapiee.biomemastery.logic.BiomeLevel;
 import me.soapiee.biomemastery.logic.rewards.Reward;
@@ -48,7 +49,7 @@ public class MessageManager {
         return true;
     }
 
-    public void save(Message messageEnum) {
+    public void save() {
         try {
             contents.save(file);
             contents.load(file);
@@ -77,7 +78,9 @@ public class MessageManager {
                 || messageEnum == Message.INVALIDAMOUNT || messageEnum == Message.INVALIDQUANTITY
                 || messageEnum == Message.INVALIDMATERIAL || messageEnum == Message.INVALIDPERMISSION
                 || messageEnum == Message.INVALIDCOMMAND || messageEnum == Message.INVALIDSOUND
-                || messageEnum == Message.INVALIDCONFLICTTYPE
+                || messageEnum == Message.INVALIDGUIMATERIAL || messageEnum == Message.INVALIDGUISLOT
+                || messageEnum == Message.INVALIDCONFLICTTYPE || messageEnum == Message.REWARDGUIACTIVATE
+                || messageEnum == Message.REWARDGUIDEACTIVATE
                 || messageEnum == Message.ADMINHELP || messageEnum == Message.BIOMEBASICINFOHEADER
                 || messageEnum == Message.BIOMEBASICINFOFOOTER || messageEnum == Message.BIOMEBASICINFOPREVBUTTON
                 || messageEnum == Message.BIOMEBASICINFONEXTBUTTON || messageEnum == Message.PREVBUTTONHOVER
@@ -113,114 +116,135 @@ public class MessageManager {
             } else {
                 contents.set(path, defaultText);
             }
-            save(messageEnum);
+
+            save();
             return getPrefix(messageEnum) + defaultText;
         }
     }
 
-    public String getWithPlaceholder(Message messageEnum, String playerName, BiomeData biomeData, BiomeLevel biomeLevel) {
-        String formattedBiomeName = Utils.capitalise(biomeData.getBiomeName());
-        int currentLevel = biomeLevel.getLevel();
-        String formattedTarget = Utils.formatTargetDuration(biomeData.getTargetDuration(currentLevel));
-        String formattedProgress = Utils.formatTargetDuration(biomeLevel.getProgress());
-
+    public String getWithPlaceholder(Message messageEnum, Path path) {
         String message = get(messageEnum);
         if (message == null) return null;
 
-        return message.replace("%biome%", formattedBiomeName)
-                .replace("%player_name%", playerName)
-                .replace("%player_level%", String.valueOf(biomeLevel.getLevel()))
-                .replace("%biome_max_level%", String.valueOf(biomeData.getMaxLevel()))
-                .replace("%player_progress%", formattedProgress)
-                .replace("%target_duration_formatted%", formattedTarget);
+        return message.replace("%invalid_field%", path.getPath());
+    }
+
+    public String getWithPlaceholder(Message messageEnum, String playerName, BiomeData biomeData, BiomeLevel biomeLevel) {
+        String message = get(messageEnum);
+        if (message == null) return null;
+
+        int currentLevel = biomeLevel.getLevel();
+
+        if (message.contains("%biome%")) message = message.replace("%biome%", Utils.capitalise(biomeData.getBiomeName()));
+        if (message.contains("%player_name%")) message = message.replace("%player_name%", playerName);
+        if (message.contains("%player_level%")) message = message.replace("%player_level%", String.valueOf(currentLevel));
+        if (message.contains("%biome_max_level%")) message = message.replace("%biome_max_level%", String.valueOf(biomeData.getMaxLevel()));
+        if (message.contains("%player_progress%")) message = message.replace("%player_progress%", Utils.formatTargetDuration(biomeLevel.getProgress()));
+        if (message.contains("%target_duration_formatted%")) message = message.replace("%target_duration_formatted%", Utils.formatTargetDuration(biomeData.getTargetDuration(currentLevel)));
+
+        return message;
     }
 
     public String getWithPlaceholder(Message messageEnum, String string) {
         String message = get(messageEnum);
         if (message == null) return null;
 
-        return get(messageEnum).replace("%player_name%", string)
-                .replace("%cmd_label%", string)
-                .replace("%world%", string)
-                .replace("%reward%", string)
-                .replace("%input%", string)
-                .replace("%biome%", Utils.capitalise(string));
+        if (message.contains("%player_name%")) message = message.replace("%player_name%", string);
+        if (message.contains("%invalid_field%")) message = message.replace("%invalid_field%", string);
+        if (message.contains("%cmd_label%")) message = message.replace("%cmd_label%", string);
+        if (message.contains("%world%")) message = message.replace("%world%", string);
+        if (message.contains("%reward%")) message = message.replace("%reward%", string);
+        if (message.contains("%input%")) message = message.replace("%input%", string);
+        if (message.contains("%biome%")) message = message.replace("%biome%", Utils.capitalise(string));
+
+        return message;
     }
 
     public String getWithPlaceholder(Message messageEnum, String string1, String string2) {
         String message = get(messageEnum);
         if (message == null) return null;
 
-        return message.replace("%player_name%", string2)
-                .replace("%reward%", string2)
-                .replace("%biome%", (string1.equals("levels") ? "default" : string1))
-                .replace("%config_level%", string2)
-                .replace("%conflicting_effect%", string1)
-                .replace("%effect%", string2);
+        if (message.contains("%player_name%")) message = message.replace("%player_name%", string2);
+        if (message.contains("%reward%")) message = message.replace("%reward%", string2);
+        if (message.contains("%biome%")) message = message.replace("%biome%", (string1.equals("levels") ? "default" : string1));
+        if (message.contains("%config_level%")) message = message.replace("%config_level%", string2);
+        if (message.contains("%conflicting_effect%")) message = message.replace("%conflicting_effect%", string1);
+        if (message.contains("%effect%")) message = message.replace("%effect%", string2);
+
+        return message;
     }
 
     public String getWithPlaceholder(Message messageEnum, int value, String input) {
         String message = get(messageEnum);
         if (message == null) return null;
 
-        String valueString = String.valueOf(value);
-        return message.replace("%level%", valueString)
-                .replace("%level_formatted%", valueString + (value > 1 ? " levels" : " level"))
-                .replace("%progress%", Utils.formatTargetDuration(value))
-                .replace("%max_level%", valueString)
-                .replace("%input%", input)
-                .replace("%total_pages%", String.valueOf(value))
-                .replace("%biome%", input);
+        if (message.contains("%level%")) message = message.replace("%level%", String.valueOf(value));
+        if (message.contains("%level_formatted%")) message = message.replace("%level_formatted%", value + (value > 1 ? " levels" : " level"));
+        if (message.contains("%progress%")) message = message.replace("%progress%", Utils.formatTargetDuration(value));
+        if (message.contains("%max_level%")) message = message.replace("%max_level%", String.valueOf(value));
+        if (message.contains("%input%")) message = message.replace("%input%", input);
+        if (message.contains("%total_pages%")) message = message.replace("%total_pages%", String.valueOf(value));
+        if (message.contains("%biome%")) message = message.replace("%biome%", input);
+
+        return message;
     }
 
     public String getWithPlaceholder(Message messageEnum, int currentPage, int totalPages) {
         String message = get(messageEnum);
         if (message == null) return null;
 
-        return message.replace("%current_page%", String.valueOf(currentPage))
-                .replace("%total_pages%", String.valueOf(totalPages))
-                .replace("%input%", String.valueOf(currentPage));
+        if (message.contains("%current_page%")) message = message.replace("%current_page%", String.valueOf(currentPage));
+        if (message.contains("%total_pages%")) message = message.replace("%total_pages%", String.valueOf(totalPages));
+        if (message.contains("%input%")) message = message.replace("%input%", String.valueOf(currentPage));
+
+        return message;
     }
 
     public String getWithPlaceholder(Message messageEnum, int level, Reward reward, String string) {
         String message = get(messageEnum);
         if (message == null) return null;
 
-        return message.replace("%level%", String.valueOf(level))
-                .replace("%reward%", reward.toString())
-                .replace("%biome%", Utils.capitalise(string))
-                .replace("%reward_status%", string);
+        if (message.contains("%level%")) message = message.replace("%level%", String.valueOf(level));
+        if (message.contains("%reward%")) message = message.replace("%reward%", reward.toString());
+        if (message.contains("%biome%")) message = message.replace("%biome%", Utils.capitalise(string));
+        if (message.contains("%reward_status%")) message = message.replace("%reward_status%", string);
+
+        return message;
     }
 
     public String getWithPlaceholder(Message messageEnum, int integer) {
         String message = get(messageEnum);
         if (message == null) return null;
 
-        String string = String.valueOf(integer);
-        return message.replace("%level%", string)
-                .replace("%cooldown%", string + (integer > 1 ? " seconds" : " second"))
-                .replace("%current_level%", string)
-                .replace("%input%", string);
+        if (message.contains("%level%")) message = message.replace("%level%", String.valueOf(integer));
+        if (message.contains("%cooldown%")) message = message.replace("%cooldown%", integer + (integer > 1 ? " seconds" : " second"));
+        if (message.contains("%current_level%")) message = message.replace("%current_level%", String.valueOf(integer));
+        if (message.contains("%input%")) message = message.replace("%input%", String.valueOf(integer));
+
+        return message;
     }
 
     public String getWithPlaceholder(Message messageEnum, String playerName, int integer, String biomeName) {
         String message = get(messageEnum);
         if (message == null) return null;
 
-        String string = String.valueOf(integer);
-        return message.replace("%level%", string + (integer > 1 ? " levels" : " level"))
-                .replace("%value%", string)
-                .replace("%progress%", Utils.formatTargetDuration(integer))
-                .replace("%biome%", biomeName)
-                .replace("%player_name%", playerName);
+        if (message.contains("%level%")) message = message.replace("%level%", integer + (integer > 1 ? " levels" : " level"));
+        if (message.contains("%value%")) message = message.replace("%value%", String.valueOf(integer));
+        if (message.contains("%progress%")) message = message.replace("%progress%", Utils.formatTargetDuration(integer));
+        if (message.contains("%biome%")) message = message.replace("%biome%", biomeName);
+        if (message.contains("%player_name%")) message = message.replace("%player_name%", playerName);
+
+        return message;
     }
 
     public String getWithPlaceholder(Message messageEnum, String string1, String string2, Message invalidObject) {
         String message = get(messageEnum);
         if (message == null) return null;
 
-        return message.replace("%biome%", (string1.equals("levels") ? "DEFAULT" : string1))
-                .replace("%config_level%", string2)
-                .replace("%invalid_field%", get(invalidObject));
+        if (message.contains("%biome%")) message = message.replace("%biome%", (string1.equals("levels") ? "DEFAULT" : string1));
+        if (message.contains("%config_level%")) message = message.replace("%config_level%", string2);
+        if (message.contains("%invalid_field%")) message = message.replace("%invalid_field%", get(invalidObject));
+
+        return message;
     }
 }

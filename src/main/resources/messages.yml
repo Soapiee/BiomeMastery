@@ -55,6 +55,8 @@ invalid_field_permission: "permission"
 invalid_field_command: "command"
 invalid_field_sound: "&cThe input (""%input%"") for the level up sound is invalid. No sound will be played."
 invalid_field_effect_conflict: "&cThe effect %effect% has an invalid conflict (""%input%"")"
+invalid_field_gui_material: "&cThere is an invalid material for %invalid_field%"
+invalid_field_gui_slot: "&cThere are no GUI slots set for %invalid_field%"
 
 # # # #                --->    PLAYER CMD MESSAGES    <---                # # # #
 player_help:
@@ -93,7 +95,9 @@ reward_status_unclaimed: "&5Unclaimed"
 reward_status_claimed: "&5Claimed"
 reward_claimable_in_biome: "&5Claimable when in the %biome% biome"
 reward_status_activate: "&5Use &l/biome reward &5to activate"
+reward_status_gui_activate: "&5Click to activate"
 reward_status_deactivate: "&5Use &l/biome reward &5to de-activate"
+reward_status_gui_deactivate: "&5Click to de-activate"
 command_on_cooldown: "&cYou must wait &e%cooldown% &cbefore you can use this command again"
 levelled_up: "&aYou levelled up to level &e%level% &ain the %biome% &e&abiome"
 reward_conflict: "&cYou cannot apply the %conflicting_effect% &cwith the %effect% &calready active"

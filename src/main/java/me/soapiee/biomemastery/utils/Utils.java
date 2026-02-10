@@ -95,10 +95,10 @@ public final class Utils {
 
         StringBuilder s = new StringBuilder();
         for (int i = 0; i < barsFilled; i++) {
-            s.append(org.bukkit.ChatColor.GREEN).append("■");
+            s.append(ChatColor.GREEN).append("■");
         }
         for (int i = 0; i < (totalBars - barsFilled); i++) {
-            s.append(org.bukkit.ChatColor.GRAY).append("■");
+            s.append(ChatColor.GRAY).append("■");
         }
 
         return s.toString();

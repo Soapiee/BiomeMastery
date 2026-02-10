@@ -1,4 +1,4 @@
-package me.soapiee.biomemastery.handlers;
+package me.soapiee.biomemastery.gui.core;
 
 import me.soapiee.biomemastery.manager.GUIManager;
 import org.bukkit.event.inventory.InventoryClickEvent;
