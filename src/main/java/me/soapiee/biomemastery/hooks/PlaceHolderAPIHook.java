@@ -25,7 +25,7 @@ public class PlaceHolderAPIHook extends PlaceholderExpansion {
     public PlaceHolderAPIHook(BiomeMastery main) {
         messageManager = main.getMessageManager();
         DataManager dataManager = main.getDataManager();
-        configManager = dataManager.getConfigManager();
+        configManager = main.getConfigManager();
         playerDataManager = dataManager.getPlayerDataManager();
     }
 

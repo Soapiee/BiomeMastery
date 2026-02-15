@@ -32,7 +32,7 @@ public abstract class StandardButton implements ButtonsHandler {
         Player onlinePlayer = target.getPlayer();
         Biome locBiome = onlinePlayer.getLocation().getBlock().getBiome();
 
-        if (!main.getDataManager().getConfigManager().isEnabledBiome(locBiome)) return;
+        if (!main.getConfigManager().isEnabledBiome(locBiome)) return;
 
         BiomeLevel biomeLevel = data.getBiomeLevel(locBiome);
         biomeLevel.updateProgress(locBiome);

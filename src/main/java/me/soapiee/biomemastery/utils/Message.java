@@ -34,8 +34,6 @@ public enum Message {
     PENDINGFILELOAD("pending_file_load_error", "&cThe pendingrewards.yml file could not be loaded"),
     PENDINGFILESAVE("pending_file_save_error", "&cThe pendingrewards.yml file could not be saved"),
     MISSINGREWARD("missing_reward", "&cThe reward is null for biome: %biome%"),
-    PLUGINVERSIONSTRING("logger_plugin_version_string", "BiomeMastery Version: "),
-    SERVERVERSIONSTRING("logger_server_version_string", "Server Version: "),
     INVFULL("player_inventory_full", "&cYour reward dropped on the floor because your inventory is full"),
     ADMINSETLEVEL("admin_set_level", "&eYour &a%biome% &elevel has been set to level &a%level% &eby an admin"),
     ADMINADDEDLEVEL("admin_added_level", "&eAn admin added &a%level_formatted% &eto your &a%biome% &elevel"),

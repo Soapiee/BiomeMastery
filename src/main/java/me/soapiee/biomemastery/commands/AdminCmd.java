@@ -35,7 +35,7 @@ public class AdminCmd implements CommandExecutor, TabCompleter {
     public AdminCmd(BiomeMastery main) {
         DataManager dataManager = main.getDataManager();
         biomeDataManager = dataManager.getBiomeDataManager();
-        configManager = dataManager.getConfigManager();
+        configManager = main.getConfigManager();
         playerCache = main.getPlayerCache();
         messageManager = main.getMessageManager();
 

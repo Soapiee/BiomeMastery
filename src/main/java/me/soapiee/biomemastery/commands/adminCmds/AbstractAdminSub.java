@@ -28,7 +28,7 @@ public abstract class AbstractAdminSub implements SubCmd {
         this.main = main;
         this.messageManager = main.getMessageManager();
         DataManager dataManager = main.getDataManager();
-        this.configManager = dataManager.getConfigManager();
+        this.configManager = main.getConfigManager();
         this.biomeDataManager = dataManager.getBiomeDataManager();
         this.pendingRewardsManager = main.getDataManager().getPendingRewardsManager();
 

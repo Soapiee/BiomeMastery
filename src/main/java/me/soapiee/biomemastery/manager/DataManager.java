@@ -22,11 +22,11 @@ public class DataManager {
     @Getter private final PlayerDataManager playerDataManager;
     @Getter private final PendingRewardsManager pendingRewardsManager;
     @Getter private final CmdCooldownManager cooldownManager;
-    @Getter private final ConfigManager configManager;
     @Getter private BiomeDataManager biomeDataManager;
     @Getter private EffectsManager effectsManager;
     @Getter private RewardFactory rewardFactory;
     @Getter private HikariCPConnection database;
+    private final ConfigManager configManager;
     private final CustomLogger customLogger;
     private final MessageManager messageManager;
 

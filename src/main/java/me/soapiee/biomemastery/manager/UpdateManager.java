@@ -20,7 +20,7 @@ public class UpdateManager {
     private final MessageManager messageManager;
 
     public UpdateManager(BiomeMastery main, int resourceId) {
-        configManager = main.getDataManager().getConfigManager();
+        configManager = main.getConfigManager();
         messageManager = main.getMessageManager();
 
         try {

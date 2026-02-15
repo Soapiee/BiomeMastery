@@ -27,7 +27,7 @@ public class PlayerData {
     public PlayerData(BiomeMastery main, @NotNull OfflinePlayer player) {
         this.player = player;
 
-        ConfigManager configManager = main.getDataManager().getConfigManager();
+        ConfigManager configManager = main.getConfigManager();
         storageHandler = (configManager.isDatabaseEnabled() ? new PlayerDatabaseStorage(main, this) : new PlayerFileStorage(main, this));
     }
 

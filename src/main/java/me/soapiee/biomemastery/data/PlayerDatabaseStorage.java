@@ -39,7 +39,7 @@ public class PlayerDatabaseStorage implements PlayerStorageHandler {
     public PlayerDatabaseStorage(BiomeMastery main, PlayerData playerData) {
         this.main = main;
         dataManager = main.getDataManager();
-        configManager = main.getDataManager().getConfigManager();
+        configManager = main.getConfigManager();
         biomeDataManager = main.getDataManager().getBiomeDataManager();
         messageManager = main.getMessageManager();
         this.playerData = playerData;
