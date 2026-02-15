@@ -36,7 +36,7 @@ public class UsageCmd implements CommandExecutor, TabCompleter {
 
     public UsageCmd(BiomeMastery main) {
         DataManager dataManager = main.getDataManager();
-        configManager = dataManager.getConfigManager();
+        configManager = main.getConfigManager();
         biomeDataManager = dataManager.getBiomeDataManager();
         playerCache = main.getPlayerCache();
         messageManager = main.getMessageManager();

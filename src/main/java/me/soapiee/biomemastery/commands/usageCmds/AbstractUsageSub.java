@@ -36,7 +36,7 @@ public abstract class AbstractUsageSub implements SubCmd {
         messageManager = main.getMessageManager();
         customLogger = main.getCustomLogger();
         DataManager dataManager = main.getDataManager();
-        configManager = dataManager.getConfigManager();
+        configManager = main.getConfigManager();
         biomeDataManager = dataManager.getBiomeDataManager();
         cmdCooldownManager = dataManager.getCooldownManager();
         playerDataManager = dataManager.getPlayerDataManager();

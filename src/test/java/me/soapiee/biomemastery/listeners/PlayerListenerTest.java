@@ -40,7 +40,7 @@ public final class PlayerListenerTest {
         when(mockMain.getDataManager()).thenReturn(mockDataManager);
         when(mockMain.getMessageManager()).thenReturn(mockMessageManager);
         when(mockDataManager.getPlayerDataManager()).thenReturn(mockPlayerDataManager);
-        when(mockDataManager.getConfigManager()).thenReturn(mockConfigManager);
+        when(mockMain.getConfigManager()).thenReturn(mockConfigManager);
         when(mockDataManager.getBiomeDataManager()).thenReturn(mockBiomeDataManager);
         when(mockDataManager.getPendingRewardsManager()).thenReturn(mockPendingRewardsManager);
         when(mockMain.getCustomLogger()).thenReturn(mockLogger);

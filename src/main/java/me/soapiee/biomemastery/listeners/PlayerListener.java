@@ -45,7 +45,7 @@ public class PlayerListener implements Listener {
         this.main = main;
         playerCache = main.getPlayerCache();
         playerDataManager = dataManager.getPlayerDataManager();
-        configManager = dataManager.getConfigManager();
+        configManager = main.getConfigManager();
         biomeDataManager = dataManager.getBiomeDataManager();
         messageManager = main.getMessageManager();
         pendingRewardsManager = dataManager.getPendingRewardsManager();
