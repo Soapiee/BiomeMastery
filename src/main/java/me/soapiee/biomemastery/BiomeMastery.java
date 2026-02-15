@@ -78,7 +78,7 @@ public class BiomeMastery extends JavaPlugin {
 
         getServer().getPluginManager().registerEvents(new PlayerListener(this, dataManager), this);
         getServer().getPluginManager().registerEvents(new PotionRemovalListener(dataManager.getPlayerDataManager()), this);
-        getServer().getPluginManager().registerEvents(new LevelUpListener(configManager, messageManager, customLogger, dataManager), this);
+        getServer().getPluginManager().registerEvents(new LevelUpListener(messageManager, customLogger, dataManager), this);
         getServer().getPluginManager().registerEvents(new GUIListener(guiManager), this);
 
         getCommand("abiomemastery").setExecutor(new AdminCmd(this));

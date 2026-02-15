@@ -28,7 +28,7 @@ public class IconFactory {
         config = main.getConfig();
     }
 
-    public void reload() {
+    public void reload(){
         config = main.getConfig();
     }
 
