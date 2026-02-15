@@ -1,36 +1,50 @@
 package me.soapiee.biomemastery.logic;
 
 import lombok.Getter;
-import me.soapiee.biomemastery.logic.rewards.RewardFactory;
+import me.soapiee.biomemastery.BiomeMastery;
+import me.soapiee.biomemastery.gui.core.Icon;
+import me.soapiee.biomemastery.gui.core.Path;
 import me.soapiee.biomemastery.logic.rewards.Reward;
+import me.soapiee.biomemastery.logic.rewards.RewardFactory;
+import me.soapiee.biomemastery.manager.ConfigGUIManager;
 import me.soapiee.biomemastery.manager.ConfigManager;
-import me.soapiee.biomemastery.util.Utils;
+import me.soapiee.biomemastery.utils.Utils;
+import org.bukkit.Bukkit;
 import org.bukkit.block.Biome;
+import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.file.FileConfiguration;
 
 import java.util.HashMap;
+import java.util.Map;
 
 public class BiomeData {
 
+    private final BiomeMastery main;
+    private final ConfigGUIManager configGUIManager;
+
     @Getter private final Biome biome;
     @Getter private final String biomeName;
-    private final HashMap<Integer, Integer> levels;
-    private final HashMap<Integer, Reward> rewards;
+    private final Map<Integer, Integer> levels = new HashMap<>();
+    private final Map<Integer, Reward> rewards = new HashMap<>();
 
-    public BiomeData(ConfigManager configManager,
-                     RewardFactory rewardFactory,
-                     FileConfiguration config,
-                     Biome biome) {
+    private final String path;
+    @Getter private Icon icon;
+
+    public BiomeData(BiomeMastery main, RewardFactory rewardFactory, Biome biome) {
+        this.main = main;
         this.biome = biome;
         biomeName = biome.name();
-        levels = new HashMap<>();
-        rewards = new HashMap<>();
+        path = Path.SPECIFIC_BIOME_DATA.getPath().replace("{biome}", biomeName);
+        configGUIManager = main.getConfigGUIManager();
+        icon = configGUIManager.getIconFactory().createIcon(path, Bukkit.getConsoleSender(), configGUIManager.getBiomePageSettings());
 
-        setRewards(configManager, rewardFactory, config);
+        setRewards(rewardFactory);
     }
 
-    private void setRewards(ConfigManager configManager, RewardFactory rewardFactory, FileConfiguration config){
-        boolean isDefault = config.getConfigurationSection("biomes." + biome.name()) == null;
+    private void setRewards(RewardFactory rewardFactory) {
+        ConfigManager configManager = main.getConfigManager();
+        FileConfiguration config = main.getConfig();
+        boolean isDefault = config.getConfigurationSection(path) == null;
         if (configManager.isDebugMode()) Utils.debugMsg("", biomeName + "&e is default: " + isDefault);
 
         if (isDefault) {
@@ -38,12 +52,11 @@ public class BiomeData {
             rewards.putAll(configManager.getDefaultRewards());
 
         } else {
-            String biomeName = biome.name();
-
-            for (String key : config.getConfigurationSection("biomes." + biomeName).getKeys(false)) {
+            for (String key : config.getConfigurationSection(path + ".levels").getKeys(false)) {
                 int level = Integer.parseInt(key);
-                levels.put(level, config.getInt("biomes." + biomeName + "." + level + ".target_duration"));
-                rewards.put(level, rewardFactory.create("biomes." + biomeName + "." + level + "."));
+                String extendedPath = path + ".levels." + level + ".";
+                levels.put(level, config.getInt(extendedPath + "target_duration"));
+                rewards.put(level, rewardFactory.create(extendedPath));
             }
         }
     }
@@ -65,4 +78,9 @@ public class BiomeData {
 
         return max;
     }
+
+    public void setIcon(CommandSender sender) {
+        icon = configGUIManager.getIconFactory().createIcon(path, sender, configGUIManager.getBiomePageSettings());
+    }
+
 }

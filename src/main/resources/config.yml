@@ -35,6 +35,103 @@ settings:
   # Default: null
   levelup_sound: null
 
+gui:
+  # These are icons that will be displayed on all pages
+  generic_icons:
+    next_page:
+      type: block # Valid types: block, texture
+      value: SPECTRAL_ARROW
+      display_name: "&eNext Page (%next_page_number%)"
+      slot: 50
+    prev_page:
+      type: block
+      value: SPECTRAL_ARROW
+      display_name: "&ePrevious Page (%prev_page_number%)"
+      slot: 48
+      lore:
+        - ""
+        - "&fclick me"
+    close:
+      type: block
+      value: BARRIER
+      display_name: "&cClose"
+      slot: 49
+      lore:
+        - ""
+        - "&7Click me to close the menu"
+
+  # When using the /biome command (The GUI)
+  main_page:
+    # What do you want the title of the GUI tp be
+    # Default: " "
+    title: "#1baecf&lBiome Info"
+
+    # Default: 54
+    size: 54
+
+    # Here you can edit the different icons
+    info_icon:
+      type: block
+      value: player_head
+      display_name: "&2Your biome info"
+      slot: 4
+      lore:
+        - ""
+        - "&%progress_bar%"
+    filler_icon:
+      type: block
+      value: LIME_STAINED_GLASS_PANE
+      slot: [ 0, 1, 2, 3, 5, 6, 7, 8, 9, 17, 18, 26, 27, 35, 36, 44, 45, 46, 47, 51, 52, 53 ]
+      display_name: "&8"
+    default_biome_icon:
+      type: block
+      value: GOLD_BLOCK
+      quantity: 2
+      slot: [ 10, 12, 14, 16, 20, 22, 24, 28, 30, 32, 34, 38, 40, 42 ]
+      display_name: "&b%biome%"
+      lore:
+        - ""
+        - "&bLevel: %level%"
+        - "&bProgress: %progress%"
+        - ""
+        - "&fClick for reward details"
+
+
+  # When clicking on a biome in the main page
+  secondary_page:
+    # What do you want the title of the GUI tp be
+    # Default: " "
+    title: "#1baecf&lReward Info"
+
+    # Default: 5
+    size: 54
+
+    # Here you can edit the different icons
+    info_icon:
+      type: block
+      value: player_head
+      display_name: "&2%biome% reward info"
+      slot: 4
+      lore:
+        - ""
+        - "&bExample"
+    filler_icon:
+      type: block
+      value: LIME_STAINED_GLASS_PANE
+      slot: [ 0, 1, 2, 3, 5, 6, 7, 8, 9, 17, 18, 26, 27, 35, 36, 44, 45, 46, 47, 51, 52, 53 ]
+      display_name: "&8"
+    default_reward_icon:
+      type: block
+      value: DIRT
+      slot: [ 20, 21, 22, 23, 24, 29, 30, 31, 32, 33, 38, 39, 40, 41, 42 ]
+      display_name: "&bReward %level%"
+      lore:
+        - ""
+        - "&b%reward%"
+        - ""
+        - "&f%reward_status%"
+
+
 default_biome_settings:
   # List the worlds you want this plugin to work on
   enabled_worlds:
@@ -48,7 +145,7 @@ default_biome_settings:
   # If the above setting is false: List biomes that you DON'T want rewards for
   # If the above setting is true: List biomes that you DO want rewards for
   biomes_blacklist:
-    - PLAINS
+    - BADLANDS
 
   # The default settings for each biomes rewards/levels.
   # If the Biome is not specified in the "biomes" section
@@ -65,7 +162,8 @@ default_biome_settings:
       reward_type: potion # Valid types: potion, effect, item, permission, command, experience, currency, null
       reward_item: jump:2 #potion effect:amplifier:duration
 
-# Anything set in here will override the default settings
+
+# Anything set in here will override the default settings and the gui default biome icon settings
 # Use this if you want specific perks for a certain biome
 # Make sure the biome name is from this list: https://hub.spigotmc.org/javadocs/spigot/org/bukkit/block/Biome.html
 biomes:
@@ -79,72 +177,105 @@ biomes:
   # be removed once the player leaves that biome
 
   FOREST:
-    '1':
-      type: multi-use # Valid types: singular or multi-use (Only needed for potion + effect reward types)
-      target_duration: 60 # seconds
-      reward_type: potion # Valid types: potion, effect, item, permission, command, experience, currency, null
-      reward_item: jump:2 #potion effect:amplifier
-    '2':
-      type: singular # Valid types: singular or multi-use (Only needed for potion + effect reward types)
-      target_duration: 60 # seconds
-      reward_type: effect # Valid types: potion, effect, item, permission, command, experience, currency, null
-      reward_item: free_food # Valid effects: speed_swimmer, lava_swimmer, free_food
-    '3':
-      target_duration: 60 # seconds
-      reward_type: item
-      reward_item: apple:5 # material:quantity
+    gui:
+      type: block # Valid types: vanilla, texture, player_head
+      value: oak_sapling
+      display_name: "&b%biome%"
+      lore:
+        - ""
+        - "&bLevel: %level%"
+        - "&bProgress: %progress%"
+        - ""
+        - "&fClick for reward details"
+    levels:
+      '1':
+        type: multi-use # Valid types: singular or multi-use (Only needed for potion + effect reward types)
+        target_duration: 60 # seconds
+        reward_type: potion # Valid types: potion, effect, item, permission, command, experience, currency, null
+        reward_item: jump:2 #potion effect:amplifier
+      '2':
+        type: singular # Valid types: singular or multi-use (Only needed for potion + effect reward types)
+        target_duration: 60 # seconds
+        reward_type: effect # Valid types: potion, effect, item, permission, command, experience, currency, null
+        reward_item: free_food # Valid effects: speed_swimmer, lava_swimmer, free_food
+      '3':
+        target_duration: 60 # seconds
+        reward_type: item
+        reward_item: apple:5 # material:quantity
 
   PLAINS:
-    '1':
-      type: multi-use # Valid types: singular or multi-use (Only needed for potion + effect reward types)
-      target_duration: 60 # seconds
-      reward_type: potion # Valid types: potion, effect, item, permission, command, experience, currency, null
-      reward_item: jump:2 #potion effect:amplifier
-    '2':
-      type: singular # Valid types: singular or multi-use (Only needed for potion + effect reward types)
-      target_duration: 60 # seconds
-      reward_type: effect # Valid types: potion, effect, item, permission, command, experience, currency, null
-      reward_item: speed_swimmer # Valid effects: speed_swimmer, lava_swimmer, free_food
-    '3':
-      target_duration: 60 # seconds
-      reward_type: item
-      reward_item: apple:5 # material:quantity
-    '4':
-      target_duration: 60
-      reward_type: currency
-      reward_item: 2000 # Amount
-    '5':
-      target_duration: 60
-      reward_type: command
-      reward_item: give %player% apple 2 # Use placeholder %player%
-      reward_description: '&dCustom &6Description' # 'reward_description' Only valid on command reward types
-    '6':
-      target_duration: 60
-      reward_type: experience
-      reward_item: 10 # How many experience levels to give
+    gui:
+      type: block # Valid types: vanilla, texture, player_head
+      value: oak_sapling
+      display_name: "&b%biome%"
+      lore:
+        - ""
+        - "&bLevel: %level%"
+        - "&bProgress: %progress%"
+        - ""
+        - "&fClick for reward details"
+    levels:
+      '1':
+        type: multi-use # Valid types: singular or multi-use (Only needed for potion + effect reward types)
+        target_duration: 60 # seconds
+        reward_type: potion # Valid types: potion, effect, item, permission, command, experience, currency, null
+        reward_item: jump:2 #potion effect:amplifier
+      '2':
+        type: singular # Valid types: singular or multi-use (Only needed for potion + effect reward types)
+        target_duration: 60 # seconds
+        reward_type: effect # Valid types: potion, effect, item, permission, command, experience, currency, null
+        reward_item: speed_swimmer # Valid effects: speed_swimmer, lava_swimmer, free_food
+      '3':
+        target_duration: 60 # seconds
+        reward_type: item
+        reward_item: apple:5 # material:quantity
+      '4':
+        target_duration: 60
+        reward_type: currency
+        reward_item: 2000 # Amount
+      '5':
+        target_duration: 60
+        reward_type: command
+        reward_item: give %player% apple 2 # Use placeholder %player%
+        reward_description: '&dCustom &6Description' # 'reward_description' Only valid on command reward types
+      '6':
+        target_duration: 60
+        reward_type: experience
+        reward_item: 10 # How many experience levels to give
 
   FLOWER_FOREST:
-    '1':
-      type: singular
-      target_duration: 60
-      reward_type: potion
-      reward_item: jump:2
-    '2':
-      type: singular
-      target_duration: 60
-      reward_type: effect
-      reward_item: lava_swimmer
-    '3':
-      target_duration: 60
-      reward_type: item
-      reward_item: apple:5
-    '4':
-      target_duration: 60
-      reward_type: experience
-      reward_item: 10
-    '5':
-      target_duration: 60
-      reward_type: command
-      reward_item: give %player% apple 2
-      reward_description: '&dCustom &6Description'
+    gui:
+      type: block # Valid types: vanilla, texture, player_head
+      value: oak_sapling
+      display_name: "&b%biome%"
+      lore:
+        - ""
+        - "&bLevel: %level%"
+        - "&bProgress: %progress%"
+        - ""
+        - "&fClick for reward details"
+    levels:
+      '1':
+        type: singular
+        target_duration: 60
+        reward_type: potion
+        reward_item: jump:2
+      '2':
+        type: singular
+        target_duration: 60
+        reward_type: effect
+        reward_item: lava_swimmer
+      '3':
+        target_duration: 60
+        reward_type: item
+        reward_item: apple:5
+      '4':
+        target_duration: 60
+        reward_type: experience
+        reward_item: 10
+      '5':
+        target_duration: 60
+        reward_type: command
+        reward_item: give %player% apple 2
+        reward_description: '&dCustom &6Description'
 

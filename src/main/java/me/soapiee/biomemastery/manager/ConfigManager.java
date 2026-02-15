@@ -6,8 +6,8 @@ import me.soapiee.biomemastery.BiomeMastery;
 import me.soapiee.biomemastery.logic.effects.EffectInterface;
 import me.soapiee.biomemastery.logic.rewards.Reward;
 import me.soapiee.biomemastery.logic.rewards.RewardFactory;
-import me.soapiee.biomemastery.util.CustomLogger;
-import me.soapiee.biomemastery.util.Message;
+import me.soapiee.biomemastery.utils.CustomLogger;
+import me.soapiee.biomemastery.utils.Message;
 import org.bukkit.Bukkit;
 import org.bukkit.Sound;
 import org.bukkit.World;
@@ -104,7 +104,6 @@ public class ConfigManager {
     }
 
     public void reload(BiomeMastery main, DataManager dataManager) {
-        main.reloadConfig();
         config = main.getConfig();
         debugMode = config.getBoolean("debug_mode", false);
         updateNotif = config.getBoolean("settings.plugin_update_notification", true);

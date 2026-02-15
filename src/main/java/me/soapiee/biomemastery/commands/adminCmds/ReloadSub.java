@@ -2,8 +2,8 @@ package me.soapiee.biomemastery.commands.adminCmds;
 
 import lombok.Getter;
 import me.soapiee.biomemastery.BiomeMastery;
-import me.soapiee.biomemastery.util.Message;
-import me.soapiee.biomemastery.util.Utils;
+import me.soapiee.biomemastery.utils.Message;
+import me.soapiee.biomemastery.utils.Utils;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -32,8 +32,10 @@ public class ReloadSub extends AbstractAdminSub {
         String reloadOutcome = messageManager.get(Message.RELOADSUCCESS);
 
         boolean errors = false;
+        main.reloadConfig();
         main.getDataManager().reloadData(main);
         if (!messageManager.load(sender)) errors = true;
+        if (!reloadGUI(sender)) errors = true;
 
         if (errors) reloadOutcome = messageManager.get(Message.RELOADERROR);
 
@@ -42,6 +44,12 @@ public class ReloadSub extends AbstractAdminSub {
         }
 
         sendMessage(sender, reloadOutcome);
+    }
+
+    private boolean reloadGUI(CommandSender sender){
+        main.getGuiManager().closeAll();
+        main.getConfigGUIManager().reload(sender);
+        return true;
     }
 
     @Override

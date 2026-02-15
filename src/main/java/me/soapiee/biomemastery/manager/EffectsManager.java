@@ -2,8 +2,8 @@ package me.soapiee.biomemastery.manager;
 
 import lombok.Getter;
 import me.soapiee.biomemastery.BiomeMastery;
-import me.soapiee.biomemastery.util.CustomLogger;
-import me.soapiee.biomemastery.util.Message;
+import me.soapiee.biomemastery.utils.CustomLogger;
+import me.soapiee.biomemastery.utils.Message;
 import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.file.YamlConfiguration;
 

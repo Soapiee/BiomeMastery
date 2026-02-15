@@ -8,7 +8,7 @@ import me.soapiee.biomemastery.manager.ConfigManager;
 import me.soapiee.biomemastery.manager.DataManager;
 import me.soapiee.biomemastery.manager.MessageManager;
 import me.soapiee.biomemastery.manager.PlayerDataManager;
-import me.soapiee.biomemastery.util.Utils;
+import me.soapiee.biomemastery.utils.Utils;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.block.Biome;
 import org.bukkit.entity.Player;

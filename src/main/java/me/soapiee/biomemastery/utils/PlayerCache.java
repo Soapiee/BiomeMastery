@@ -1,4 +1,4 @@
-package me.soapiee.biomemastery.util;
+package me.soapiee.biomemastery.utils;
 
 import lombok.Getter;
 import org.bukkit.OfflinePlayer;

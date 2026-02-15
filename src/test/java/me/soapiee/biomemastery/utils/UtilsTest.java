@@ -1,4 +1,4 @@
-package me.soapiee.biomemastery.util;
+package me.soapiee.biomemastery.utils;
 
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;

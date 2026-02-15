@@ -1,4 +1,4 @@
-package me.soapiee.biomemastery.util;
+package me.soapiee.biomemastery.utils;
 
 import lombok.Getter;
 
@@ -60,6 +60,8 @@ public enum Message {
     INVALIDCOMMAND("invalid_field_command", "command"),
     INVALIDSOUND("invalid_field_sound", "&cThe input (\"\"%input%\"\") for the level up sound is invalid. No sound will be played."),
     INVALIDCONFLICTTYPE("invalid_field_effect_conflict", "&cThe effect %effect% has an invalid conflict (\"\"%input%\"\")"),
+    INVALIDGUIMATERIAL("invalid_field_gui_material", "&cThere is an invalid material for %invalid_field%"),
+    INVALIDGUISLOT("invalid_field_gui_slot", "&cThere are no GUI slots set for %invalid_field%"),
 
     //                    --->    PLAYER CMD MESSAGES    <---
     PLAYERHELP("player_help", "#01d54a--------- BiomeMastery Help ---------"
@@ -95,7 +97,9 @@ public enum Message {
     REWARDCLAIMED("reward_status_claimed", "&5Claimed"),
     REWARDCLAIMINBIOME("reward_claimable_in_biome", "&5Claimable when in the %biome% biome"),
     REWARDACTIVATE("reward_status_activate", "&5Use &l/biome reward &5to activate"),
+    REWARDGUIACTIVATE("reward_status_gui_activate", "&5Click to activate"),
     REWARDDEACTIVATE("reward_status_deactivate", "&5Use &l/biome reward &5to de-activate"),
+    REWARDGUIDEACTIVATE("reward_status_gui_deactivate", "&5Click to de-activate"),
     CMDONCOOLDOWN("command_on_cooldown", "&cYou must wait &e%cooldown% &cbefore you can use this command again"),
     LEVELLEDUP("levelled_up", "&aYou levelled up to level &e%level% &ain the %biome% &e&abiome"),
     REWARDCONFLICT("reward_conflict", "&cYou cannot apply the %conflicting_effect% &cwith the %effect% &calready active"),

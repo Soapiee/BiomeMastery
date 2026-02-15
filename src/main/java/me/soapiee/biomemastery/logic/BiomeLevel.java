@@ -4,7 +4,7 @@ import lombok.Getter;
 import lombok.Setter;
 import me.soapiee.biomemastery.logic.events.LevelUpEvent;
 import me.soapiee.biomemastery.logic.rewards.Reward;
-import me.soapiee.biomemastery.util.Utils;
+import me.soapiee.biomemastery.utils.Utils;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.block.Biome;
@@ -21,9 +21,7 @@ public class BiomeLevel {
     private final BiomeData biomeData;
     @Getter private int level;
     @Getter private long progress;
-    @Getter
-    @Setter
-    private LocalDateTime entryTime;
+    @Getter @Setter private LocalDateTime entryTime;
 
     public BiomeLevel(@NotNull OfflinePlayer player, BiomeData biomeData, int level, int progress) {
         this.player = player;
@@ -65,7 +63,7 @@ public class BiomeLevel {
             LevelUpEvent event = new LevelUpEvent(player, level, this);
             Bukkit.getPluginManager().callEvent(event);
 
-            if (biomeData.getMaxLevel() == level) {
+            if (level >= biomeData.getMaxLevel()) {
                 progress = 0;
                 clearEntryTime();
                 return 2;
@@ -104,14 +102,6 @@ public class BiomeLevel {
         }
     }
 
-    public void initialiseProgress(long newProgress) {
-        synchronized (lock) {
-            if (newProgress < 0) newProgress = 0;
-
-            progress = newProgress;
-        }
-    }
-
     public void reset() {
         level = 0;
         progress = 0;
@@ -119,7 +109,7 @@ public class BiomeLevel {
     }
 
     public boolean isMaxLevel() {
-        return level == biomeData.getMaxLevel();
+        return level >= biomeData.getMaxLevel();
     }
 
     public Reward getReward(int level) {

@@ -11,10 +11,8 @@ import me.soapiee.biomemastery.logic.rewards.types.EffectReward;
 import me.soapiee.biomemastery.logic.rewards.types.PotionReward;
 import me.soapiee.biomemastery.manager.BiomeDataManager;
 import me.soapiee.biomemastery.manager.ConfigManager;
-import me.soapiee.biomemastery.manager.PlayerDataManager;
-import me.soapiee.biomemastery.util.CustomLogger;
-import me.soapiee.biomemastery.util.Message;
-import me.soapiee.biomemastery.util.Utils;
+import me.soapiee.biomemastery.utils.Message;
+import me.soapiee.biomemastery.utils.Utils;
 import org.bukkit.block.Biome;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.ConsoleCommandSender;
@@ -45,12 +43,10 @@ public class RewardSub extends AbstractUsageSub {
         Biome biome = validateBiome(sender, args, label);
         if (biome == null) return;
 
-        PlayerDataManager playerDataManager = main.getDataManager().getPlayerDataManager();
-        CustomLogger logger = main.getCustomLogger();
         playerDataManager.getOrLoad((Player) sender)
                 .thenAcceptAsync(data -> toggleReward(data, biome, args[2], label), BukkitExecutor.sync(main))
                 .exceptionally(error -> {
-                    logger.logToPlayer(sender, error, Utils.addColour(messageManager.getWithPlaceholder(Message.DATAERROR, sender.getName())));
+                    customLogger.logToPlayer(sender, error, Utils.addColour(messageManager.getWithPlaceholder(Message.DATAERROR, sender.getName())));
                     return null;
                 });
     }

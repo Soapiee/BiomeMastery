@@ -1,4 +1,4 @@
-package me.soapiee.biomemastery.util;
+package me.soapiee.biomemastery.utils;
 
 import net.md_5.bungee.api.ChatColor;
 import org.bukkit.Bukkit;
@@ -95,10 +95,10 @@ public final class Utils {
 
         StringBuilder s = new StringBuilder();
         for (int i = 0; i < barsFilled; i++) {
-            s.append(org.bukkit.ChatColor.GREEN).append("■");
+            s.append(ChatColor.GREEN).append("■");
         }
         for (int i = 0; i < (totalBars - barsFilled); i++) {
-            s.append(org.bukkit.ChatColor.GRAY).append("■");
+            s.append(ChatColor.GRAY).append("■");
         }
 
         return s.toString();

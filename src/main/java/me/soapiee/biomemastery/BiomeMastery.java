@@ -6,18 +6,12 @@ import me.soapiee.biomemastery.commands.UsageCmd;
 import me.soapiee.biomemastery.data.PlayerData;
 import me.soapiee.biomemastery.hooks.PlaceHolderAPIHook;
 import me.soapiee.biomemastery.hooks.VaultHook;
-import me.soapiee.biomemastery.listeners.EffectsListener;
-import me.soapiee.biomemastery.listeners.LevelUpListener;
-import me.soapiee.biomemastery.listeners.PlayerListener;
-import me.soapiee.biomemastery.listeners.PotionRemovalListener;
-import me.soapiee.biomemastery.manager.DataManager;
-import me.soapiee.biomemastery.manager.MessageManager;
-import me.soapiee.biomemastery.manager.PlayerDataManager;
-import me.soapiee.biomemastery.manager.UpdateManager;
-import me.soapiee.biomemastery.util.CustomLogger;
-import me.soapiee.biomemastery.util.Message;
-import me.soapiee.biomemastery.util.PlayerCache;
-import me.soapiee.biomemastery.util.Utils;
+import me.soapiee.biomemastery.listeners.*;
+import me.soapiee.biomemastery.manager.*;
+import me.soapiee.biomemastery.utils.CustomLogger;
+import me.soapiee.biomemastery.utils.Message;
+import me.soapiee.biomemastery.utils.PlayerCache;
+import me.soapiee.biomemastery.utils.Utils;
 import org.bstats.bukkit.Metrics;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
@@ -30,11 +24,14 @@ import java.io.IOException;
 
 public class BiomeMastery extends JavaPlugin {
 
-    @Getter private DataManager dataManager;
-    @Getter private MessageManager messageManager;
     @Getter private PlayerCache playerCache;
-    private VaultHook vaultHook;
+    @Getter private MessageManager messageManager;
     @Getter private CustomLogger customLogger;
+    @Getter private ConfigManager configManager;
+    @Getter private GUIManager guiManager;
+    @Getter private ConfigGUIManager configGUIManager;
+    @Getter private DataManager dataManager;
+    private VaultHook vaultHook;
     @Getter private EffectsListener effectsListener;
     @Getter private UpdateManager updateChecker;
 
@@ -55,6 +52,9 @@ public class BiomeMastery extends JavaPlugin {
         messageManager = new MessageManager(this);
         customLogger = new CustomLogger(this);
         messageManager.setCustomLogger(customLogger);
+        configGUIManager = new ConfigGUIManager(this);
+        configManager = new ConfigManager(this);
+        guiManager = new GUIManager();
 
         dataManager = new DataManager(this);
 
@@ -73,15 +73,13 @@ public class BiomeMastery extends JavaPlugin {
         getServer().getPluginManager().registerEvents(effectsListener, this);
 
         dataManager.initialiseRewards(this);
-        dataManager.initialiseBiomeData(getConfig());
+        dataManager.initialiseBiomeData(this);
         dataManager.startChecker(this);
 
-        PlayerListener playerListener = new PlayerListener(this, dataManager);
-        getServer().getPluginManager().registerEvents(playerListener, this);
-        PotionRemovalListener potionRemovalListener = new PotionRemovalListener(dataManager.getPlayerDataManager());
-        getServer().getPluginManager().registerEvents(potionRemovalListener, this);
-        LevelUpListener levelUpListener = new LevelUpListener(messageManager, customLogger, dataManager);
-        getServer().getPluginManager().registerEvents(levelUpListener, this);
+        getServer().getPluginManager().registerEvents(new PlayerListener(this, dataManager), this);
+        getServer().getPluginManager().registerEvents(new PotionRemovalListener(dataManager.getPlayerDataManager()), this);
+        getServer().getPluginManager().registerEvents(new LevelUpListener(messageManager, customLogger, dataManager), this);
+        getServer().getPluginManager().registerEvents(new GUIListener(guiManager), this);
 
         getCommand("abiomemastery").setExecutor(new AdminCmd(this));
         getCommand("biomemastery").setExecutor(new UsageCmd(this));
