@@ -19,7 +19,7 @@ public class ProgressChecker extends BukkitRunnable {
 
     public ProgressChecker(BiomeMastery main, DataManager dataManager) {
         playerDataManager = dataManager.getPlayerDataManager();
-        configManager = dataManager.getConfigManager();
+        configManager = main.getConfigManager();
 
         long delay = configManager.getUpdateInterval();
         if (configManager.isDebugMode())

@@ -61,7 +61,7 @@ public class FreeFoodEffect extends Effect {
 
                 player.setFoodLevel(Math.min(HUNGER_MAX, oldHunger + hungerToIncrease));
 
-                if (main.getDataManager().getConfigManager().isDebugMode())
+                if (main.getConfigManager().isDebugMode())
                     Utils.debugMsg(player.getName(), ChatColor.BLUE.toString() + hungerToIncrease + " hunger added");
 
             }

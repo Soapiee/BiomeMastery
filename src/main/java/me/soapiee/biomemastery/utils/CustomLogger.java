@@ -17,8 +17,8 @@ import java.util.concurrent.CompletionException;
 
 public class CustomLogger {
 
-    private final MessageManager messageManager;
     private final BiomeMastery main;
+    private final MessageManager messageManager;
     private final File logFile;
 
     public CustomLogger(BiomeMastery main) {
@@ -50,9 +50,9 @@ public class CustomLogger {
             writer.write(System.lineSeparator());
             writer.write(time + " [" + logType.name() + "] " + string);
             writer.write(System.lineSeparator());
-            writer.write(messageManager.get(Message.PLUGINVERSIONSTRING) + Bukkit.getPluginManager().getPlugin("BiomeMastery").getDescription().getVersion());
+            writer.write("BiomeMastery Version: " + Bukkit.getPluginManager().getPlugin("BiomeMastery").getDescription().getVersion());
             writer.write(System.lineSeparator());
-            writer.write(messageManager.get(Message.SERVERVERSIONSTRING) + Bukkit.getBukkitVersion());
+            writer.write("Server Version: " + Bukkit.getBukkitVersion());
             writer.write(System.lineSeparator());
             if (cause != null) {
                 writer.write(System.lineSeparator());

@@ -67,7 +67,6 @@ public class MessageManager {
                 || messageEnum == Message.COOLDOWNFILELOAD || messageEnum == Message.COOLDOWNFILESAVE
                 || messageEnum == Message.PENDINGFILECREATE || messageEnum == Message.PENDINGFILELOAD
                 || messageEnum == Message.PENDINGFILESAVE || messageEnum == Message.MISSINGREWARD
-                || messageEnum == Message.PLUGINVERSIONSTRING || messageEnum == Message.SERVERVERSIONSTRING
                 || messageEnum == Message.DATABASECONNECTED || messageEnum == Message.DATABASEFAILED
                 || messageEnum == Message.FILESYSTEMACTIVATED || messageEnum == Message.FILEFOLDERERROR
                 || messageEnum == Message.LOGGERFILEERROR || messageEnum == Message.LOGGERLOGSUCCESS

@@ -24,10 +24,10 @@ public class LevelUpListener implements Listener {
     private final PendingRewardsManager pendingRewardsManager;
     private final CustomLogger logger;
 
-    public LevelUpListener(MessageManager messageManager, CustomLogger logger, DataManager dataManager) {
+    public LevelUpListener(ConfigManager configManager, MessageManager messageManager, CustomLogger logger, DataManager dataManager) {
         this.messageManager = messageManager;
         this.logger = logger;
-        configManager = dataManager.getConfigManager();
+        this.configManager = configManager;
         pendingRewardsManager = dataManager.getPendingRewardsManager();
     }
 

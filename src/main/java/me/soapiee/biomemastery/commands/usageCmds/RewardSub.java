@@ -64,7 +64,7 @@ public class RewardSub extends AbstractUsageSub {
             return null;
         }
 
-        ConfigManager configManager = main.getDataManager().getConfigManager();
+        ConfigManager configManager = main.getConfigManager();
         if (!configManager.isEnabledBiome(biome)) {
             sendMessage(sender, messageManager.getWithPlaceholder(Message.BIOMEINFODISABLED, args[1]));
             return null;
