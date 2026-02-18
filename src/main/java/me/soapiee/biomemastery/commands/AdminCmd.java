@@ -62,7 +62,7 @@ public class AdminCmd implements CommandExecutor, TabCompleter {
         if (!hasPermission(sender)) return true;
 
         if (args.length == 0) {
-            sendMessage(sender, messageManager.get(Message.ADMINHELP));
+            sendMessage(sender, messageManager.getWithPlaceholder(Message.ADMINHELP, "abm"));
             return true;
         }
 
