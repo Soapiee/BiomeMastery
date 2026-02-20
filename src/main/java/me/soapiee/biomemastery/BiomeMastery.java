@@ -51,7 +51,6 @@ public class BiomeMastery extends JavaPlugin {
         playerCache = new PlayerCache(Bukkit.getServer().getOfflinePlayers());
         messageManager = new MessageManager(this);
         customLogger = new CustomLogger(this);
-        messageManager.setCustomLogger(customLogger);
         configGUIManager = new ConfigGUIManager(this);
         configManager = new ConfigManager(this);
         guiManager = new GUIManager();
@@ -78,7 +77,7 @@ public class BiomeMastery extends JavaPlugin {
 
         getServer().getPluginManager().registerEvents(new PlayerListener(this, dataManager), this);
         getServer().getPluginManager().registerEvents(new PotionRemovalListener(dataManager.getPlayerDataManager()), this);
-        getServer().getPluginManager().registerEvents(new LevelUpListener(messageManager, customLogger, dataManager), this);
+        getServer().getPluginManager().registerEvents(new LevelUpListener(configManager, messageManager, customLogger, dataManager), this);
         getServer().getPluginManager().registerEvents(new GUIListener(guiManager), this);
 
         getCommand("abiomemastery").setExecutor(new AdminCmd(this));

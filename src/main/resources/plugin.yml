@@ -1,6 +1,6 @@
 name: BiomeMastery
 main: me.soapiee.biomemastery.BiomeMastery
-version: 1.0.7
+version: 1.0.8
 author: Soapiee
 prefix: BiomeMastery
 
@@ -31,7 +31,10 @@ permissions:
     description: Allows access to /abm reset
     default: op
   biomemastery.player:
-    description: Allows access to /biome help
+    description: Allows visibility/usability of /biome
+    default: true
+  biomemastery.player.gui:
+    description: Allows access to the GUI
     default: true
   biomemastery.player.command:
     description: Allows access to /biome help
