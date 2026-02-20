@@ -64,7 +64,7 @@ invalid_field_gui_slot: "&cEr zijn geen GUI-slots ingesteld voor %invalid_field%
 
 # # # #                --->    SPELER CMD BERICHTEN    <---                # # # #
 player_help:
-  - "#01d54a--------- BiomeMastery Help ---------"
+  - "#01d54a--------- BiomeMastery Hulp ---------"
   - "#01d54aLegenda: < > = Optioneel | [ ] = Vereist"
   - "#01d54a/%cmd_label% info <pagina> &7- Toont je bioom-niveaus"
   - "#01d54a/%cmd_label% info [speler] <pagina> &7- Toont bioom-niveaus van een andere speler"
@@ -116,7 +116,7 @@ not_inside_biome: "&cJe moet in het &e%biome% &cbioom zijn om de &e%reward% &cbe
 # # # #                --->    ADMIN CMD BERICHTEN    <---                # # # #
 update_available: "&aEr is een update beschikbaar voor BiomeMastery"
 admin_help:
-  - "#01d54a--------- BiomeMastery Admin Help ---------"
+  - "#01d54a--------- BiomeMastery Admin Hulp ---------"
   - "#01d54aLegenda: < > = Optioneel | [ ] = Vereist"
   - "#01d54a/%cmd_label% reload &7- Herlaadt de plugin"
   - "#01d54a/%cmd_label% list worlds &7- Toont alle ingeschakelde werelden"

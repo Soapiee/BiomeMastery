@@ -47,7 +47,7 @@ public class MessageManager {
         File newLangFile = new File(main.getDataFolder() + File.separator + "language", language + ".yml");
         if (!newLangFile.exists()) main.saveResource("language" + File.separator + language + ".yml", false);
 
-        File legacyFile = new File(main.getDataFolder(), "messages.yml");
+        File legacyFile = new File(main.getDataFolder() + File.separator + "messages.yml");
         if (legacyFile.exists()) {
             Utils.consoleMsg(ChatColor.RED.toString() + ChatColor.BOLD + "[IMPORTANT] " + ChatColor.RESET
                     + ChatColor.RED + "Please transfer the contents of your messages.yml file to the new language file. Located in the \"language\" folder. Then delete the messages.yml file");
