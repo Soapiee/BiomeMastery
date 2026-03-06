@@ -1,15 +1,14 @@
 package me.soapiee.biomemastery.manager;
 
-import lombok.Setter;
 import me.soapiee.biomemastery.BiomeMastery;
 import me.soapiee.biomemastery.gui.core.Path;
 import me.soapiee.biomemastery.logic.BiomeData;
 import me.soapiee.biomemastery.logic.BiomeLevel;
 import me.soapiee.biomemastery.logic.rewards.Reward;
-import me.soapiee.biomemastery.utils.CustomLogger;
+import me.soapiee.biomemastery.utils.Languages;
 import me.soapiee.biomemastery.utils.Message;
 import me.soapiee.biomemastery.utils.Utils;
-import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.file.YamlConfiguration;
 
@@ -18,43 +17,79 @@ import java.io.File;
 public class MessageManager {
 
     private final BiomeMastery main;
-    @Setter private CustomLogger customLogger;
 
     private final File file;
     private final YamlConfiguration contents;
+    private final String language;
 
     public MessageManager(BiomeMastery main) {
         this.main = main;
-        file = new File(main.getDataFolder(), "messages.yml");
+
+        //TODO: Revert code back in future updates
+//        file = new File(main.getDataFolder() + File.separator + "language", language + ".yml");
+//        contents = new YamlConfiguration();
+
+//        load(null);
+
+        String languageString = validateLanguage();
+        if (languageString == null) language = Languages.LANG_EN.toString().toLowerCase();
+        else language = languageString;
+
+        file = getFile();
         contents = new YamlConfiguration();
 
         load(null);
+
+        if (languageString == null) Utils.consoleMsg(get(Message.INVALIDLANGUAGE));
+    }
+
+    private File getFile() {
+        File newLangFile = new File(main.getDataFolder() + File.separator + "language", language + ".yml");
+        if (!newLangFile.exists()) main.saveResource("language" + File.separator + language + ".yml", false);
+
+        File legacyFile = new File(main.getDataFolder() + File.separator + "messages.yml");
+        if (legacyFile.exists()) {
+            Utils.consoleMsg(ChatColor.RED.toString() + ChatColor.BOLD + "[IMPORTANT] " + ChatColor.RESET
+                    + ChatColor.RED + "Please transfer the contents of your messages.yml file to the new language file. Located in the \"language\" folder. Then delete the messages.yml file");
+            return legacyFile;
+        }
+
+        return newLangFile;
+    }
+
+    private String validateLanguage() {
+        String configString = main.getConfig().getString("settings.language", "lang_en");
+
+        Languages lang;
+        try {
+            lang = Languages.valueOf(configString.toUpperCase());
+        } catch (IllegalArgumentException error) {
+            return null;
+        }
+
+        return lang.toString().toLowerCase();
     }
 
     public boolean load(CommandSender sender) {
-        if (!file.exists()) {
-            main.saveResource("messages.yml", false);
-        }
+        //TODO: Revert code back in future updates
+//        if (!file.exists()) main.saveResource("language" + File.separator + language + ".yml", false);
 
         try {
             contents.load(file);
         } catch (Exception ex) {
             if (sender != null) {
-//                customLogger.logToPlayer(sender, ex, get(Message.MESSAGESFILEERROR));
-                Utils.consoleMsg(get(Message.MESSAGESFILEERROR));
-                Bukkit.getLogger().throwing("Message Manager", "load()", ex);
-            }
+                main.getCustomLogger().logToPlayer(sender, ex, get(Message.LANGUAGEFILEERROR));
+            } else ex.printStackTrace();
             return false;
         }
         return true;
     }
 
-    public void save() {
+    private void save() {
         try {
             contents.save(file);
-            contents.load(file);
         } catch (Exception ex) {
-            customLogger.logToFile(ex, get(Message.MESSAGESFIELDERROR));
+            main.getCustomLogger().logToFile(ex, get(Message.LANGUAGEFIELDERROR));
         }
     }
 
@@ -62,7 +97,8 @@ public class MessageManager {
         if (messageEnum == Message.UPDATEAVAILABLE
                 || messageEnum == Message.HOOKEDPLACEHOLDERAPI || messageEnum == Message.HOOKEDVAULT
                 || messageEnum == Message.HOOKEDVAULTERROR || messageEnum == Message.MAJORDATAERROR
-                || messageEnum == Message.MESSAGESFILEERROR || messageEnum == Message.MESSAGESFIELDERROR
+                || messageEnum == Message.INVALIDLANGUAGE
+                || messageEnum == Message.LANGUAGEFIELDERROR || messageEnum == Message.LANGUAGEFILEERROR
                 || messageEnum == Message.DATASAVEERROR || messageEnum == Message.COOLDOWNFILECREATE
                 || messageEnum == Message.COOLDOWNFILELOAD || messageEnum == Message.COOLDOWNFILESAVE
                 || messageEnum == Message.PENDINGFILECREATE || messageEnum == Message.PENDINGFILELOAD
@@ -134,12 +170,17 @@ public class MessageManager {
 
         int currentLevel = biomeLevel.getLevel();
 
-        if (message.contains("%biome%")) message = message.replace("%biome%", Utils.capitalise(biomeData.getBiomeName()));
+        if (message.contains("%biome%"))
+            message = message.replace("%biome%", Utils.capitalise(biomeData.getBiomeName()));
         if (message.contains("%player_name%")) message = message.replace("%player_name%", playerName);
-        if (message.contains("%player_level%")) message = message.replace("%player_level%", String.valueOf(currentLevel));
-        if (message.contains("%biome_max_level%")) message = message.replace("%biome_max_level%", String.valueOf(biomeData.getMaxLevel()));
-        if (message.contains("%player_progress%")) message = message.replace("%player_progress%", Utils.formatTargetDuration(biomeLevel.getProgress()));
-        if (message.contains("%target_duration_formatted%")) message = message.replace("%target_duration_formatted%", Utils.formatTargetDuration(biomeData.getTargetDuration(currentLevel)));
+        if (message.contains("%player_level%"))
+            message = message.replace("%player_level%", String.valueOf(currentLevel));
+        if (message.contains("%biome_max_level%"))
+            message = message.replace("%biome_max_level%", String.valueOf(biomeData.getMaxLevel()));
+        if (message.contains("%player_progress%"))
+            message = message.replace("%player_progress%", Utils.formatTargetDuration(biomeLevel.getProgress()));
+        if (message.contains("%target_duration_formatted%"))
+            message = message.replace("%target_duration_formatted%", Utils.formatTargetDuration(biomeData.getTargetDuration(currentLevel)));
 
         return message;
     }
@@ -165,7 +206,8 @@ public class MessageManager {
 
         if (message.contains("%player_name%")) message = message.replace("%player_name%", string2);
         if (message.contains("%reward%")) message = message.replace("%reward%", string2);
-        if (message.contains("%biome%")) message = message.replace("%biome%", (string1.equals("levels") ? "default" : string1));
+        if (message.contains("%biome%"))
+            message = message.replace("%biome%", (string1.equals("levels") ? "default" : string1));
         if (message.contains("%config_level%")) message = message.replace("%config_level%", string2);
         if (message.contains("%conflicting_effect%")) message = message.replace("%conflicting_effect%", string1);
         if (message.contains("%effect%")) message = message.replace("%effect%", string2);
@@ -178,7 +220,8 @@ public class MessageManager {
         if (message == null) return null;
 
         if (message.contains("%level%")) message = message.replace("%level%", String.valueOf(value));
-        if (message.contains("%level_formatted%")) message = message.replace("%level_formatted%", value + (value > 1 ? " levels" : " level"));
+        if (message.contains("%level_formatted%"))
+            message = message.replace("%level_formatted%", value + (value > 1 ? " levels" : " level"));
         if (message.contains("%progress%")) message = message.replace("%progress%", Utils.formatTargetDuration(value));
         if (message.contains("%max_level%")) message = message.replace("%max_level%", String.valueOf(value));
         if (message.contains("%input%")) message = message.replace("%input%", input);
@@ -192,7 +235,8 @@ public class MessageManager {
         String message = get(messageEnum);
         if (message == null) return null;
 
-        if (message.contains("%current_page%")) message = message.replace("%current_page%", String.valueOf(currentPage));
+        if (message.contains("%current_page%"))
+            message = message.replace("%current_page%", String.valueOf(currentPage));
         if (message.contains("%total_pages%")) message = message.replace("%total_pages%", String.valueOf(totalPages));
         if (message.contains("%input%")) message = message.replace("%input%", String.valueOf(currentPage));
 
@@ -216,7 +260,8 @@ public class MessageManager {
         if (message == null) return null;
 
         if (message.contains("%level%")) message = message.replace("%level%", String.valueOf(integer));
-        if (message.contains("%cooldown%")) message = message.replace("%cooldown%", integer + (integer > 1 ? " seconds" : " second"));
+        if (message.contains("%cooldown%"))
+            message = message.replace("%cooldown%", integer + (integer > 1 ? " seconds" : " second"));
         if (message.contains("%current_level%")) message = message.replace("%current_level%", String.valueOf(integer));
         if (message.contains("%input%")) message = message.replace("%input%", String.valueOf(integer));
 
@@ -227,9 +272,11 @@ public class MessageManager {
         String message = get(messageEnum);
         if (message == null) return null;
 
-        if (message.contains("%level%")) message = message.replace("%level%", integer + (integer > 1 ? " levels" : " level"));
+        if (message.contains("%level%"))
+            message = message.replace("%level%", integer + (integer > 1 ? " levels" : " level"));
         if (message.contains("%value%")) message = message.replace("%value%", String.valueOf(integer));
-        if (message.contains("%progress%")) message = message.replace("%progress%", Utils.formatTargetDuration(integer));
+        if (message.contains("%progress%"))
+            message = message.replace("%progress%", Utils.formatTargetDuration(integer));
         if (message.contains("%biome%")) message = message.replace("%biome%", biomeName);
         if (message.contains("%player_name%")) message = message.replace("%player_name%", playerName);
 
@@ -240,7 +287,8 @@ public class MessageManager {
         String message = get(messageEnum);
         if (message == null) return null;
 
-        if (message.contains("%biome%")) message = message.replace("%biome%", (string1.equals("levels") ? "DEFAULT" : string1));
+        if (message.contains("%biome%"))
+            message = message.replace("%biome%", (string1.equals("levels") ? "DEFAULT" : string1));
         if (message.contains("%config_level%")) message = message.replace("%config_level%", string2);
         if (message.contains("%invalid_field%")) message = message.replace("%invalid_field%", get(invalidObject));
 

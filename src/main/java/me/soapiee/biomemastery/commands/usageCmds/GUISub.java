@@ -17,6 +17,7 @@ import java.util.List;
 public class GUISub extends AbstractUsageSub {
 
     @Getter private final String IDENTIFIER = "gui";
+    private final String PERMISSION = "biomemastery.player.gui";
 
     private final GUIManager guiManager;
     private final int totalPages;
@@ -33,6 +34,11 @@ public class GUISub extends AbstractUsageSub {
     public void execute(CommandSender sender, String label, String[] args) {
         if (sender instanceof ConsoleCommandSender) {
             sendMessage(sender, Utils.addColour(messageManager.get(Message.MUSTBEPLAYERERROR)));
+            return;
+        }
+
+        if (!checkPermission(sender, PERMISSION)) {
+            sendMessage(sender, messageManager.get(Message.NOPERMISSION));
             return;
         }
 
