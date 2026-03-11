@@ -56,13 +56,13 @@ public class ConfigManager {
         enabledBiomes.addAll(setUpEnabledBiomes());
     }
 
-    private Sound validateSound(String string){
+    private Sound validateSound(String string) {
         if (string == null || string.equalsIgnoreCase("null")) return null;
 
         Sound sound;
         try {
             sound = Sound.valueOf(string);
-        } catch (IllegalArgumentException error){
+        } catch (IllegalArgumentException error) {
             sound = null;
             customLogger.logToFile(error, messageManager.getWithPlaceholder(Message.INVALIDSOUND, string));
         }
@@ -230,11 +230,11 @@ public class ConfigManager {
         return enabledBiomes.contains(biome);
     }
 
-    public List<Biome> generateEnabledBiomesList(){
+    public List<Biome> generateEnabledBiomesList() {
         return setUpEnabledBiomes();
     }
 
-    public List<World> generateEnabledWorldsList(){
+    public List<World> generateEnabledWorldsList() {
         return setUpEnabledWords();
     }
 }

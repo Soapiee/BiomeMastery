@@ -12,7 +12,7 @@ import me.soapiee.biomemastery.utils.Message;
 import org.bukkit.Material;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.potion.PotionType;
+import org.bukkit.potion.PotionEffectType;
 
 import java.util.ArrayList;
 
@@ -73,24 +73,28 @@ public class RewardFactory {
 
     private Reward potionReward(String path) {
         String[] potionParts = config.getString(path + "reward_item").split(":");
-        PotionType potionType;
         int amplifier;
+        PotionEffectType effectType;
 
         try {
-            amplifier = Integer.parseInt(potionParts[1]);
-            potionType = PotionType.valueOf(potionParts[0].toUpperCase());
-        } catch (IllegalArgumentException error) {
-            if (error instanceof NumberFormatException)
-                createLog(path, error, Message.INVALIDPOTIONAMP);
-            else
-                createLog(path, error, Message.INVALIDPOTIONTYPE);
+            effectType = PotionEffectType.ABSORPTION;
+//            effectType = Registry.EFFECT.match(potionParts[0].toUpperCase());
+            if (effectType == null) throw new IllegalArgumentException();
 
+            amplifier = Integer.parseInt(potionParts[1]);
+
+        } catch (NumberFormatException e) {
+            createLog(path, e, Message.INVALIDPOTIONAMP);
+            return new NullReward();
+
+        } catch (IllegalArgumentException | NullPointerException e) {
+            createLog(path, e, Message.INVALIDPOTIONTYPE);
             return new NullReward();
         }
 
         String singular = config.getString(path + "type", "singular");
 
-        return new PotionReward(main, playerDataManager, potionType, amplifier, (singular.equalsIgnoreCase("singular")));
+        return new PotionReward(main, playerDataManager, effectType, amplifier, (singular.equalsIgnoreCase("singular")));
     }
 
     private Reward effectReward(String path) {
