@@ -10,16 +10,18 @@ import me.soapiee.biomemastery.utils.Utils;
 import org.bukkit.entity.Player;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
-import org.bukkit.potion.PotionType;
 
 public class PotionReward extends Reward {
 
+    private final PotionEffectType potionEffectType;
     private final PotionEffect potion;
     private final PlayerDataManager playerDataManager;
 
-    public PotionReward(BiomeMastery main, PlayerDataManager playerDataManager, PotionType potionType, int amplifier, boolean isSingular) {
+    public PotionReward(BiomeMastery main, PlayerDataManager playerDataManager, PotionEffectType potionEffectType, int amplifier, boolean isSingular) {
         super(RewardType.POTION, isSingular, main.getMessageManager());
-        potion = new PotionEffect(potionType.getEffectType(), Integer.MAX_VALUE, amplifier);
+
+        this.potionEffectType = potionEffectType;
+        potion = potionEffectType.createEffect(Integer.MAX_VALUE, amplifier);
         this.playerDataManager = playerDataManager;
     }
 
@@ -33,20 +35,21 @@ public class PotionReward extends Reward {
         player.addPotionEffect(potion);
     }
 
-    public void remove(Player player){
+    public void remove(Player player) {
         PlayerData playerData = playerDataManager.getPlayerData(player.getUniqueId());
         if (playerData == null) return;
 
         playerData.clearActiveReward(this);
-        player.removePotionEffect(potion.getType());
+        player.removePotionEffect(potionEffectType);
     }
 
     public PotionEffectType getPotion() {
-        return potion.getType();
+        return potionEffectType;
     }
 
     @Override
     public String toString() {
-        return Utils.capitalise(potion.getType().getName()) + " " + potion.getAmplifier();
+//        return Utils.capitalise(potionEffectType.getTranslationKey()) + " " + potion.getAmplifier();
+        return Utils.capitalise(potionEffectType.getName()) + " " + potion.getAmplifier();
     }
 }

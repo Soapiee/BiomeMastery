@@ -40,6 +40,7 @@ public final class Utils {
     }
 
     public static String capitalise(String string){
+        string = string.replace("effect.minecraft.", "");
         String[] stringParts = string.toLowerCase().split("_");
 
         StringBuilder builder = new StringBuilder();
