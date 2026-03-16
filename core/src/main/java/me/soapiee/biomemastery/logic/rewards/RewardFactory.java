@@ -2,6 +2,7 @@ package me.soapiee.biomemastery.logic.rewards;
 
 import me.soapiee.biomemastery.BiomeMastery;
 import me.soapiee.biomemastery.hooks.VaultHook;
+import me.soapiee.biomemastery.internals.PotionsProvider;
 import me.soapiee.biomemastery.logic.effects.EffectType;
 import me.soapiee.biomemastery.logic.rewards.types.*;
 import me.soapiee.biomemastery.manager.EffectsManager;
@@ -25,6 +26,7 @@ public class RewardFactory {
     private final MessageManager messageManager;
     private final PlayerDataManager playerDataManager;
     private final EffectsManager effectsManager;
+    private final PotionsProvider potionsProvider;
 
     public RewardFactory(BiomeMastery main, PlayerDataManager playerDataManager, EffectsManager effectsManager) {
         this.main = main;
@@ -34,6 +36,7 @@ public class RewardFactory {
         this.messageManager = main.getMessageManager();
         this.playerDataManager = playerDataManager;
         this.effectsManager = effectsManager;
+        potionsProvider = main.getInternalsManager().getPotionsProvider();
     }
 
     public Reward create(String path) {
@@ -77,8 +80,7 @@ public class RewardFactory {
         PotionEffectType effectType;
 
         try {
-            effectType = PotionEffectType.ABSORPTION;
-//            effectType = Registry.EFFECT.match(potionParts[0].toUpperCase());
+            effectType = potionsProvider.getPotionEffectType(potionParts[0].toUpperCase());
             if (effectType == null) throw new IllegalArgumentException();
 
             amplifier = Integer.parseInt(potionParts[1]);

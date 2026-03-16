@@ -1,25 +1,33 @@
 package me.soapiee.biomemastery.utils;
 
+import org.bukkit.Bukkit;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.MockedStatic;
+import org.mockito.Mockito;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.Mockito.when;
 
 class UtilsTest {
+    private MockedStatic<Bukkit> mockedBukkit;
 
     @BeforeEach
     void beforeEach() {
-
+        mockedBukkit = Mockito.mockStatic(Bukkit.class);
+        when(Bukkit.getBukkitVersion()).thenReturn("v1.0.0");
     }
 
     @AfterEach
     void afterEach() {
-
+        mockedBukkit.close();
     }
+
 
     @Test
     void givenTwoWords_whenCapitalise_thenReturnFirstLetterAsCapital() {
+
         String input = "two words";
         String expectedValue = "Two words";
         String actualValue = Utils.capitalise(input);

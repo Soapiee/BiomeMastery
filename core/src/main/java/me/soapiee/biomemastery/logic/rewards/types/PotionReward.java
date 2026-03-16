@@ -2,6 +2,7 @@ package me.soapiee.biomemastery.logic.rewards.types;
 
 import me.soapiee.biomemastery.BiomeMastery;
 import me.soapiee.biomemastery.data.PlayerData;
+import me.soapiee.biomemastery.internals.PotionsProvider;
 import me.soapiee.biomemastery.logic.rewards.Reward;
 import me.soapiee.biomemastery.logic.rewards.RewardType;
 import me.soapiee.biomemastery.manager.PlayerDataManager;
@@ -15,11 +16,13 @@ public class PotionReward extends Reward {
 
     private final PotionEffectType potionEffectType;
     private final PotionEffect potion;
+    private final PotionsProvider potionsProvider;
     private final PlayerDataManager playerDataManager;
 
     public PotionReward(BiomeMastery main, PlayerDataManager playerDataManager, PotionEffectType potionEffectType, int amplifier, boolean isSingular) {
         super(RewardType.POTION, isSingular, main.getMessageManager());
 
+        potionsProvider = main.getInternalsManager().getPotionsProvider();
         this.potionEffectType = potionEffectType;
         potion = potionEffectType.createEffect(Integer.MAX_VALUE, amplifier);
         this.playerDataManager = playerDataManager;
@@ -49,7 +52,6 @@ public class PotionReward extends Reward {
 
     @Override
     public String toString() {
-//        return Utils.capitalise(potionEffectType.getTranslationKey()) + " " + potion.getAmplifier();
-        return Utils.capitalise(potionEffectType.getName()) + " " + potion.getAmplifier();
+        return potionsProvider.toString(potionEffectType, potion.getAmplifier());
     }
 }

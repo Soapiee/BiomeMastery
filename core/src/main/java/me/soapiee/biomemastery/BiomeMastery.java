@@ -27,6 +27,7 @@ public class BiomeMastery extends JavaPlugin {
     @Getter private PlayerCache playerCache;
     @Getter private MessageManager messageManager;
     @Getter private CustomLogger customLogger;
+    @Getter private InternalsManager internalsManager;
     @Getter private ConfigManager configManager;
     @Getter private GUIManager guiManager;
     @Getter private ConfigGUIManager configGUIManager;
@@ -51,6 +52,7 @@ public class BiomeMastery extends JavaPlugin {
         playerCache = new PlayerCache(Bukkit.getServer().getOfflinePlayers());
         messageManager = new MessageManager(this);
         customLogger = new CustomLogger(this);
+        internalsManager = new InternalsManager(this);
         configGUIManager = new ConfigGUIManager(this);
         configManager = new ConfigManager(this);
         guiManager = new GUIManager();

@@ -2,13 +2,17 @@ package me.soapiee.biomemastery.manager;
 
 import lombok.Getter;
 import me.soapiee.biomemastery.BiomeMastery;
-import me.soapiee.biomemastery.gui.pages.main.BiomePageSettings;
 import me.soapiee.biomemastery.gui.core.IconFactory;
 import me.soapiee.biomemastery.gui.core.PageSettings;
+import me.soapiee.biomemastery.gui.pages.main.BiomePageSettings;
 import me.soapiee.biomemastery.gui.pages.secondary.RewardPageSettings;
 import me.soapiee.biomemastery.logic.BiomeData;
 import org.bukkit.command.CommandSender;
+import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
+import org.bukkit.configuration.file.YamlConfiguration;
+
+import java.io.InputStreamReader;
 
 public class ConfigGUIManager {
 
@@ -31,7 +35,10 @@ public class ConfigGUIManager {
         FileConfiguration config = main.getConfig();
         if (config.isSet("gui")) return;
 
-        config.options().copyDefaults(true);
+        FileConfiguration defaultConfig = YamlConfiguration.loadConfiguration(new InputStreamReader(main.getResource("config.yml")));
+        ConfigurationSection guiSection = defaultConfig.getConfigurationSection("gui");
+        config.set("gui", guiSection);
+
         main.saveConfig();
     }
 

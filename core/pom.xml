@@ -56,7 +56,11 @@
                                 </relocation>
                                 <relocation>
                                     <pattern>org.bstats</pattern>
-                                    <shadedPattern>me.soapiee</shadedPattern>
+                                    <shadedPattern>me.soapiee.biomemastery.libs.bstats</shadedPattern>
+                                </relocation>
+                                <relocation>
+                                    <pattern>me.soapiee.bukkit</pattern>
+                                    <shadedPattern>me.soapiee.biomemastery.libs.metrics</shadedPattern>
                                 </relocation>
                             </relocations>
                         </configuration>

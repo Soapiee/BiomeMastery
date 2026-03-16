@@ -13,6 +13,26 @@ import java.util.regex.Pattern;
 
 public final class Utils {
 
+    public static final String VERSION = getVersion();
+
+    public static int getMinorVersion() {
+        String[] parts = VERSION.split("_");
+
+        if (parts[0].equalsIgnoreCase("1")) return Integer.parseInt(parts[2]);
+        return Integer.parseInt(parts[1]);
+    }
+
+    public static int getMajorVersion() {
+        String[] parts = VERSION.split("_");
+
+        if (parts[0].equalsIgnoreCase("1")) return Integer.parseInt(parts[1]);
+        return Integer.parseInt(parts[0]);
+    }
+
+    public static String getVersion() {
+        return Bukkit.getBukkitVersion().split("-")[0].replace(".", "_");
+    }
+
     public static void consoleMsg(String message) {
         String prefix = "[" + Bukkit.getServer().getPluginManager().getPlugin("BiomeMastery").getDescription().getPrefix() + "]";
         Bukkit.getConsoleSender().sendMessage(addColour(prefix + " " + message));

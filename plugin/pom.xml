@@ -19,7 +19,7 @@
     </properties>
 
     <build>
-        <!--         <finalName>${project.name}-${project.version}</finalName> -->
+        <directory>../target</directory>
         <finalName>BiomeMastery-${project.parent.version}</finalName>
         <plugins>
             <plugin>
@@ -86,10 +86,17 @@
             <groupId>me.soapiee</groupId>
             <artifactId>biomemastery-core</artifactId>
         </dependency>
-<!--        <dependency>-->
-<!--            <groupId>me.soapiee</groupId>-->
-<!--            <artifactId>tfquiz-nms_1_16_R1</artifactId>-->
-<!--            <version>${project.version}</version>-->
-<!--        </dependency>-->
+        <dependency>
+            <groupId>me.soapiee</groupId>
+            <artifactId>biomemastery-internals_1_20_4</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>me.soapiee</groupId>
+            <artifactId>biomemastery-internals_1_21_1</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>me.soapiee</groupId>
+            <artifactId>biomemastery-internals_1_21_4</artifactId>
+        </dependency>
     </dependencies>
 </project>

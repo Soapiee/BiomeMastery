@@ -2,6 +2,7 @@ package me.soapiee.biomemastery.gui.core;
 
 import me.soapiee.biomemastery.BiomeMastery;
 import me.soapiee.biomemastery.gui.pages.main.BiomePageSettings;
+import me.soapiee.biomemastery.internals.TexturesProvider;
 import me.soapiee.biomemastery.manager.MessageManager;
 import me.soapiee.biomemastery.utils.CustomLogger;
 import me.soapiee.biomemastery.utils.Message;
@@ -10,10 +11,8 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
-import org.bukkit.inventory.meta.SkullMeta;
 
 import java.util.ArrayList;
-import java.util.Base64;
 import java.util.List;
 
 public class IconFactory {
@@ -21,12 +20,14 @@ public class IconFactory {
     private final BiomeMastery main;
     private final CustomLogger customLogger;
     private final MessageManager messageManager;
+    private final TexturesProvider texturesProvider;
     private FileConfiguration config;
 
     public IconFactory(BiomeMastery main) {
         this.main = main;
         customLogger = main.getCustomLogger();
         messageManager = main.getMessageManager();
+        texturesProvider = main.getInternalsManager().getTexturesProvider();
         config = main.getConfig();
     }
 
@@ -44,7 +45,7 @@ public class IconFactory {
             // if (version >= 1.21.4) return new Icon(createItemStack(path), createLore(path), getSlot(path));
             // else customLogger.logToPlayer(sender, null, "You must be on 1.21.4 or above to use textures");
 
-            return new Icon(createItemStack(path), createLore(path), getSlot(path));
+            return new Icon(createItemStack(path, sender), createLore(path), getSlot(path));
         }
 
         Material material = getMaterial(path + ".value", sender);
@@ -62,7 +63,7 @@ public class IconFactory {
             // if (version >= 1.21.4) return new Icon(createItemStack(path), createLore(path), getSlot(path));
             // else customLogger.logToPlayer(sender, null, "You must be on 1.21.4 or above to use textures");
 
-            return new Icon(createItemStack(path), createLore(path), getSlot(path));
+            return new Icon(createItemStack(path, sender), createLore(path), getSlot(path));
         }
 
         if (isDefault) {
@@ -71,11 +72,6 @@ public class IconFactory {
             Material material = getMaterial(path + ".value", sender);
             return new Icon(createItemStack(material, path), createLore(path), getSlot(path));
         }
-    }
-
-    private String extractTextureUrl(String base64) {
-        String decoded = new String(Base64.getDecoder().decode(base64));
-        return decoded.split("\"url\":\"")[1].split("\"")[0];
     }
 
     private Material getMaterial(String path, CommandSender sender) {
@@ -104,30 +100,11 @@ public class IconFactory {
         return itemStack;
     }
 
-    private ItemStack createItemStack(String path) {
+    private ItemStack createItemStack(String path, CommandSender sender) {
         String textureInput = config.getString(path + ".value");
-
         ItemStack itemStack = createItemStack(Material.PLAYER_HEAD, path);
-        SkullMeta meta = (SkullMeta) itemStack.getItemMeta();
 
-//        try {
-//            PlayerProfile profile = Bukkit.createPlayerProfile(UUID.randomUUID());
-//
-//            PlayerTextures textures = profile.getTextures();
-//            textures.setSkin(new URL(extractTextureUrl(textureInput)));
-//            profile.setTextures(textures);
-//
-//            meta.setOwnerProfile(profile);
-//        } catch (Exception ex) {
-//            customLogger.logToFile(ex, "Failed to apply custom texture");
-//            itemStack.setType(Material.GRASS_BLOCK);
-//
-//            return itemStack;
-//        }
-
-        itemStack.setItemMeta(meta);
-
-        return itemStack;
+        return texturesProvider.getTexturedSkull(itemStack, textureInput, sender);
     }
 
     private List<String> createLore(String path) {

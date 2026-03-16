@@ -1,6 +1,7 @@
 package me.soapiee.biomemastery.logic;
 
 import me.soapiee.biomemastery.BiomeMastery;
+import me.soapiee.biomemastery.InternalsManager;
 import me.soapiee.biomemastery.hooks.VaultHook;
 import me.soapiee.biomemastery.logic.rewards.Reward;
 import me.soapiee.biomemastery.logic.rewards.RewardFactory;
@@ -44,6 +45,7 @@ class RewardFactoryTest {
         DataManager mockDataManager = mock(DataManager.class);
         PlayerDataManager mockPlayerDataManager = mock(PlayerDataManager.class);
         EffectsManager mockEffectsManager = mock(EffectsManager.class);
+        InternalsManager mockInternalsManager = mock(InternalsManager.class);
         YamlConfiguration mockYaml = mock(YamlConfiguration.class);
 
         // mock BiomeMastery behavior
@@ -55,6 +57,7 @@ class RewardFactoryTest {
         when(mockDataManager.getPlayerDataManager()).thenReturn(mockPlayerDataManager);
         when(mockMain.getDataManager().getEffectsManager()).thenReturn(mockEffectsManager);
         when(mockEffectsManager.getConfig()).thenReturn(mockYaml);
+        when(mockMain.getInternalsManager()).thenReturn(mockInternalsManager);
 
         // mock Bukkit static methods
         mockedBukkit = Mockito.mockStatic(Bukkit.class);
@@ -76,7 +79,7 @@ class RewardFactoryTest {
 //    void givenTypePotion_whenCreate_thenReturnPotionReward() {
 //        String path = "biomes.plains.levels.1";
 //        when(mockConfig.getString(path + "reward_type")).thenReturn("potion");
-//        when(mockConfig.getString(path + "reward_item")).thenReturn("jump_boost:1");
+//        when(mockConfig.getString(path + "reward_item")).thenReturn("jump:1");
 //        //when(mockedRegistry.match(any())).thenReturn(PotionEffectType.JUMP_BOOST);
 //        when(mockConfig.getString(path + "type", "singular")).thenReturn("singular");
 //

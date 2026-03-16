@@ -98,6 +98,7 @@ public class MessageManager {
                 || messageEnum == Message.HOOKEDPLACEHOLDERAPI || messageEnum == Message.HOOKEDVAULT
                 || messageEnum == Message.HOOKEDVAULTERROR || messageEnum == Message.MAJORDATAERROR
                 || messageEnum == Message.INVALIDLANGUAGE
+                || messageEnum == Message.TEXTURESUNSUPPORTED
                 || messageEnum == Message.LANGUAGEFIELDERROR || messageEnum == Message.LANGUAGEFILEERROR
                 || messageEnum == Message.DATASAVEERROR || messageEnum == Message.COOLDOWNFILECREATE
                 || messageEnum == Message.COOLDOWNFILELOAD || messageEnum == Message.COOLDOWNFILESAVE
