@@ -39,14 +39,8 @@ public class IconFactory {
     public Icon createIcon(Path rawPath, CommandSender sender) {
         String path = rawPath.getPath();
 
-        //TODO:
-        if (config.getString(path + ".type", "").equalsIgnoreCase("texture")) {
-            //TODO: Check version
-            // if (version >= 1.21.4) return new Icon(createItemStack(path), createLore(path), getSlot(path));
-            // else customLogger.logToPlayer(sender, null, "You must be on 1.21.4 or above to use textures");
-
+        if (config.getString(path + ".type", "").equalsIgnoreCase("texture"))
             return new Icon(createItemStack(path, sender), createLore(path), getSlot(path));
-        }
 
         Material material = getMaterial(path + ".value", sender);
         return new Icon(createItemStack(material, path), createLore(path), getSlot(path));
@@ -57,14 +51,8 @@ public class IconFactory {
         boolean isDefault = config.getConfigurationSection(path) == null || !config.isSet(path + ".gui");
         path = path + ".gui";
 
-        //TODO:
-        if (config.getString(path + ".type", "").equalsIgnoreCase("texture")) {
-            //TODO: Check version
-            // if (version >= 1.21.4) return new Icon(createItemStack(path), createLore(path), getSlot(path));
-            // else customLogger.logToPlayer(sender, null, "You must be on 1.21.4 or above to use textures");
-
+        if (config.getString(path + ".type", "").equalsIgnoreCase("texture"))
             return new Icon(createItemStack(path, sender), createLore(path), getSlot(path));
-        }
 
         if (isDefault) {
             return biomePageSettings.getBiomeIcon();

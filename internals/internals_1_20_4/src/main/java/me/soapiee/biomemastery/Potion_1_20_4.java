@@ -26,7 +26,7 @@ public class Potion_1_20_4 implements PotionsProvider {
     }
 
     @Override public String toString(PotionEffectType potionEffectType, int amplifier) {
-        return Utils.capitalise(potionEffectType.getTranslationKey() + " " + amplifier);
+        return Utils.capitalise(potionEffectType.getTranslationKey() + " " + (amplifier +1));
     }
 
 }

@@ -10,7 +10,7 @@ public class Potion_1_16 implements PotionsProvider {
         PotionEffectType potionEffectType;
 
         try {
-            potionEffectType = PotionType.valueOf(potionString).getEffectType();
+            potionEffectType = PotionType.valueOf(potionString.toUpperCase()).getEffectType();
         } catch (IllegalArgumentException e) {
             potionEffectType = null;
         }
@@ -19,6 +19,6 @@ public class Potion_1_16 implements PotionsProvider {
     }
 
     @Override public String toString(PotionEffectType potionEffectType, int amplifier) {
-        return Utils.capitalise(potionEffectType.getName()) + " " + amplifier;
+        return Utils.capitalise(potionEffectType.getName()) + " " + (amplifier +1);
     }
 }

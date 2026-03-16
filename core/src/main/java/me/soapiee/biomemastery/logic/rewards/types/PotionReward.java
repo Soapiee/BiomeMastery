@@ -14,17 +14,18 @@ import org.bukkit.potion.PotionEffectType;
 
 public class PotionReward extends Reward {
 
-    private final PotionEffectType potionEffectType;
-    private final PotionEffect potion;
     private final PotionsProvider potionsProvider;
     private final PlayerDataManager playerDataManager;
+
+    private final PotionEffect potion;
+    private final PotionEffectType potionEffectType;
 
     public PotionReward(BiomeMastery main, PlayerDataManager playerDataManager, PotionEffectType potionEffectType, int amplifier, boolean isSingular) {
         super(RewardType.POTION, isSingular, main.getMessageManager());
 
         potionsProvider = main.getInternalsManager().getPotionsProvider();
         this.potionEffectType = potionEffectType;
-        potion = potionEffectType.createEffect(Integer.MAX_VALUE, amplifier);
+        potion = potionEffectType.createEffect(Integer.MAX_VALUE, amplifier - 1);
         this.playerDataManager = playerDataManager;
     }
 
