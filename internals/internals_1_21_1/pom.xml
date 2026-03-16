@@ -7,7 +7,7 @@
     <parent>
         <groupId>me.soapiee</groupId>
         <artifactId>biomemastery-internals</artifactId>
-        <version>1.0.8</version>
+        <version>1.0.9</version>
     </parent>
 
     <artifactId>biomemastery-internals_1_21_1</artifactId>
@@ -60,7 +60,7 @@
         <dependency>
             <groupId>me.soapiee</groupId>
             <artifactId>biomemastery-core</artifactId>
-            <version>1.0.8</version>
+            <version>1.0.9</version>
         </dependency>
     </dependencies>
 
