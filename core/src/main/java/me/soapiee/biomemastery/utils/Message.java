@@ -38,7 +38,7 @@ public enum Message {
     PENDINGFILESAVE("pending_file_save_error", "&cThe pendingrewards.yml file could not be saved"),
     TEXTURESUNSUPPORTED("textures_unsupported", "&cYoure on an unsupport version to use textures. Please use 1.21.4 or above"),
     TEXTUREFAILED("texture_failed", "&cFailed to apply a custom texture"),
-    VERSIONSUPPORTFAILED("version_support_failed", "&cThere is an version support error. Please give the log file to the developer"),
+    VERSIONSUPPORTERROR("version_support_error", "&cThere is an version support error. Please give the log file to the developer"),
     MISSINGREWARD("missing_reward", "&cThe reward is null for biome: %biome%"),
     INVFULL("player_inventory_full", "&cYour reward dropped on the floor because your inventory is full"),
     ADMINSETLEVEL("admin_set_level", "&eYour &a%biome% &elevel has been set to level &a%level% &eby an admin"),

@@ -41,7 +41,7 @@ public class InternalsManager {
 
         } catch (ClassNotFoundException | InstantiationException | IllegalAccessException |
                  ClassCastException | IllegalArgumentException ex) {
-            customLogger.logToFile(ex, messageManager.get(Message.VERSIONSUPPORTFAILED));
+            customLogger.logToFile(ex, messageManager.get(Message.VERSIONSUPPORTERROR));
             potionsProvider = new Potion_1_16();
         }
 
@@ -81,7 +81,7 @@ public class InternalsManager {
 
         } catch (ClassNotFoundException | InstantiationException | IllegalAccessException |
                  ClassCastException | IllegalArgumentException ex) {
-            customLogger.logToFile(ex, messageManager.get(Message.VERSIONSUPPORTFAILED));
+            customLogger.logToFile(ex, messageManager.get(Message.VERSIONSUPPORTERROR));
 //            customLogger.logToFile(ex, "There is an version support error. Please give the log file to the developer");
             biomesProvider = new Biomes_1_16();
         }
