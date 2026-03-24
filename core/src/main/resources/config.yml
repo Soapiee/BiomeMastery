@@ -1,3 +1,11 @@
+## -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=- ##
+##                                   BiomeMastery                                    ##
+##                                    By Soapiee                                     ##
+##                                                                                   ##
+##       Message me on Discord for support, feature requests, bug reports, etc       ##
+##                        discord.com/users/152044111153594369                       ##
+## -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=- ##
+
 # Data Storage Settings
 database:
   enabled: false # If false, data is stored as files
