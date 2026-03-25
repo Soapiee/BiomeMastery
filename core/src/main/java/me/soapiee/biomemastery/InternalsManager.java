@@ -53,7 +53,9 @@ public class InternalsManager {
 
         try {
             String packageName = InternalsManager.class.getPackage().getName();
-            String providerName = (majorVersion >= 21 && minorVersion > 3 ? "Textures_1_21_4" : "internals.TexturesUnsupported");
+            String providerName = "internals.TexturesUnsupported";
+            if (majorVersion == 21 && minorVersion > 3) providerName =  "Textures_1_21_4";
+            if (majorVersion > 21) providerName =  "Textures_1_21_4";
 
             texturesProvider = (TexturesProvider) Class.forName(packageName + "." + providerName).newInstance();
 

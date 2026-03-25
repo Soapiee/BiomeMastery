@@ -9,7 +9,6 @@ import me.soapiee.biomemastery.manager.MessageManager;
 import me.soapiee.biomemastery.utils.Message;
 import me.soapiee.biomemastery.utils.PlayerCache;
 import me.soapiee.biomemastery.utils.Utils;
-import org.bukkit.OfflinePlayer;
 import org.bukkit.block.Biome;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -79,9 +78,7 @@ public class UsageCmd implements CommandExecutor, TabCompleter {
         String input = args[1];
         if (validatePage(input)) return "infopage";
         if (validateBiome(input)) return "infobiome";
-        if (validatePlayer(input)) return "infoplayer";
-
-        return "null";
+        return "infoplayer";
     }
 
     private boolean validatePage(String value) {
@@ -102,11 +99,6 @@ public class UsageCmd implements CommandExecutor, TabCompleter {
         }
 
         return true;
-    }
-
-    private boolean validatePlayer(String value) {
-        OfflinePlayer player = playerCache.getOfflinePlayer(value);
-        return player != null;
     }
 
     private void sendMessage(CommandSender sender, String message) {

@@ -50,7 +50,7 @@ public class InfoPlayerSub extends AbstractUsageSub {
     private OfflinePlayer getTarget(CommandSender sender, String[] args) {
         OfflinePlayer target = main.getPlayerCache().getOfflinePlayer(args[1]);
 
-        if (target == null) sendMessage(sender, messageManager.getWithPlaceholder(Message.PLAYERNOTFOUND, args[2]));
+        if (target == null) sendMessage(sender, messageManager.getWithPlaceholder(Message.PLAYERNOTFOUND, args[1]));
 
         return target;
     }

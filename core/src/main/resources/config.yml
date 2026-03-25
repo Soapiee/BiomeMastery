@@ -207,7 +207,7 @@ biomes:
         reward_type: potion # Valid types: potion, effect, item, permission, command, experience, currency, null
         reward_item: strength:1 #potion effect:amplifier
       '2':
-        type: singular
+        type: multi-use
         target_duration: 60 # seconds
         reward_type: effect
         reward_item: speed_swimmer # Valid effects: speed_swimmer, lava_swimmer, free_food
