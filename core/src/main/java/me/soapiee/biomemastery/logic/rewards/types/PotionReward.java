@@ -1,0 +1,58 @@
+package me.soapiee.biomemastery.logic.rewards.types;
+
+import me.soapiee.biomemastery.BiomeMastery;
+import me.soapiee.biomemastery.data.PlayerData;
+import me.soapiee.biomemastery.internals.PotionsProvider;
+import me.soapiee.biomemastery.logic.rewards.Reward;
+import me.soapiee.biomemastery.logic.rewards.RewardType;
+import me.soapiee.biomemastery.manager.PlayerDataManager;
+import me.soapiee.biomemastery.utils.Message;
+import me.soapiee.biomemastery.utils.Utils;
+import org.bukkit.entity.Player;
+import org.bukkit.potion.PotionEffect;
+import org.bukkit.potion.PotionEffectType;
+
+public class PotionReward extends Reward {
+
+    private final PotionsProvider potionsProvider;
+    private final PlayerDataManager playerDataManager;
+
+    private final PotionEffect potion;
+    private final PotionEffectType potionEffectType;
+
+    public PotionReward(BiomeMastery main, PlayerDataManager playerDataManager, PotionEffectType potionEffectType, int amplifier, boolean isSingular) {
+        super(RewardType.POTION, isSingular, main.getMessageManager());
+
+        potionsProvider = main.getInternalsManager().getPotionsProvider();
+        this.potionEffectType = potionEffectType;
+        potion = potionEffectType.createEffect(Integer.MAX_VALUE, amplifier - 1);
+        this.playerDataManager = playerDataManager;
+    }
+
+    @Override
+    public void give(Player player) {
+        PlayerData playerData = playerDataManager.getPlayerData(player.getUniqueId());
+        if (playerData == null) return;
+
+        player.sendMessage(Utils.addColour(messageManager.getWithPlaceholder(Message.REWARDACTIVATED, toString())));
+        playerData.addActiveReward(this);
+        player.addPotionEffect(potion);
+    }
+
+    public void remove(Player player) {
+        PlayerData playerData = playerDataManager.getPlayerData(player.getUniqueId());
+        if (playerData == null) return;
+
+        playerData.clearActiveReward(this);
+        player.removePotionEffect(potionEffectType);
+    }
+
+    public PotionEffectType getPotion() {
+        return potionEffectType;
+    }
+
+    @Override
+    public String toString() {
+        return potionsProvider.toString(potionEffectType, potion.getAmplifier());
+    }
+}

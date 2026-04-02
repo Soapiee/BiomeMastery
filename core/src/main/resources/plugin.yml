@@ -1,0 +1,44 @@
+name: BiomeMastery
+main: me.soapiee.biomemastery.BiomeMastery
+version: 1.0.9
+author: Soapiee
+prefix: BiomeMastery
+
+dependencies: [ ]
+softdepend: [ "PlaceholderAPI", "Vault" ]
+api-version: 1.13
+
+commands:
+  abiomemastery:
+    description: 'admin commands'
+    aliases: ["abm", "abiome", "adminbm"]
+    usage: /abm help
+    permission: biomemastery.admin
+  biomemastery:
+    description: 'placeholder commands'
+    aliases: ["bm", "biome"]
+    usage: /biome help
+    permission: biomemastery.player
+
+permissions:
+  biomemastery.admin:
+    description: Allows access to /abm commands
+    default: op
+  biomemastery.reload:
+    description: Allows access to /abm reload
+    default: op
+  biomemastery.reset:
+    description: Allows access to /abm reset
+    default: op
+  biomemastery.player:
+    description: Allows visibility/usability of /biome
+    default: true
+  biomemastery.player.gui:
+    description: Allows access to the GUI
+    default: true
+  biomemastery.player.command:
+    description: Allows access to /biome help
+    default: true
+  biomemastery.player.others:
+    description: Allows access to check stats of other players
+    default: true

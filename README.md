@@ -6,6 +6,13 @@
 ## Introduction
 This plugin gives your players something to grind towards. Players can gain experience in each Biome, and they can level up to get rewards. Some rewards are one time use, and some they can toggle (once earnt) any time theyre in that specific Biome.
 
+## Installation
+1. Download the plugin. 
+2. Place the .jar file inside your "/Plugins" folder on your Minecraft server. 
+3. Start the server. 
+4. Edit the "config.yml" file to your liking.
+5. Restart the server.
+
 ## Dependencies
 There are only two **OPTIONAL** dependencies
 1. [Vault](https://dev.bukkit.org/projects/vault)  
