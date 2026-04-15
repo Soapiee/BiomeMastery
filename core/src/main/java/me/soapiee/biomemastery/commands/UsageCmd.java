@@ -93,7 +93,7 @@ public class UsageCmd implements CommandExecutor, TabCompleter {
 
     private boolean validateBiome(String value) {
         try {
-            Biome.valueOf(value);
+            Biome.valueOf(value.toUpperCase());
         } catch (IllegalArgumentException | NullPointerException ignored) {
             return false;
         }

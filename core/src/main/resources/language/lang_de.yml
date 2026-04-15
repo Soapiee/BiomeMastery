@@ -54,7 +54,7 @@ invalid_field_reward_type: "&cBiom %biome% auf Level %config_level% hat einen un
 invalid_field_potion_amplifier: "Trank-Verstärker Wert"
 invalid_field_potion_type: "Trank-Typ"
 invalid_field_effect_type: "Effekt-Typ"
-reward_invalid_vault_hook: "Vault-Verbindung"
+reward_invalid_vault_hook: "Belohnung, da Vault nicht installiert ist"
 invalid_field_amount: "Menge"
 invalid_field_quantity: "Anzahl"
 invalid_field_material: "Material"
