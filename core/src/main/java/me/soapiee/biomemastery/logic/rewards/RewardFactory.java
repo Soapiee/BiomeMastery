@@ -249,7 +249,7 @@ public class RewardFactory {
                 messageManager.getWithPlaceholder(
                         Message.INVALIDREWARD,
                         pathParts[1],
-                        pathParts[2],
+                        (pathParts[2].equalsIgnoreCase("levels") ? pathParts[3] : pathParts[2]),
                         invalidObject));
     }
 }

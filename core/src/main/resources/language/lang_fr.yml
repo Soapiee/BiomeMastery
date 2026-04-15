@@ -54,7 +54,7 @@ invalid_field_reward_type: "&cle biome %biome% au niveau %config_level% a un typ
 invalid_field_potion_amplifier: "valeur de l'amplificateur de potion"
 invalid_field_potion_type: "type de potion"
 invalid_field_effect_type: "type d'effet"
-reward_invalid_vault_hook: "liaison vault"
+reward_invalid_vault_hook: "récompense, car Vault n'est pas installé"
 invalid_field_amount: "montant"
 invalid_field_quantity: "quantité"
 invalid_field_material: "matériau"
