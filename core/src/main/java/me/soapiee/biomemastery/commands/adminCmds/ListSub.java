@@ -19,7 +19,7 @@ public class ListSub extends AbstractAdminSub {
     @Getter private final String IDENTIFIER = "list";
 
     public ListSub(BiomeMastery main) {
-        super(main, null, 1, 2);
+        super(main, null, 2, 2);
     }
 
     // /abm list worlds

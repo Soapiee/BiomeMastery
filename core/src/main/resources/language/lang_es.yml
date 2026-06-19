@@ -54,7 +54,7 @@ invalid_field_reward_type: "&cEl bioma %biome% en el nivel %config_level% tiene 
 invalid_field_potion_amplifier: "valor del amplificador de poción"
 invalid_field_potion_type: "tipo de poción"
 invalid_field_effect_type: "tipo de efecto"
-reward_invalid_vault_hook: "conexión con vault"
+reward_invalid_vault_hook: "recompensa, debido a que Vault no está instalado"
 invalid_field_amount: "cantidad"
 invalid_field_quantity: "cantidad"
 invalid_field_material: "material"

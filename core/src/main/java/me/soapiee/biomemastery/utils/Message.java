@@ -56,7 +56,7 @@ public enum Message {
     INVALIDPOTIONAMP("invalid_field_potion_amplifier", "potion amplifier value"),
     INVALIDPOTIONTYPE("invalid_field_potion_type", "potion type"),
     INVALIDEFFECTTYPE("invalid_field_effect_type", "effect type"),
-    INVALIDVAULTHOOK("reward_invalid_vault_hook", "vault hook"),
+    INVALIDVAULTHOOK("reward_invalid_vault_hook", "reward, due to vault not being installed"),
     INVALIDAMOUNT("invalid_field_amount", "amount"),
     INVALIDQUANTITY("invalid_field_quantity", "quantity"),
     INVALIDMATERIAL("invalid_field_material", "material"),

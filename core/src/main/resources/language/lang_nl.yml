@@ -54,7 +54,7 @@ invalid_field_reward_type: "&cBioom %biome% op niveau %config_level% heeft een o
 invalid_field_potion_amplifier: "drankversterkingswaarde"
 invalid_field_potion_type: "dranktype"
 invalid_field_effect_type: "effecttype"
-reward_invalid_vault_hook: "vault-koppeling"
+reward_invalid_vault_hook: "beloning, omdat Vault niet geïnstalleerd is"
 invalid_field_amount: "aantal"
 invalid_field_quantity: "hoeveelheid"
 invalid_field_material: "materiaal"

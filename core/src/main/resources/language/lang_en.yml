@@ -54,7 +54,7 @@ invalid_field_reward_type: "&cBiome %biome% at level %config_level% has an inval
 invalid_field_potion_amplifier: "potion amplifier value"
 invalid_field_potion_type: "potion type"
 invalid_field_effect_type: "effect type"
-reward_invalid_vault_hook: "vault hook"
+reward_invalid_vault_hook: "reward, due to vault not being installed"
 invalid_field_amount: "amount"
 invalid_field_quantity: "quantity"
 invalid_field_material: "material"

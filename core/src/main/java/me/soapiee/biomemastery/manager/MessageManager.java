@@ -8,7 +8,6 @@ import me.soapiee.biomemastery.logic.rewards.Reward;
 import me.soapiee.biomemastery.utils.Languages;
 import me.soapiee.biomemastery.utils.Message;
 import me.soapiee.biomemastery.utils.Utils;
-import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.file.YamlConfiguration;
 
@@ -25,36 +24,16 @@ public class MessageManager {
     public MessageManager(BiomeMastery main) {
         this.main = main;
 
-        //TODO: Revert code back in future updates
-//        file = new File(main.getDataFolder() + File.separator + "language", language + ".yml");
-//        contents = new YamlConfiguration();
-
-//        load(null);
-
         String languageString = validateLanguage();
         if (languageString == null) language = Languages.LANG_EN.toString().toLowerCase();
         else language = languageString;
 
-        file = getFile();
+        file = new File(main.getDataFolder() + File.separator + "language", language + ".yml");
         contents = new YamlConfiguration();
 
         load(null);
 
         if (languageString == null) Utils.consoleMsg(get(Message.INVALIDLANGUAGE));
-    }
-
-    private File getFile() {
-        File newLangFile = new File(main.getDataFolder() + File.separator + "language", language + ".yml");
-        if (!newLangFile.exists()) main.saveResource("language" + File.separator + language + ".yml", false);
-
-        File legacyFile = new File(main.getDataFolder() + File.separator + "messages.yml");
-        if (legacyFile.exists()) {
-            Utils.consoleMsg(ChatColor.RED.toString() + ChatColor.BOLD + "[IMPORTANT] " + ChatColor.RESET
-                    + ChatColor.RED + "Please transfer the contents of your messages.yml file to the new language file. Located in the \"language\" folder. Then delete the messages.yml file");
-            return legacyFile;
-        }
-
-        return newLangFile;
     }
 
     private String validateLanguage() {
@@ -71,8 +50,7 @@ public class MessageManager {
     }
 
     public boolean load(CommandSender sender) {
-        //TODO: Revert code back in future updates
-//        if (!file.exists()) main.saveResource("language" + File.separator + language + ".yml", false);
+        if (!file.exists()) main.saveResource("language" + File.separator + language + ".yml", false);
 
         try {
             contents.load(file);
