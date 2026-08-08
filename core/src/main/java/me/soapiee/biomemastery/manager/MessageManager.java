@@ -175,6 +175,7 @@ public class MessageManager {
         if (message.contains("%reward%")) message = message.replace("%reward%", string);
         if (message.contains("%input%")) message = message.replace("%input%", string);
         if (message.contains("%biome%")) message = message.replace("%biome%", Utils.capitalise(string));
+        if (message.contains("%version%")) message = message.replace("%version%", string);
 
         return message;
     }

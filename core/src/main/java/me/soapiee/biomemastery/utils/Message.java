@@ -117,6 +117,7 @@ public enum Message {
 
     //                    --->    ADMIN CMD MESSAGES    <---
     UPDATEAVAILABLE("update_available", "&aThere is an update available for BiomeMastery"),
+    ADMINVERSION("admin_version", "&cCurrent version: %version%"),
     ADMINHELP("admin_help", "#01d54a--------- BiomeMastery Admin Help ---------"
             + "\n#01d54aKey: < > = Optional | [ ] = Required"
             + "\n#01d54a/%cmd_label% reload &7- Reloads the plugin"
