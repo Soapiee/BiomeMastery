@@ -50,6 +50,7 @@ public class AdminCmd implements CommandExecutor, TabCompleter {
         register(new SetProgressSub(main));
         register(new AddProgressSub(main));
         register(new RemoveProgressSub(main));
+        register(new VersionSub(main));
     }
 
     private void register(SubCmd cmd) {
@@ -111,7 +112,7 @@ public class AdminCmd implements CommandExecutor, TabCompleter {
         switch (args.length) {
             case 1:
                 results.addAll(Arrays.asList("list", "enable", "disable", "setlevel", "addlevel", "removelevel",
-                        "setprogress", "addprogress", "removeprogress", "reset"));
+                        "setprogress", "addprogress", "removeprogress", "reset", "version"));
 
 //                results.add("effect");
 
