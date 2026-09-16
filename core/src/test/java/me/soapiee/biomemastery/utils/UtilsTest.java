@@ -1,6 +1,9 @@
 package me.soapiee.biomemastery.utils;
 
+import me.soapiee.biomemastery.BiomeMastery;
 import org.bukkit.Bukkit;
+import org.bukkit.plugin.PluginDescriptionFile;
+import org.bukkit.plugin.PluginManager;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -8,6 +11,8 @@ import org.mockito.MockedStatic;
 import org.mockito.Mockito;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 class UtilsTest {
@@ -17,6 +22,10 @@ class UtilsTest {
     void beforeEach() {
         mockedBukkit = Mockito.mockStatic(Bukkit.class);
         when(Bukkit.getBukkitVersion()).thenReturn("v1.0.0");
+        when(Bukkit.getPluginManager()).thenReturn(mock(PluginManager.class));
+        when(Bukkit.getPluginManager().getPlugin(anyString())).thenReturn(mock(BiomeMastery.class));
+        when(Bukkit.getPluginManager().getPlugin(anyString()).getDescription()).thenReturn(mock(PluginDescriptionFile.class));
+        when(Bukkit.getPluginManager().getPlugin("BiomeMastery").getDescription().getVersion()).thenReturn("v1.0.0");
     }
 
     @AfterEach

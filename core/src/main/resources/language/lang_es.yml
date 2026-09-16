@@ -118,6 +118,7 @@ not_inside_biome: "&cDebes estar dentro del bioma &e%biome% &cpara activar la re
 
 # # # #                --->    MENSAJES DE COMANDOS ADMIN    <---                # # # #
 update_available: "&aHay una actualización disponible para BiomeMastery"
+admin_version: "&cVersión actual: %version%"
 admin_help:
   - "#01d54a--------- Ayuda Admin de BiomeMastery ---------"
   - "#01d54aClave: < > = Opcional | [ ] = Obligatorio"
